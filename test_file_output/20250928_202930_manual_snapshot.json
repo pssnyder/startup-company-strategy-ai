@@ -1,0 +1,83 @@
+{
+  "date": "2025-09-28T20:29:29.107364",
+  "started": "2025-08-29T20:29:29.107364",
+  "balance": 145000,
+  "progress": {
+    "products": [
+      {
+        "users": {
+          "total": 25000,
+          "satisfaction": 62.0
+        }
+      }
+    ]
+  },
+  "office": {
+    "workstations": [
+      {
+        "employee": {
+          "salary": 5181
+        }
+      },
+      {
+        "employee": {
+          "salary": 4975
+        }
+      },
+      {
+        "employee": {
+          "salary": 5010
+        }
+      },
+      {
+        "employee": {
+          "salary": 5195
+        }
+      },
+      {
+        "employee": {
+          "salary": 4278
+        }
+      },
+      {
+        "employee": {
+          "salary": 5052
+        }
+      },
+      {
+        "employee": {
+          "salary": 5474
+        }
+      },
+      {
+        "employee": {
+          "salary": 5636
+        }
+      }
+    ]
+  },
+  "featureInstances": [
+    {
+      "featureName": "Landing Page",
+      "quality": {
+        "current": 25,
+        "max": 50
+      },
+      "efficiency": {
+        "current": 30,
+        "max": 50
+      }
+    },
+    {
+      "featureName": "Login System",
+      "quality": {
+        "current": 15,
+        "max": 40
+      },
+      "efficiency": {
+        "current": 20,
+        "max": 40
+      }
+    }
+  ]
+}

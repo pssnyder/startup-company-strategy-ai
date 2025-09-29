@@ -308,93 +308,33 @@ Available for:
 
 ## Main Components Required\[[](https://auth.fandom.com/signin?redirect=https%3A%2F%2Fstartupcompany.fandom.com%2Fwiki%2FComment_Functionality%3Fveaction%3Dedit%26section%3D1&uselang=en "Sign in to edit")\]
 
+| 
 Nr
 
-Required Modules
-
-Employee
-
-Base Prd. Time
-
-3
-
-Backend Module
-
-Lead Developer (b)
-
-10h
-
-3
-
-Input Module
-
-Lead Developer (b)
-
-6h
+ | Required Modules | Employee | Base Prd. Time |
+| --- | --- | --- | --- |
+| 3 | Backend Module | Lead Developer (b) | 10h |
+| 3 | Input Module | Lead Developer (b) | 6h |
 
 ## Total Components Required\[[](https://auth.fandom.com/signin?redirect=https%3A%2F%2Fstartupcompany.fandom.com%2Fwiki%2FComment_Functionality%3Fveaction%3Dedit%26section%3D2&uselang=en "Sign in to edit")\]
 
+| 
 Nr
 
-Required Modules
-
-Employee
-
-Base Prd. Time
-
-3
-
-Backend Module
-
-Lead Developer (b)
-
-10h
-
-3
-
-Input Module
-
-Lead Developer (b)
-
-6h
-
-6
-
-Backend Component
-
-Developer (b)
-
-4h
-
-3
-
-Network Component
-
-Developer (b)
-
-6h
-
-3
-
-UI Component
-
-Developer (b)
-
-2h
+ | Required Modules | Employee | Base Prd. Time |
+| --- | --- | --- | --- |
+| 3 | Backend Module | Lead Developer (b) | 10h |
+| 3 | Input Module | Lead Developer (b) | 6h |
+| 6 | Backend Component | Developer (b) | 4h |
+| 3 | Network Component | Developer (b) | 6h |
+| 3 | UI Component | Developer (b) | 2h |
 
 ## Total Time Required\[[](https://auth.fandom.com/signin?redirect=https%3A%2F%2Fstartupcompany.fandom.com%2Fwiki%2FComment_Functionality%3Fveaction%3Dedit%26section%3D3&uselang=en "Sign in to edit")\]
 
-Employee
-
-Time
-
-Lead Developer (b)
-
-48h
-
-Developer (b)
-
-48h
+| Employee | Time |
+| --- | --- |
+| Lead Developer (b) | 48h |
+| Developer (b) | 48h |
 
 ---
 
@@ -414,69 +354,15 @@ An array of statistics are shown in the Company Profile popover view, including 
 
 Employee benefits make the company more attractive to potential employees. Beginner level employees only require a Work Environment Rating (WER) of 0 or 1, however, intermediate employees will require anywhere from 3-5 WER and expert employees will require even more. Benefits can be activated and deactivated at any time from their tab in the Company Profile popover window (under the Benefits tab). The cost per month to keep a benefit active is calculated based on the number of employees currently hired by the startup.
 
-Benefit
-
-Bonus
-
-Cost per Employee
-
-Unlock Tier
-
-Small Retirement Plan
-
-5%
-
-$150
-
-3
-
-Free Beverages
-
-5%
-
-$130
-
-5
-
-Free Gym Membership
-
-2%
-
-$30
-
-8
-
-Extended Retirement Plan
-
-10%
-
-$300
-
-9
-
-Free Health Care
-
-10%
-
-$240
-
-11
-
-Full Retirement Plan
-
-5%
-
-$360
-
-13
-
-Paid Transportation
-
-3%
-
-$210
-
-15
+| Benefit | Bonus | Cost per Employee | Unlock Tier |
+| --- | --- | --- | --- |
+| Small Retirement Plan | 5% | $150 | 3 |
+| Free Beverages | 5% | $130 | 5 |
+| Free Gym Membership | 2% | $30 | 8 |
+| Extended Retirement Plan | 10% | $300 | 9 |
+| Free Health Care | 10% | $240 | 11 |
+| Full Retirement Plan | 5% | $360 | 13 |
+| Paid Transportation | 3% | $210 | 15 |
 
 _Note: cost per employee may be slightly less or more for some numbers of total employees._
 
@@ -484,125 +370,38 @@ _Note: cost per employee may be slightly less or more for some numbers of total 
 
 Currently, there are three office buildings in the game, a small, medium, and large variant. The player begins in the small building but can upgrade to the others at any point, provided he/she has the funds available. Once a player purchases a larger building size, they will not be able to downgrade to a smaller one in the future - only larger upgrades are allowed.
 
-Building Size
-
-Upfront Payment
-
-Cost per Month
-
-Max Workstations Allowed
-
-Small
-
-$10,000
-
-$3,000
-
-8
-
-Medium
-
-$35,000
-
-$6,000
-
-20
-
-Large
-
-$100,000
-
-$22,000
-
-50
+| Building Size | Upfront Payment | Cost per Month | Max Workstations Allowed |
+| --- | --- | --- | --- |
+| Small | $10,000 | $3,000 | 8 |
+| Medium | $35,000 | $6,000 | 20 |
+| Large | $100,000 | $22,000 | 50 |
 
 ## Leveling System\[[](https://auth.fandom.com/signin?redirect=https%3A%2F%2Fstartupcompany.fandom.com%2Fwiki%2FCompany_Profile%3Fveaction%3Dedit%26section%3D4&uselang=en "Sign in to edit")\]
 
 Startup Company progress is based on a 20-tier leveling system, with most employee types and items being unlocked within the first ten tiers. Each tier can be achieved by collecting XP from the game that is rewarded upon completion of contracts, assigning general work for employees, and many other in-game operations. For example: contracts typically reward the player with 6% of the total monetary value of the contract in the form of XP upon completion of said contract.
 
-Tier
-
-XP Required
-
-1
-
-Game start
-
-2
-
-200
-
-3
-
-800
-
-4
-
-2,500
-
-5
-
-5,000
-
-6
-
-8,000
-
-7
-
-15,000
-
-8
-
-28,000
-
-9
-
-50,000
-
-10
-
-90,000
-
-11
-
-200,000
-
-12
-
-300,000
-
-13
-
-340,000
-
-14
-
-380,000
-
-15
-
-360,000
-
-16
-
-370,000
-
-17
-
-380,000
-
-18
-
-390,000
-
-19
-
-400,000
-
-20
-
-500,000
+| Tier | XP Required |
+| --- | --- |
+| 1 | Game start |
+| 2 | 200 |
+| 3 | 800 |
+| 4 | 2,500 |
+| 5 | 5,000 |
+| 6 | 8,000 |
+| 7 | 15,000 |
+| 8 | 28,000 |
+| 9 | 50,000 |
+| 10 | 90,000 |
+| 11 | 200,000 |
+| 12 | 300,000 |
+| 13 | 340,000 |
+| 14 | 380,000 |
+| 15 | 360,000 |
+| 16 | 370,000 |
+| 17 | 380,000 |
+| 18 | 390,000 |
+| 19 | 400,000 |
+| 20 | 500,000 |
 
 ---
 
@@ -630,403 +429,165 @@ Decor and Furniture are items in the game that can be purchased in the store for
 
 This set can be obtained in the Research tab for 0 RP.
 
-Product
-
-Price
-
-Beginner Desk
-
-$3.000
-
-Small Closet
-
-$500
-
-Closet
-
-$1.000
-
-Plant in a black vase
-
-$100
+| Product | Price |
+| --- | --- |
+| Beginner Desk | $3.000 |
+| Small Closet | $500 |
+| Closet | $1.000 |
+| Plant in a black vase | $100 |
 
 ## Furniture Pack #2\[[](https://auth.fandom.com/signin?redirect=https%3A%2F%2Fstartupcompany.fandom.com%2Fwiki%2FDecor%2FItems%3Fveaction%3Dedit%26section%3D2&uselang=en "Sign in to edit")\]
 
 This set can be obtained in the Research tab for 50 RP.
 
-Product
-
-Price
-
-Intermediate Desk
-
-$5.500
-
-Coffee Machine
-
-$500
-
-Bookshelf Wood
-
-$1.000
-
-Blue Couch
-
-$1.500
+| Product | Price |
+| --- | --- |
+| Intermediate Desk | $5.500 |
+| Coffee Machine | $500 |
+| Bookshelf Wood | $1.000 |
+| Blue Couch | $1.500 |
 
 ## Benefit Pack 1\[[](https://auth.fandom.com/signin?redirect=https%3A%2F%2Fstartupcompany.fandom.com%2Fwiki%2FDecor%2FItems%3Fveaction%3Dedit%26section%3D3&uselang=en "Sign in to edit")\]
 
 This package can be obtained in the Research tab for 100 RP.
 
-Product
-
-Small Retirement plan
-
-Free Beverages
-
-Free Gym Membership
+| Product |
+| --- |
+| Small Retirement plan |
+| Free Beverages |
+| Free Gym Membership |
 
 ## Benefit Pack 2\[[](https://auth.fandom.com/signin?redirect=https%3A%2F%2Fstartupcompany.fandom.com%2Fwiki%2FDecor%2FItems%3Fveaction%3Dedit%26section%3D4&uselang=en "Sign in to edit")\]
 
 This package can be obtained in the Research tab for 100 RP.
 
-Product
-
-Extended Retirement Plan
-
-Free Health Care
-
-Full Retirement Plan
-
-Paid Transportation
+| Product |
+| --- |
+| Extended Retirement Plan |
+| Free Health Care |
+| Full Retirement Plan |
+| Paid Transportation |
 
 ## Wall Pack 1\[[](https://auth.fandom.com/signin?redirect=https%3A%2F%2Fstartupcompany.fandom.com%2Fwiki%2FDecor%2FItems%3Fveaction%3Dedit%26section%3D5&uselang=en "Sign in to edit")\]
 
 This package can be obtained in the Research tab for 200 RP.
 
-Product
-
-Price
-
-Wall
-
-$200
-
-Wall corner
-
-$200
-
-Wall T Piece
-
-$200
-
-Wall X Piece
-
-$200
+| Product | Price |
+| --- | --- |
+| Wall | $200 |
+| Wall corner | $200 |
+| Wall T Piece | $200 |
+| Wall X Piece | $200 |
 
 ## Furniture Pack #3\[[](https://auth.fandom.com/signin?redirect=https%3A%2F%2Fstartupcompany.fandom.com%2Fwiki%2FDecor%2FItems%3Fveaction%3Dedit%26section%3D6&uselang=en "Sign in to edit")\]
 
 This set can be obtained in the Research tab for 300 RP.
 
-Product
-
-Price
-
-Watercooler
-
-$2.500
-
-Small Red Bench
-
-$400
-
-Red Bench
-
-$800
-
-Plant in a white vase
-
-$100
-
-White Board
-
-$500
-
-Round Lounge Area
-
-$2.500
+| Product | Price |
+| --- | --- |
+| Watercooler | $2.500 |
+| Small Red Bench | $400 |
+| Red Bench | $800 |
+| Plant in a white vase | $100 |
+| White Board | $500 |
+| Round Lounge Area | $2.500 |
 
 ## Wall Pack 2\[[](https://auth.fandom.com/signin?redirect=https%3A%2F%2Fstartupcompany.fandom.com%2Fwiki%2FDecor%2FItems%3Fveaction%3Dedit%26section%3D7&uselang=en "Sign in to edit")\]
 
 This package can be obtained in the Research tab for 500 RP.
 
-Product
-
-Price
-
-Glass Door
-
-$200
-
-Glass Wall
-
-$500
-
-Glass Wall Corner
-
-$200
-
-Glass Wall T Piece
-
-$200
-
-Glass Wall X Piece
-
-$200
+| Product | Price |
+| --- | --- |
+| Glass Door | $200 |
+| Glass Wall | $500 |
+| Glass Wall Corner | $200 | Glass Wall T Piece | $200 |
+| Glass Wall X Piece | $200 |
 
 ## Furniture Pack #4\[[](https://auth.fandom.com/signin?redirect=https%3A%2F%2Fstartupcompany.fandom.com%2Fwiki%2FDecor%2FItems%3Fveaction%3Dedit%26section%3D8&uselang=en "Sign in to edit")\]
 
 This set can be obtained in the Research tab for 1,500 RP.
 
-Product
-
-Price
-
-Coffee Table
-
-$200
-
-Black Armchair
-
-$2.000
-
-Black Counch
-
-$4.000
-
-Bookshelf White
-
-$1.000
-
-Expert Desk
-
-$7.000
+| Product | Price |
+| --- | --- |
+| Coffee Table | $200 |
+| Black Armchair | $2.000 |
+| Black Counch | $4.000 |
+| Bookshelf White | $1.000 |
+| Expert Desk | $7.000 |
 
 ## Furniture Pack #5\[[](https://auth.fandom.com/signin?redirect=https%3A%2F%2Fstartupcompany.fandom.com%2Fwiki%2FDecor%2FItems%3Fveaction%3Dedit%26section%3D9&uselang=en "Sign in to edit")\]
 
 This set can be obtained in the Research tab for 1,500 RP.
 
-Product
-
-Price
-
-Programmer Desk
-
-$18.000
-
-Small Meeting Table
-
-$200
-
-Lounge Chair
-
-$1.000
-
-Ping Pong Table
-
-$700
+| Product | Price |
+| --- | --- |
+| Programmer Desk | $18.000 |
+| Small Meeting Table | $200 |
+| Lounge Chair | $1.000 |
+| Ping Pong Table | $700 |
 
 ## Furniture Pack #6\[[](https://auth.fandom.com/signin?redirect=https%3A%2F%2Fstartupcompany.fandom.com%2Fwiki%2FDecor%2FItems%3Fveaction%3Dedit%26section%3D10&uselang=en "Sign in to edit")\]
 
 This set can be obtained in the Research tab for 1,500 RP.
 
-Product
-
-Price
-
-Executive Desk
-
-$16.000
-
-Large Meeting Table
-
-$3.000
-
-Industrial Coffee Machine
-
-$5.700
-
-42" TV
-
-$1.200
-
-Vending Machine
-
-$800
+| Product | Price |
+| --- | --- |
+| Executive Desk | $16.000 |
+| Large Meeting Table | $3.000 |
+| Industrial Coffee Machine | $5.700 |
+| 42" TV | $1.200 |
+| Vending Machine | $800 |
 
 ## Furniture Pack #7\[[](https://auth.fandom.com/signin?redirect=https%3A%2F%2Fstartupcompany.fandom.com%2Fwiki%2FDecor%2FItems%3Fveaction%3Dedit%26section%3D11&uselang=en "Sign in to edit")\]
 
 This set can be obtained in the Research tab for 3,000 RP.
 
-Product
-
-Price
-
-Egg Chair
-
-$14.900
-
-Privacy Box
-
-$12.000
-
-Privacy Wall (Small)
-
-$2.500
-
-Privacy Wall (Large)
-
-$4.000
-
-Rectangular Plant
-
-$5.000
+| Product | Price |
+| --- | --- |
+| Egg Chair | $14.900 |
+| Privacy Box | $12.000 |
+| Privacy Wall (Small) | $2.500 |
+| Privacy Wall (Large) | $4.000 |
+| Rectangular Plant | $5.000 |
 
 ## Furniture Pack #8\[[](https://auth.fandom.com/signin?redirect=https%3A%2F%2Fstartupcompany.fandom.com%2Fwiki%2FDecor%2FItems%3Fveaction%3Dedit%26section%3D12&uselang=en "Sign in to edit")\]
 
 This set can be obtained in the Research tab for 5,000 RP.
 
-Product
-
-Price
-
-Huge Slide
-
-$25.000
-
-Indoor Tree
-
-$22.000
-
-Large Plant
-
-$3.000
-
-Game Console Area
-
-$25.000
+<table class="sortable fandom table"><tbody><tr><th>Product</th><th>Price</th><td><span class="new" title="Huge Slide (page does not exist)" data-uncrawlable-url="L3dpa2kvSHVnZV9TbGlkZT9hY3Rpb249ZWRpdCZyZWRsaW5rPTE=">Huge Slide</span></td><td>$25.000</td></tr><tr><td><span class="new" title="Indoor Tree (page does not exist)" data-uncrawlable-url="L3dpa2kvSW5kb29yX1RyZWU/YWN0aW9uPWVkaXQmcmVkbGluaz0x">Indoor Tree</span></td><td>$22.000</td></tr><tr><td><span class="new" title="Large Plant (page does not exist)" data-uncrawlable-url="L3dpa2kvTGFyZ2VfUGxhbnQ/YWN0aW9uPWVkaXQmcmVkbGluaz0x">Large Plant</span></td><td>$3.000</td></tr><tr><td><span class="new" title="Game Console Area (page does not exist)" data-uncrawlable-url="L3dpa2kvR2FtZV9Db25zb2xlX0FyZWE/YWN0aW9uPWVkaXQmcmVkbGluaz0x">Game Console Area</span></td><td>$25.000</td></tr></tbody></table>
 
 ## Letter set\[[](https://auth.fandom.com/signin?redirect=https%3A%2F%2Fstartupcompany.fandom.com%2Fwiki%2FDecor%2FItems%3Fveaction%3Dedit%26section%3D13&uselang=en "Sign in to edit")\]
 
 This set can be obtained in the Research tab for 25,000 RP.
 
-Product
-
-Price
-
-Letter A
-
-$5.000
-
-Letter B
-
-$5.000
-
-Letter C
-
-$5.000
-
-Letter D
-
-$5.000
-
-Letter E
-
-$5.000
-
-Letter F
-
-$5.000
-
-Letter G
-
-$5.000
-
-Letter H
-
-$5.000
-
-Letter I
-
-$5.000
-
-Letter J
-
-$5.000
-
-Letter K
-
-$5.000
-
-Letter L
-
-$5.000
-
-Letter M
-
-$5.000
-
-Letter N
-
-$5.000
-
-Letter O
-
-$5.000
-
-Letter P
-
-$5.000
-
-Letter Q
-
-$5.000
-
-Letter P
-
-$5.000
-
-Letter C
-
-$5.000
-
-Letter T
-
-$5.000
-
-Letter U
-
-$5.000
-
-Letter B
-
-$5.000
-
-Letter Ж
-
-$5.000
-
-Letter X
-
-$5.000
-
-Letter Y
-
-$5.000
-
-Letter Z
-
-$5.000
+| Product | Price |
+| --- | --- |
+| Letter A | $5.000 |
+| Letter B | $5.000 |
+| Letter C | $5.000 |
+| Letter D | $5.000 |
+| Letter E | $5.000 |
+| Letter F | $5.000 |
+| Letter G | $5.000 |
+| Letter H | $5.000 |
+| Letter I | $5.000 |
+| Letter J | $5.000 |
+| Letter K | $5.000 |
+| Letter L | $5.000 |
+| Letter M | $5.000 |
+| Letter N | $5.000 |
+| Letter O | $5.000 |
+| Letter P | $5.000 |
+| Letter Q | $5.000 |
+| Letter P | $5.000 |
+| Letter C | $5.000 |
+| Letter T | $5.000 |
+| Letter U | $5.000 |
+| Letter B | $5.000 |
+| Letter Ж | $5.000 |
+| Letter X | $5.000 |
+| Letter Y | $5.000 |
+| Letter Z | $5.000 |
 
 ---
 
@@ -1050,59 +611,16 @@ Designers are employees who produce graphical components for building websites.
 
 The ability to hire designers is unlocked at tier 2.
 
-Element
-
-Level Required
-
-Base Production Time
-
-Blueprint Component
-
-Beginner
-
-2 hours
-
-Wireframe Component
-
-Beginner
-
-3 hours
-
-Graphics Component
-
-Beginner
-
-4 hours
-
-UI Element
-
-Beginner
-
-6 hours
-
-UI Set
-
-Intermediate
-
-18 hours
-
-Responsive UI
-
-Intermediate
-
-18 hours
-
-Documentation Component
-
-Expert
-
-12 hours
-
-Design Guidelines
-
-Expert
-
-90 hours
+| Element | Level Required | Base Production Time |
+| --- | --- | --- |
+| Blueprint Component | Beginner | 2 hours |
+| Wireframe Component | Beginner | 3 hours |
+| Graphics Component | Beginner | 4 hours |
+| UI Element | Beginner | 6 hours |
+| UI Set | Intermediate | 18 hours |
+| Responsive UI | Intermediate | 18 hours |
+| Documentation Component | Expert | 12 hours |
+| Design Guidelines | Expert | 90 hours |
 
 ---
 
@@ -1134,83 +652,25 @@ Developers are employees who produce technical components for building websites.
 
 The ability to hire developers is unlocked at the start of the game.
 
-Component
-
-Level Required
-
-Base Production Time
-
+| Component | Level Required | Base Production Time |
+| --- | --- | --- |
+| 
 [![UI Component](https://static.wikia.nocookie.net/startupcompany/images/0/0d/UI_Component.png/revision/latest/scale-to-width-down/64?cb=20230116012013)](https://static.wikia.nocookie.net/startupcompany/images/0/0d/UI_Component.png/revision/latest?cb=20230116012013)
 
-Beginner
 
-2 hours
 
-Backend
-
-Beginner
-
-4 hours
-
-Network
-
-Beginner
-
-6 hours
-
-Database
-
-Beginner
-
-4 hours
-
-Video
-
-Beginner
-
-14 hours
-
-Semantic
-
-Intermediate
-
-3 hours
-
-SMTP
-
-Intermediate
-
-8 hours
-
-Encryption
-
-Intermediate
-
-8 hours
-
-Filesystem
-
-Intermediate
-
-4 hours
-
-I18n
-
-Expert
-
-4 hours
-
-Search Algorithm
-
-Expert
-
-12 hours
-
-Compression
-
-Expert
-
-8 hours
+ | Beginner | 2 hours |
+| Backend | Beginner | 4 hours |
+| Network | Beginner | 6 hours |
+| Database | Beginner | 4 hours |
+| Video | Beginner | 14 hours |
+| Semantic | Intermediate | 3 hours |
+| SMTP | Intermediate | 8 hours |
+| Encryption | Intermediate | 8 hours |
+| Filesystem | Intermediate | 4 hours |
+| I18n | Expert | 4 hours |
+| Search Algorithm | Expert | 12 hours |
+| Compression | Expert | 8 hours |
 
 ---
 
@@ -1232,35 +692,11 @@ Employees are the lifeblood of any company, and that is no different in Startup 
 
 Employees can be hired via the Recruitment tab of the Employees popover view. The length of the recruitment posting can be increased on this screen as well as the desired employee level. After the posting has been made, players can choose the Candidates tab of the Employees popover view to see current applicants, their salary requirement, and WER (Workplace Environment Requirement). Applicants will continue to show up while the recruitment campaign is still live. Intermediate and expert employees are much more rare than beginner employees so it is recommended to allot more than a single day to recruiting them. Candidates will be available for hire for 24 hours after they submit their application, even after the player has hired another candidate. There is no maximum on the number of employees that can be hired from a single job listing.
 
-Beginner
-
-Intermediate
-
-Expert
-
-1 Day
-
-$1,760
-
-$4,000
-
-$9,600
-
-3 Days
-
-$5,280
-
-$12,000
-
-$28,800
-
-7 Days
-
-$12,320
-
-$28,000
-
-$67,200
+|  | Beginner | Intermediate | Expert |
+| --- | --- | --- | --- |
+| 1 Day | $1,760 | $4,000 | $9,600 |
+| 3 Days | $5,280 | $12,000 | $28,800 |
+| 7 Days | $12,320 | $28,000 | $67,200 |
 
 _Table showing costs for job listings based on level of employee desired and length of posting._
 
@@ -1311,97 +747,30 @@ Employees can be sent on vacation individually through their popover view as wel
 
 Upon hiring an HR Manager who is controlling current Managers in the company, a player may adjust each employees' hours individually. Working longer hours will bring their mood down at a faster rate each day, while working shorter hours will slow down the mood drop rate.
 
-Hours Worked
-
-Mood Drop Per Day
-
-3 hours
-
-1.3%
-
-4 hours
-
-1.8%
-
-5 hours
-
-2.2%
-
-6 hours
-
-2.6%
-
-7 hours
-
-3.1%
-
-8 hours
-
-5.1%
-
-9 hours
-
-7.6%
-
-10 hours
-
-10.4%
-
-11 hours
-
-25.1%
-
-12 hours
-
-30.9%
-
-13 hours
-
-37.3%
-
-14 hours
-
-44.3%
-
-15 hours
-
-51.9%
-
-16 hours
-
-60%
-
-17 hours
-
-68.8%
-
-18 hours
-
-98.6%
-
-19 hours
-
-110.8%
-
-20 hours
-
-123.8%
-
-21 hours
-
-137.5%
-
-22 hours
-
-151.9%
-
-23 hours
-
-167.1%
-
-24 hours
-
-182.9%
+| Hours Worked | Mood Drop Per Day |
+| --- | --- |
+| 3 hours | 1.3% |
+| 4 hours | 1.8% |
+| 5 hours | 2.2% |
+| 6 hours | 2.6% |
+| 7 hours | 3.1% |
+| 8 hours | 5.1% |
+| 9 hours | 7.6% |
+| 10 hours | 10.4% |
+| 11 hours | 25.1% |
+| 12 hours | 30.9% |
+| 13 hours | 37.3% |
+| 14 hours | 44.3% |
+| 15 hours | 51.9% |
+| 16 hours | 60% |
+| 17 hours | 68.8% |
+| 18 hours | 98.6% |
+| 19 hours | 110.8% |
+| 20 hours | 123.8% |
+| 21 hours | 137.5% |
+| 22 hours | 151.9% |
+| 23 hours | 167.1% |
+| 24 hours | 182.9% |
 
 ## Firing Employees\[[](https://auth.fandom.com/signin?redirect=https%3A%2F%2Fstartupcompany.fandom.com%2Fwiki%2FEmployees%3Fveaction%3Dedit%26section%3D7&uselang=en "Sign in to edit")\]
 
@@ -1415,61 +784,11 @@ Employees may be fired from their popover view via a red X button in the top rig
 
 At the beginning of the game, players are presented with a screen to take out a loan in order to kickstart the growth of their dream startup. The only loan available at this point in the game is the one offered by Eazy Money. Other loans are unlocked later in the game. Loans can be paid back at any time during the game.
 
-Loan Company
-
-Amount
-
-Unlock Level
-
-Length
-
-Interest
-
-Daily Cost
-
-Total Cost
-
-Eazy Money
-
-$40,000
-
-Game start
-
-365 days
-
-30%
-
-$128.20
-
-$46,793.00
-
-Global Loans
-
-$70,000
-
-Tier 3
-
-365 days
-
-30%
-
-$224.30
-
-$81,869.50
-
-Fever Inc
-
-$120,000
-
-Tier 5
-
-365 days
-
-25%
-
-$374.96
-
-$136,860.40
+| Loan Company | Amount | Unlock Level | Length | Interest | Daily Cost | Total Cost |
+| --- | --- | --- | --- | --- | --- | --- |
+| Eazy Money | $40,000 | Game start | 365 days | 30% | $128.20 | $46,793.00 |
+| Global Loans | $70,000 | Tier 3 | 365 days | 30% | $224.30 | $81,869.50 |
+| Fever Inc | $120,000 | Tier 5 | 365 days | 25% | $374.96 | $136,860.40 |
 
 ## Credit\[[](https://auth.fandom.com/signin?redirect=https%3A%2F%2Fstartupcompany.fandom.com%2Fwiki%2FFinances%3Fveaction%3Dedit%26section%3D2&uselang=en "Sign in to edit")\]
 
@@ -1493,117 +812,7 @@ Keeping an eye on the flow of money in and out of a startup company is crucial t
 
 The "Cute Framework Basic" is available at the start of the game. Other frameworks are researched, and allow for more and higher-level features.
 
-Caption
-
-Framework
-
-License Cost
-
-Max Features
-
-Max Feature Level
-
-RP
-
-Cute Framework Basic
-
-$0
-
-3
-
-10
-
-0
-
-Cute Framework 1.0
-
-$60,000
-
-3
-
-40
-
-200
-
-Nitrosoft Platform 2005
-
-$100,000
-
-3
-
-60
-
-300
-
-Cute Framework 2.0
-
-$300,000
-
-6
-
-500
-
-500
-
-Nitrosoft Platform 2005
-
-$500,000
-
-6
-
-1000
-
-700
-
-Cute Framework 3.0
-
-$780,000
-
-9
-
-2000
-
-1,200
-
-Nitrosoft Platform 2008
-
-$1,200,000
-
-9
-
-3500
-
-2,500
-
-Cute Framework 4.0
-
-$1,800,000
-
-9
-
-4000
-
-3,500
-
-Nitrosoft Platform 2016
-
-$4,900,000
-
-9
-
-5000
-
-6,000
-
-Fusion Framework
-
-$80,000,000
-
-12
-
-7000
-
-20,000
+<table class="article-table"><caption>Caption</caption><tbody><tr><th>Framework</th><th>License Cost</th><th>Max Features</th><th>Max Feature Level</th><th>RP</th></tr><tr><td>Cute Framework Basic</td><td>$0</td><td>3</td><td>10</td><td>0</td></tr><tr><td>Cute Framework 1.0</td><td>$60,000</td><td>3</td><td>40</td><td>200</td></tr><tr><td>Nitrosoft Platform 2005</td><td>$100,000</td><td>3</td><td>60</td><td>300</td></tr><tr><td>Cute Framework 2.0</td><td>$300,000</td><td>6</td><td>500</td><td>500</td></tr><tr><td>Nitrosoft Platform 2005</td><td>$500,000</td><td>6</td><td>1000</td><td>700</td></tr><tr><td>Cute Framework 3.0</td><td>$780,000</td><td>9</td><td>2000</td><td>1,200</td></tr><tr><td>Nitrosoft Platform 2008</td><td>$1,200,000</td><td>9</td><td>3500</td><td>2,500</td></tr><tr><td>Cute Framework 4.0</td><td>$1,800,000</td><td>9</td><td>4000</td><td>3,500</td></tr><tr><td>Nitrosoft Platform 2016</td><td>$4,900,000</td><td>9</td><td>5000</td><td>6,000</td></tr><tr><td>Fusion Framework</td><td>$80,000,000</td><td>12</td><td>7000</td><td>20,000</td></tr></tbody></table>
 
 ---
 
@@ -1774,21 +983,11 @@ HR Managers are a type of employee in Startup Company that develop components re
 
 The HR Manager popover view allows players to easily see managers they are controlling and employees under those managers. Individual employee hours, current mood, and a button to send employees on vacation will show in a list of all employees under the HR Manager's control.
 
-HR Manager Level
-
-Number of Managers That Can Be Controlled
-
-Beginner
-
-3
-
-Intermediate
-
-5
-
-Expert
-
-8
+| HR Manager Level | Number of Managers That Can Be Controlled |
+| --- | --- |
+| Beginner | 3 |
+| Intermediate | 5 |
+| Expert | 8 |
 
 ---
 
@@ -1876,161 +1075,42 @@ Available for:
 
 ## Main Components Required\[[](https://auth.fandom.com/signin?redirect=https%3A%2F%2Fstartupcompany.fandom.com%2Fwiki%2FItem_Listing%3Fveaction%3Dedit%26section%3D1&uselang=en "Sign in to edit")\]
 
+| 
 Nr
 
-Required Modules
-
-Employee
-
-Base Prd. Time
-
-1
-
-Backend Module
-
-Lead Developer (b)
-
-10h
-
-1
-
-Frontend Module
-
-Lead Developer (b)
-
-21h
-
-1
-
-Content Management Module
-
-Lead Developer (b)
-
-37h
+ | Required Modules | Employee | Base Prd. Time |
+| --- | --- | --- | --- |
+| 1 | Backend Module | Lead Developer (b) | 10h |
+| 1 | Frontend Module | Lead Developer (b) | 21h |
+| 1 | Content Management Module | Lead Developer (b) | 37h |
 
 ## Total Components Required\[[](https://auth.fandom.com/signin?redirect=https%3A%2F%2Fstartupcompany.fandom.com%2Fwiki%2FItem_Listing%3Fveaction%3Dedit%26section%3D2&uselang=en "Sign in to edit")\]
 
+| 
 Nr
 
-Required Modules
-
-Employee
-
-Base Prd. Time
-
-2
-
-Backend Module
-
-Lead Developer (b)
-
-10h
-
-2
-
-Frontend Module
-
-Lead Developer (b)
-
-21h
-
-1
-
-Content Management Module
-
-Lead Developer (b)
-
-37h
-
-2
-
-Interface Module
-
-Lead Developer (b)
-
-15h
-
-1
-
-Input Module
-
-Lead Developer (b)
-
-6h
-
-3
-
-Backend Component
-
-Developer (b)
-
-4h
-
-2
-
-Network Component
-
-Developer (b)
-
-6h
-
-1
-
-UI Component
-
-Developer (b)
-
-2h
-
-6
-
-UI Element
-
-Designer (b)
-
-6h
-
-2
-
-Wireframe Component
-
-Designer (b)
-
-3h
-
-6
-
-Blueprint Component
-
-Designer (b)
-
-2h
-
-6
-
-Graphics Component
-
-Designer (b)
-
-4h
+ | Required Modules | Employee | Base Prd. Time |
+| --- | --- | --- | --- |
+| 2 | Backend Module | Lead Developer (b) | 10h |
+| 2 | Frontend Module | Lead Developer (b) | 21h |
+| 1 | Content Management Module | Lead Developer (b) | 37h |
+| 2 | Interface Module | Lead Developer (b) | 15h |
+| 1 | Input Module | Lead Developer (b) | 6h |
+| 3 | Backend Component | Developer (b) | 4h |
+| 2 | Network Component | Developer (b) | 6h |
+| 1 | UI Component | Developer (b) | 2h |
+| 6 | UI Element | Designer (b) | 6h |
+| 2 | Wireframe Component | Designer (b) | 3h |
+| 6 | Blueprint Component | Designer (b) | 2h |
+| 6 | Graphics Component | Designer (b) | 4h |
 
 ## Total Time Required\[[](https://auth.fandom.com/signin?redirect=https%3A%2F%2Fstartupcompany.fandom.com%2Fwiki%2FItem_Listing%3Fveaction%3Dedit%26section%3D3&uselang=en "Sign in to edit")\]
 
-Employee
-
-Time
-
-Lead Developer (b)
-
-129h
-
-Designer (b)
-
-78h
-
-Developer (b)
-
-26h
+| Employee | Time |
+| --- | --- |
+| Lead Developer (b) | 129h |
+| Designer (b) | 78h |
+| Developer (b) | 26h |
 
 ---
 
@@ -2038,45 +1118,15 @@ Developer (b)
 
 The first page your visitors see. Explains to visitors what to expect from your website.
 
+| 
 Nr
 
-Required Modules
-
-Employee
-
-Base Prd. Time
-
-1
-
-UI Component
-
-Developer
-
-2h
-
-1
-
-Backend Component
-
-Developer
-
-4h
-
-1
-
-Blueprint Component
-
-Designer
-
-2h
-
-1
-
-Graphics Component
-
-Designer
-
-4h
+ | Required Modules | Employee | Base Prd. Time |
+| --- | --- | --- | --- |
+| 1 | UI Component | Developer | 2h |
+| 1 | Backend Component | Developer | 4h |
+| 1 | Blueprint Component | Designer | 2h |
+| 1 | Graphics Component | Designer | 4h |
 
 ---
 
@@ -2100,119 +1150,26 @@ Lead Developers are employees who take care of merging components together into 
 
 The ability to hire lead developers is unlocked at tier 4.
 
-Module
-
-Level Required
-
-Base Production Time
-
-Interface
-
-Beginner
-
-15 hours
-
-Frontend
-
-Beginner
-
-21 hours
-
-Backend
-
-Beginner
-
-10 hours
-
-Input
-
-Beginner
-
-6 hours
-
-Storage
-
-Beginner
-
-8 hours
-
-Content Management
-
-Beginner
-
-37 hours
-
-Video Playback
-
-Beginner
-
-45 hours
-
-SEO
-
-Intermediate
-
-24 hours
-
-Email
-
-Intermediate
-
-12 hours
-
-Database
-
-Intermediate
-
-14 hours
-
-Notification
-
-Intermediate
-
-18 hours
-
-Authentication
-
-Intermediate
-
-22 hours
-
-Payment Gateway
-
-Expert
-
-76 hours
-
-Localization
-
-Expert
-
-25 hours
-
-Search
-
-Expert
-
-20 hours
-
-Bandwidth Compression
-
-Expert
-
-18 hours
-
-Code Optimization
-
-Expert
-
-90 hours
-
-ApiClient
-
-Expert
-
-40 hours
+| Module | Level Required | Base Production Time |
+| --- | --- | --- |
+| Interface | Beginner | 15 hours |
+| Frontend | Beginner | 21 hours |
+| Backend | Beginner | 10 hours |
+| Input | Beginner | 6 hours |
+| Storage | Beginner | 8 hours |
+| Content Management | Beginner | 37 hours |
+| Video Playback | Beginner | 45 hours |
+| SEO | Intermediate | 24 hours |
+| Email | Intermediate | 12 hours |
+| Database | Intermediate | 14 hours |
+| Notification | Intermediate | 18 hours |
+| Authentication | Intermediate | 22 hours |
+| Payment Gateway | Expert | 76 hours |
+| Localization | Expert | 25 hours |
+| Search | Expert | 20 hours |
+| Bandwidth Compression | Expert | 18 hours |
+| Code Optimization | Expert | 90 hours |
+| ApiClient | Expert | 40 hours |
 
 ---
 
@@ -2226,137 +1183,39 @@ Available for:
 
 ## Main Components Required\[[](https://auth.fandom.com/signin?redirect=https%3A%2F%2Fstartupcompany.fandom.com%2Fwiki%2FLive_Streaming%3Fveaction%3Dedit%26section%3D1&uselang=en "Sign in to edit")\]
 
+| 
 Nr
 
-Required Modules
-
-Employee
-
-Base Prd. Time
-
-1
-
-Backend Module
-
-Lead Developer (b)
-
-10h
-
-1
-
-Frontend Module
-
-Lead Developer (b)
-
-21h
-
-1
-
-Network Component
-
-Developer (b)
-
-6h
+ | Required Modules | Employee | Base Prd. Time |
+| --- | --- | --- | --- |
+| 1 | Backend Module | Lead Developer (b) | 10h |
+| 1 | Frontend Module | Lead Developer (b) | 21h |
+| 1 | Network Component | Developer (b) | 6h |
 
 ## Total Components Required\[[](https://auth.fandom.com/signin?redirect=https%3A%2F%2Fstartupcompany.fandom.com%2Fwiki%2FLive_Streaming%3Fveaction%3Dedit%26section%3D2&uselang=en "Sign in to edit")\]
 
+| 
 Nr
 
-Required Modules
-
-Employee
-
-Base Prd. Time
-
-1
-
-Backend Module
-
-Lead Developer (b)
-
-10h
-
-1
-
-Frontend Module
-
-Lead Developer (b)
-
-21h
-
-1
-
-Interface Module
-
-Lead Developer (b)
-
-15h
-
-2
-
-Network Component
-
-Developer (b)
-
-6h
-
-1
-
-Backend Component
-
-Developer (b)
-
-4h
-
-2
-
-UI Element
-
-Designer (b)
-
-6h
-
-1
-
-Wireframe Component
-
-Designer (b)
-
-3h
-
-2
-
-Blueprint Component
-
-Designer (b)
-
-2h
-
-2
-
-Graphics Component
-
-Designer (b)
-
-4h
+ | Required Modules | Employee | Base Prd. Time |
+| --- | --- | --- | --- |
+| 1 | Backend Module | Lead Developer (b) | 10h |
+| 1 | Frontend Module | Lead Developer (b) | 21h |
+| 1 | Interface Module | Lead Developer (b) | 15h |
+| 2 | Network Component | Developer (b) | 6h |
+| 1 | Backend Component | Developer (b) | 4h |
+| 2 | UI Element | Designer (b) | 6h |
+| 1 | Wireframe Component | Designer (b) | 3h |
+| 2 | Blueprint Component | Designer (b) | 2h |
+| 2 | Graphics Component | Designer (b) | 4h |
 
 ## Total Time Required\[[](https://auth.fandom.com/signin?redirect=https%3A%2F%2Fstartupcompany.fandom.com%2Fwiki%2FLive_Streaming%3Fveaction%3Dedit%26section%3D3&uselang=en "Sign in to edit")\]
 
-Employee
-
-Time
-
-Lead Developer (b)
-
-46h
-
-Designer (b)
-
-27h
-
-Developer (b)
-
-16h
+| Employee | Time |
+| --- | --- |
+| Lead Developer (b) | 46h |
+| Designer (b) | 27h |
+| Developer (b) | 16h |
 
 ---
 
@@ -2396,21 +1255,11 @@ Managers provide a productivity bonus to all of the employees on their roster. T
 
 The bonus is directly tied to the productivity level of the manager. For example if a manager is has a productivity of 500% and is managing one employee, the manager will give a 500% bonus to the employees output, 2 employees 250% each etc.
 
-Manager Level
-
-Roster Size
-
-Beginner
-
-3 employees
-
-Intermediate
-
-5 employees
-
-Expert
-
-8 employees
+| Manager Level | Roster Size |
+| --- | --- |
+| Beginner | 3 employees |
+| Intermediate | 5 employees |
+| Expert | 8 employees |
 
 ---
 
@@ -2432,243 +1281,52 @@ Tier 8
 
 Marketers are a type of employee in Startup Company that are in charge of spreading the word about products that the player creates, resulting in a larger user base. The ability to hire Marketers is unlocked at tier 8.
 
-Component
-
-Level Required
-
-Default Production Time
-
-Copywriting
-
-Beginner
-
-4 hours
-
-Text Format
-
-Beginner
-
-4 hours
-
-Image Format
-
-Beginner
-
-4 hours
-
-User Feedback
-
-Beginner
-
-8 hours
-
-Survey
-
-Beginner
-
-4 hours
-
-Phone Interview
-
-Beginner
-
-6 hours
-
-Video Format
-
-Intermediate
-
-8 hours
-
-Audio Format
-
-Intermediate
-
-8 hours
-
-Analytics Reseach
-
-Intermediate
-
-12 hours
-
- Contract Agreement
-
-Expert
-
-12 hours
-
-A/B Testing
-
-Expert
-
-10 hours
-
-Behavior Observation
-
-Expert
-
-12 hours
+| Component | Level Required | Default Production Time |
+| --- | --- | --- |
+| Copywriting | Beginner | 4 hours |
+| Text Format | Beginner | 4 hours |
+| Image Format | Beginner | 4 hours |
+| User Feedback | Beginner | 8 hours |
+| Survey | Beginner | 4 hours |
+| Phone Interview | Beginner | 6 hours |
+| Video Format | Intermediate | 8 hours |
+| Audio Format | Intermediate | 8 hours |
+| Analytics Reseach | Intermediate | 12 hours |
+|  Contract Agreement | Expert | 12 hours |
+| A/B Testing | Expert | 10 hours |
+| Behavior Observation | Expert | 12 hours |
 
 ---
 
 ## Milestones
 
-Milestone
-
-Goal
-
-Reward
-
-1
-
-Rent an **office** building
-
-$45,000
-
-2
-
-Seat the CEO at a desk
-
-$5,000
-
-3
-
-Hire **1 designer(s)** and **1 developer(s)**
-
-$5,000
-
-4
-
-Research the following items: **Landing Page**
-
-$5,000
-
-5
-
-Increase potential users to **2,000**
-
-$5,000
-
-6
-
-Get **2,000** registered users
-
-$30,000
-
-7
-
-Add a total of **2** features
-
-$40,000
-
-8
-
-Reach at least **75%** satisfaction
-
-$60,000
-
-9
-
-Get **20,000** registered users
-
-$40,000
-
-10
-
-Reach a total CU of **1000**
-
-$20,000
-
-11
-
-Negotiate at least **1 ad space deals**
-
-$60,000
-
-12
-
-Increase maximum workstations to **20**
-
-$10,000
-
-13
-
-Reach **$200,000** valuation
-
-$70,000
-
-14
-
-Get **100,000** registered users
-
-$150,000
-
-15
-
-Reach a feature max level of at least **20**
-
-$100,000
-
-16
-
-Rent a **hosting** building
-
-$100,000
-
-17
-
-Produce a minimum of **2500 CU**
-
-$100,000
-
-18
-
-Generate a profit of at least **$1** per month
-
-$100,000
-
-19
-
-Get **1,000,000** registered users
-
-$500,000
-
-20
-
-Resolve **2 support tickets**
-
-$100,000
-
-21
-
-Reach daily income of **$40,000**
-
-$700,000
-
-22
-
-Get **10,000,000** registered users
-
-$1,000,000
-
-23
-
-Acquire at least **1 competitor(s)**
-
-$1,500,000
-
-24
-
-Become Top **#3**
-
-$2,000,000
-
-25
-
-Become Top **#1**
-
-$3,000,000
+| Milestone | Goal | Reward |
+| --- | --- | --- |
+| 1 | Rent an **office** building | $45,000 |
+| 2 | Seat the CEO at a desk | $5,000 |
+| 3 | Hire **1 designer(s)** and **1 developer(s)** | $5,000 |
+| 4 | Research the following items: **Landing Page** | $5,000 |
+| 5 | Increase potential users to **2,000** | $5,000 |
+| 6 | Get **2,000** registered users | $30,000 |
+| 7 | Add a total of **2** features | $40,000 |
+| 8 | Reach at least **75%** satisfaction | $60,000 |
+| 9 | Get **20,000** registered users | $40,000 |
+| 10 | Reach a total CU of **1000** | $20,000 |
+| 11 | Negotiate at least **1 ad space deals** | $60,000 |
+| 12 | Increase maximum workstations to **20** | $10,000 |
+| 13 | Reach **$200,000** valuation | $70,000 |
+| 14 | Get **100,000** registered users | $150,000 |
+| 15 | Reach a feature max level of at least **20** | $100,000 |
+| 16 | Rent a **hosting** building | $100,000 |
+| 17 | Produce a minimum of **2500 CU** | $100,000 |
+| 18 | Generate a profit of at least **$1** per month | $100,000 |
+| 19 | Get **1,000,000** registered users | $500,000 |
+| 20 | Resolve **2 support tickets** | $100,000 |
+| 21 | Reach daily income of **$40,000** | $700,000 |
+| 22 | Get **10,000,000** registered users | $1,000,000 |
+| 23 | Acquire at least **1 competitor(s)** | $1,500,000 |
+| 24 | Become Top **#3** | $2,000,000 |
+| 25 | Become Top **#1** | $3,000,000 |
 
 ---
 
@@ -2789,29 +1447,13 @@ Researchers are a type of employee in Startup Company that discover [Frameworks]
 
 Features are the bread and butter of projects that are created. Each feature can be added and upgraded in a product, which will in turn boost the hype of that product, which increases the user base. Components are required for each feature to be researched. Each feature will have a certain number of cycles it must be researched before it is available - it is not a one time job like components.
 
-Feature
-
-Benefits
-
-Requirements
-
-Research Cycles
-
-Landing Page
-
-+10% Hype, 50 CU
-
-**2** Frontend Modules
-
+| Feature | Benefits | Requirements | Research Cycles |
+| --- | --- | --- | --- |
+| Landing Page | +10% Hype, 50 CU | **2** Frontend Modules
 **1** Input Module
 
-28
-
-Login System
-
-+14% Hype, 50 CU
-
-**1** Authentication Module
+ | 28 |
+| Login System | +14% Hype, 50 CU | **1** Authentication Module
 
 **1** Backend Module
 
@@ -2819,13 +1461,8 @@ Login System
 
 **1** Input Module
 
-49
-
-Comment Functionality
-
-+18% Hype, 50 CU
-
-**2** Backend Modules
+ | 49 |
+| Comment Functionality | +18% Hype, 50 CU | **2** Backend Modules
 
 **2** Frontend Modules
 
@@ -2833,13 +1470,8 @@ Comment Functionality
 
 **1** Notification Module
 
-66
-
-Sharing Functionality
-
-+16% Hype, 50 CU
-
-**2** APIClient Modules
+ | 66 |
+| Sharing Functionality | +16% Hype, 50 CU | **2** APIClient Modules
 
 **2** Backend Modules
 
@@ -2847,25 +1479,15 @@ Sharing Functionality
 
 **1** Interface Module
 
-85
-
-Payment System
-
-+20% Hype, 50 CU
-
-**4** Backend Modules
+ | 85 |
+| Payment System | +20% Hype, 50 CU | **4** Backend Modules
 
 **2** Email Modules
 
 **4** Payment Gateway Modules
 
-168
-
-Image Upload
-
-+22% Hype, 50 CU
-
-**2** Backend Modules
+ | 168 |
+| Image Upload | +22% Hype, 50 CU | **2** Backend Modules
 
 **2** Database Layers
 
@@ -2873,35 +1495,20 @@ Image Upload
 
 **3** Storage Modules
 
-84
-
-Content Management Sytem
-
-+22% Hype, 50 CU
-
-**5** Content Management Modules
+ | 84 |
+| Content Management Sytem | +22% Hype, 50 CU | **5** Content Management Modules
 
 **4** Input Modules
 
-94
-
-Chat System
-
-+28% Hype, 50 CU
-
-**5** Network Components
+ | 94 |
+| Chat System | +28% Hype, 50 CU | **5** Network Components
 
 **2** Input Modules
 
 **4** Notification Modules
 
-114
-
-Video Functionality
-
-+26% Hype, 50 CU
-
-**3** Network Components
+ | 114 |
+| Video Functionality | +26% Hype, 50 CU | **3** Network Components
 
 **6** Video Components
 
@@ -2909,13 +1516,8 @@ Video Functionality
 
 **5** Storage Modules
 
-184
-
-IMAP Service
-
-+22% Hype, 50 CU
-
-**1** Filesystem Component
+ | 184 |
+| IMAP Service | +22% Hype, 50 CU | **1** Filesystem Component
 
 **3** Authentication Modules
 
@@ -2923,13 +1525,8 @@ IMAP Service
 
 **6** Email Modules
 
-198
-
-Screen Capturing
-
-+25% Hype, 100 CU
-
-**12** Network Components
+ | 198 |
+| Screen Capturing | +25% Hype, 100 CU | **12** Network Components
 
 **15** Video Components
 
@@ -2937,13 +1534,8 @@ Screen Capturing
 
 **20** Input Modules
 
-435
-
-Live Streaming
-
-+45% Hype, 75 CU
-
-**20** Network Components
+ | 435 |
+| Live Streaming | +45% Hype, 75 CU | **20** Network Components
 
 **25** Video Components
 
@@ -2957,13 +1549,8 @@ Live Streaming
 
 **2** Video Playback Modules
 
-682
-
-Server Redundancy
-
-+15% Hype, 5 CU
-
-**10** Network Components
+ | 682 |
+| Server Redundancy | +15% Hype, 5 CU | **10** Network Components
 
 **1** Semantic Component
 
@@ -2973,13 +1560,8 @@ Server Redundancy
 
 **1** Automatic Update
 
-242
-
-Intrusion Prevention System
-
-+50% Hype, 25 CU
-
-**20** Network Components
+ | 242 |
+| Intrusion Prevention System | +50% Hype, 25 CU | **20** Network Components
 
 **5** Semantic Components
 
@@ -2989,7 +1571,7 @@ Intrusion Prevention System
 
 **10** Incoming Request Filters
 
-693
+ | 693 |
 
 ---
 
@@ -3056,161 +1638,20 @@ There are 3 different types of server and all 3 are needed in any setup.
 
 There are also 3 different sizes for each type.
 
-Server
-
-Data it Produces
-
-Space it takes up in (U's)
-
-Purchase Cost
-
-Configuration Cost (Per Item)
-
-Power Cost (per Month)
-
-Small Web Server
-
-200
-
-1
-
-10,000
-
-2
-
-375
-
-2U Web Server
-
-650
-
-2
-
-25,000
-
-4
-
-675
-
-4U (Blade) Web Server
-
-2500
-
-4
-
-150,000
-
-15
-
-1200
-
-8U Web XServer
-
-21000
-
-8
-
-800,000
-
-32
-
-2100
-
-Small Database Server
-
-300
-
-1
-
-10,000
-
-2
-
-375
-
-2U Database Server
-
-800
-
-2
-
-30,000
-
-4
-
-675
-
-4U (Blade) Database Server
-
-4000
-
-4
-
-150,000
-
-15
-
-1200
-
-48 Cache XServer
-
-30000
-
-8
-
-800,000
-
-32
-
-2100
-
-Small Cache Server
-
-500
-
-1
-
-10,000
-
-2
-
-375
-
-2U Cache Server
-
-1200
-
-2
-
-30,000
-
-4
-
-675
-
-4U (Blade) Cache Server
-
-5000
-
-4
-
-150,000
-
-15
-
-1200
-
-8U Cache XServer
-
-42000
-
-8
-
-800,000
-
-15
-
-2100
+| Server | Data it Produces | Space it takes up in (U's) | Purchase Cost | Configuration Cost (Per Item) | Power Cost (per Month) |
+| --- | --- | --- | --- | --- | --- |
+| Small Web Server | 200 | 1 | 10,000 | 2 | 375 |
+| 2U Web Server | 650 | 2 | 25,000 | 4 | 675 |
+| 4U (Blade) Web Server | 2500 | 4 | 150,000 | 15 | 1200 |
+| 8U Web XServer | 21000 | 8 | 800,000 | 32 | 2100 |
+| Small Database Server | 300 | 1 | 10,000 | 2 | 375 |
+| 2U Database Server | 800 | 2 | 30,000 | 4 | 675 |
+| 4U (Blade) Database Server | 4000 | 4 | 150,000 | 15 | 1200 |
+| 48 Cache XServer | 30000 | 8 | 800,000 | 32 | 2100 |
+| Small Cache Server | 500 | 1 | 10,000 | 2 | 375 |
+| 2U Cache Server | 1200 | 2 | 30,000 | 4 | 675 |
+| 4U (Blade) Cache Server | 5000 | 4 | 150,000 | 15 | 1200 |
+| 8U Cache XServer | 42000 | 8 | 800,000 | 15 | 2100 |
 
 ## CU\[[](https://auth.fandom.com/signin?redirect=https%3A%2F%2Fstartupcompany.fandom.com%2Fwiki%2FServers%3Fveaction%3Dedit%26section%3D2&uselang=en "Sign in to edit")\]
 
@@ -3218,35 +1659,10 @@ CU is only produced when all 3 servers are used together. However, they must als
 
 An efficient starting setup is to use 3 Small Web Servers with 2 Database Servers and 1 Cache Server. This will result in 100 being wasted on both the web and database servers (but this can be compensated for with Overclocking). This will cost a Total of 61,600 (with the Small Rack bought as well) and will need 12 Firewall, 12 Virtual Hardware and 12 Operating System (All produced by the SysAdmin). This set up will result in 7000 CU (or 8400 CU if you overclock the Cache Server)
 
-Overclocked Cache
-
-Total Cost
-
-Power Cost
-
-Bandwidth Cost
-
-CU Produced
-
-No
-
-61600
-
-2250
-
-2800
-
-7000
-
-Yes by 20% (to 120%)
-
-61600
-
-2325
-
-3360
-
-8400
+| Overclocked Cache | Total Cost | Power Cost | Bandwidth Cost | CU Produced |
+| --- | --- | --- | --- | --- |
+| No | 61600 | 2250 | 2800 | 7000 |
+| Yes by 20% (to 120%) | 61600 | 2325 | 3360 | 8400 |
 
 With 2 of these Racks, you will be creating 16800 CU (overclocked Cache) for a cost of $175 a Day. Which is a lot better than the Hosted option of 15000 CU for $900 a Day.
 
@@ -3306,65 +1722,17 @@ SysAdmins are in charge of creating virtual servers to allow for expansion of ap
 
 As products grow in user base, they will require more virtual servers to support the increased amount of traffic generated. SysAdmin will create components to fulfill this increased traffic, which can be monitored under the Hosting tab of the popover view for each application that a player has created.
 
-Component
-
-Level Required
-
-Default Production Time
-
-Virtual Hardware
-
-Beginner
-
-4 hours
-
-Operating System
-
-Beginner
-
-4 hours
-
-Firewall
-
-Beginner
-
-4 hours
-
-Process Management
-
-Intermediate
-
-6 hours
-
-Continuous Integration
-
-Intermediate
-
-8 hours
-
-Cron Job
-
-Intermediate
-
-3 hours
-
-Virtual Container
-
-Expert
-
-25 hours
-
-Cluster
-
-Expert
-
-115 hours
-
-Swarm Management
-
-Expert
-
-140 hours
+| Component | Level Required | Default Production Time |
+| --- | --- | --- |
+| Virtual Hardware | Beginner | 4 hours |
+| Operating System | Beginner | 4 hours |
+| Firewall | Beginner | 4 hours |
+| Process Management | Intermediate | 6 hours |
+| Continuous Integration | Intermediate | 8 hours |
+| Cron Job | Intermediate | 3 hours |
+| Virtual Container | Expert | 25 hours |
+| Cluster | Expert | 115 hours |
+| Swarm Management | Expert | 140 hours |
 
 ---
 
@@ -3400,142 +1768,37 @@ Available for:
 
 ## Main Components Required\[[](https://auth.fandom.com/signin?redirect=https%3A%2F%2Fstartupcompany.fandom.com%2Fwiki%2FVideo_Functionality%3Fveaction%3Dedit%26section%3D1&uselang=en "Sign in to edit")\]
 
+| 
 Nr
 
-Required Modules
-
-Employee
-
-Base Prd. Time
-
-1
-
-Frontend Module
-
-Lead Developer (b)
-
-21h
-
-1
-
-Video Playback Module
-
-Lead Developer (b)
-
-45h
+ | Required Modules | Employee | Base Prd. Time |
+| --- | --- | --- | --- |
+| 1 | Frontend Module | Lead Developer (b) | 21h |
+| 1 | Video Playback Module | Lead Developer (b) | 45h |
 
 ## Total Components Required\[[](https://auth.fandom.com/signin?redirect=https%3A%2F%2Fstartupcompany.fandom.com%2Fwiki%2FVideo_Functionality%3Fveaction%3Dedit%26section%3D2&uselang=en "Sign in to edit")\]
 
+| 
 Nr
 
-Required Modules
-
-Employee
-
-Base Prd. Time
-
-1
-
-Video Playback Module
-
-Lead Developer (b)
-
-45h
-
-2
-
-Frontend Module
-
-Lead Developer (b)
-
-21h
-
-8
-
-UI Element
-
-Designer (b)
-
-6h
-
-3
-
-Interface Module
-
-Lead Developer (b)
-
-15h
-
-1
-
-Video Component
-
-Developer (b)
-
-14h
-
-1
-
-Backend Module
-
-Lead Developer (b)
-
-10h
-
-3
-
-Wireframe Component
-
-Designer (b)
-
-3h
-
-8
-
-Blueprint Component
-
-Designer (b)
-
-4h
-
-8
-
-Graphics Component
-
-Designer (b)
-
-2h
-
-1
-
-Backend Component
-
-Developer (b)
-
-4h
-
-1
-
-Network Component
-
-Developer (b)
-
-6h
+ | Required Modules | Employee | Base Prd. Time |
+| --- | --- | --- | --- |
+| 1 | Video Playback Module | Lead Developer (b) | 45h |
+| 2 | Frontend Module | Lead Developer (b) | 21h |
+| 8 | UI Element | Designer (b) | 6h |
+| 3 | Interface Module | Lead Developer (b) | 15h |
+| 1 | Video Component | Developer (b) | 14h |
+| 1 | Backend Module | Lead Developer (b) | 10h |
+| 3 | Wireframe Component | Designer (b) | 3h |
+| 8 | Blueprint Component | Designer (b) | 4h |
+| 8 | Graphics Component | Designer (b) | 2h |
+| 1 | Backend Component | Developer (b) | 4h |
+| 1 | Network Component | Developer (b) | 6h |
 
 ## Total Time Required\[[](https://auth.fandom.com/signin?redirect=https%3A%2F%2Fstartupcompany.fandom.com%2Fwiki%2FVideo_Functionality%3Fveaction%3Dedit%26section%3D3&uselang=en "Sign in to edit")\]
 
-Employee
-
-Time
-
-Lead Developer (b)
-
-142h
-
-Designer (b)
-
-105h
-
-Developer (b)
-
-24h
+| Employee | Time |
+| --- | --- |
+| Lead Developer (b) | 142h |
+| Designer (b) | 105h |
+| Developer (b) | 24h |
