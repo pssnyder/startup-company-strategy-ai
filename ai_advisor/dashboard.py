@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Dict, List, Any, Optional, Tuple
 from dataclasses import dataclass
 import numpy as np
+import streamlit as st
 
 @dataclass
 class TrendAlert:
@@ -291,30 +292,112 @@ class RealTimeDashboard:
         return output_path
 
 
-def main():
-    """Example usage of the dashboard."""
+# Function to load the most recent save file
+@st.cache_data
+def load_data():
     dashboard = RealTimeDashboard()
-    
-    # Generate current dashboard data
     data = dashboard.generate_dashboard_data()
-    
-    print("=== Current Game State ===")
-    if data['current_state']:
-        state = data['current_state']
-        print(f"Balance: ${state['balance']:,.2f}")
-        print(f"Users: {state['total_users']:,}")
-        print(f"Satisfaction: {state['satisfaction']:.1f}%")
-        print(f"Employees: {state['total_employees']}")
-        print(f"Runway: {state['runway_months']:.1f} months")
-    
-    print(f"\n=== Alerts ({len(data['alerts'])}) ===")
-    for alert in data['alerts']:
-        print(f"[{alert['level'].upper()}] {alert['title']}: {alert['message']}")
-    
-    # Export for web dashboard
-    output_file = dashboard.export_dashboard_json()
-    print(f"\nDashboard data exported to: {output_file}")
+    return data
 
+# Main dashboard layout
+st.set_page_config(layout="wide")
+st.title("🚀 Phoenix Dashboard: Momentum AI")
 
-if __name__ == "__main__":
-    main()
+data = load_data()
+
+if data:
+    # --- Key Metrics Row ---
+    st.header("Company KPIs")
+    col1, col2, col3, col4 = st.columns(4)
+    
+    balance = data['current_state']['balance']
+    research_points = data.get("researchPoints", 0)
+    
+    # Extract product data
+    products = data.get("products", {})
+    total_users = 0
+    valuation = 0
+    if products:
+        # Assuming the first product is the main one
+        main_product_id = list(products.keys())[0]
+        main_product = products[main_product_id]
+        total_users = main_product.get("users", {}).get("total", 0)
+        valuation = main_product.get("stats", {}).get("valuation", 0)
+
+    col1.metric("💰 Balance", f"${balance:,.2f}")
+    col2.metric("🔬 Research Points", f"{research_points:,}")
+    col3.metric("👥 Total Users", f"{int(total_users):,}")
+    col4.metric("🏦 Valuation", f"${valuation:,.2f}")
+
+    st.divider()
+
+    # --- Recruitment Intelligence ---
+    st.header("👨‍💼 Recruitment Intelligence")
+    candidates = data.get("candidates", [])
+    if candidates:
+        candidate_list = []
+        for c in candidates:
+            # Extract negotiation data if it exists
+            negotiation = c.get("negotiation", {})
+            expected_salary = "N/A"
+            if negotiation and negotiation.get("completed") is False and negotiation.get("offers"):
+                # Find the candidate's last offer to determine their expectation
+                for offer in reversed(negotiation["offers"]):
+                    if offer.get("fromCandidate"):
+                        expected_salary = offer.get("total", "N/A")
+                        break
+            
+            candidate_list.append({
+                "Name": c.get("name"),
+                "Role": c.get("employeeTypeName"),
+                "Level": c.get("level"),
+                "Speed": c.get("speed"),
+                "Current Salary": f"${c.get('salary', 0):,}",
+                "Expected Salary": f"${expected_salary:,.0f}" if isinstance(expected_salary, (int, float)) else "N/A"
+            })
+        
+        df_candidates = pd.DataFrame(candidate_list)
+        st.dataframe(df_candidates, use_container_width=True)
+    else:
+        st.info("No active candidates to display.")
+
+    st.divider()
+
+    # --- Product & Feature Roadmap ---
+    st.header("📦 Product & Feature Roadmap")
+    feature_instances = data.get("featureInstances", [])
+    if feature_instances:
+        feature_list = []
+        for f in feature_instances:
+            reqs = f.get("requirements", {})
+            req_str = ", ".join([f"{k}: {v}" for k, v in reqs.items()])
+            feature_list.append({
+                "Feature": f.get("featureName"),
+                "Activated": "✅" if f.get("activated") else "❌",
+                "Quality": f.get("quality", {}).get("current", 0),
+                "Efficiency": f.get("efficiency", {}).get("current", 0),
+                "Requirements": req_str
+            })
+        df_features = pd.DataFrame(feature_list)
+        st.dataframe(df_features, use_container_width=True)
+    else:
+        st.info("No product features found.")
+
+    st.divider()
+
+    # --- Research & Development ---
+    st.header("🔬 Research & Development")
+    researched_items = data.get("researchedItems", [])
+    
+    st.subheader("Unlocked Technologies")
+    if researched_items:
+        # Display in multiple columns for better readability
+        num_columns = 4
+        cols = st.columns(num_columns)
+        for i, item in enumerate(sorted(researched_items)):
+            cols[i % num_columns].markdown(f"- {item}")
+    else:
+        st.info("No research completed yet.")
+
+else:
+    st.error("Could not load save game data. Ensure a valid save file is in the `save_data` directory.")

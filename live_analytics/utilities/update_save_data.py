@@ -56,41 +56,49 @@ def copy_latest_save():
         print(f"[{time.ctime()}] No save files found to copy.")
 
 
-# --- Watchdog Event Handler ---
-class SaveFileEventHandler(FileSystemEventHandler):
-    """
-    An event handler that triggers when a file is modified in the save directory.
-    """
-    def on_modified(self, event):
-        if not event.is_directory:
-            # Check if the modified file is one of the ones we're watching
-            if event.src_path.endswith(MANUAL_SAVE_NAME) or event.src_path.endswith(AUTOSAVE_NAME):
-                # Give the game a moment to finish writing the file
-                time.sleep(1) 
-                copy_latest_save()
-
 # --- Main Execution ---
 if __name__ == "__main__":
     # Ensure the destination directory exists
     DESTINATION_DIR.mkdir(exist_ok=True)
 
-    print("--- Starting Project Phoenix Save Data Utility ---")
+    print("--- Starting Project Phoenix Save Data Utility (Polling Mode) ---")
     print(f"Watching directory: {SAVE_GAME_DIR}")
-    print("Press Ctrl+C to stop.")
+    print(f"Checking for updates every 30 seconds. Press Ctrl+C to stop.")
 
-    # Perform an initial copy when the script starts
-    copy_latest_save()
-
-    # Set up and start the file system observer
-    event_handler = SaveFileEventHandler()
-    observer = Observer()
-    observer.schedule(event_handler, str(SAVE_GAME_DIR), recursive=False)
-    observer.start()
+    last_known_mod_time = 0
 
     try:
         while True:
-            time.sleep(5)
+            latest_file = get_latest_save_file()
+            
+            if latest_file:
+                try:
+                    current_mod_time = latest_file.stat().st_mtime
+                    
+                    # Check if the file has been modified since our last check
+                    if current_mod_time > last_known_mod_time:
+                        print(f"[{time.ctime()}] Detected new save file '{latest_file.name}'.")
+                        
+                        # Give the game a moment to finish writing to prevent copy errors
+                        time.sleep(1) 
+                        
+                        destination_path = DESTINATION_DIR / DESTINATION_FILE_NAME
+                        shutil.copy(latest_file, destination_path)
+                        
+                        last_known_mod_time = current_mod_time
+                        print(f"[{time.ctime()}] Copy complete. New timestamp: {last_known_mod_time}")
+                        
+                except FileNotFoundError:
+                    # This can happen in rare cases if the file is deleted right after being checked
+                    print(f"[{time.ctime()}] Warning: Could not stat file {latest_file.name}, it may have been deleted.")
+                    pass
+                except Exception as e:
+                    print(f"[{time.ctime()}] An error occurred: {e}")
+
+            # Wait for 30 seconds before the next check
+            time.sleep(30)
+            
     except KeyboardInterrupt:
-        observer.stop()
-        print("\n--- Observer stopped. Exiting. ---")
-    observer.join()
+        print("\n--- Polling stopped. Exiting. ---")
+    except Exception as e:
+        print(f"\nAn unexpected error occurred: {e}")
