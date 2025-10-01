@@ -743,32 +743,196 @@ def generate_executive_tasks(data):
     
     return tasks
 
-def generate_dev_standup_details(priority_features, data):
-    """Generate detailed dev team standup information."""
-    details = {
-        'priority_features': priority_features,
-        'team_assignments': [],
-        'queue_adjustments': [],
-        'blockers': []
+# Advanced Work Queue Management Functions
+def analyze_work_queue_coverage(data):
+    """Analyze which components/modules are being worked on and identify gaps."""
+    coverage_analysis = {
+        'active_assignments': {},  # component_name -> employee_name
+        'unassigned_requirements': [],  # requirements not in any queue
+        'team_workload': {},  # employee_name -> queue_info
+        'automation_suggestions': []  # specific assignment recommendations
     }
     
-    # Get team analysis
-    team_analysis = analyze_team_hierarchy(data)
+    # Get all employees and their current work queues
+    workstations = data.get('office', {}).get('workstations', [])
+    for ws in workstations:
+        employee = ws.get('employee')
+        if employee:
+            emp_name = employee.get('name', 'Unknown')
+            queue = employee.get('queue', [])
+            
+            # Analyze employee's current workload
+            coverage_analysis['team_workload'][emp_name] = {
+                'employee': employee,
+                'queue_size': len(queue),
+                'active_tasks': [],
+                'completed_tasks': [],
+                'tier': determine_employee_tier(
+                    employee.get('employeeTypeName', 'Developer'),
+                    employee.get('level', 'Beginner'),
+                    employee.get('speed', 0)
+                )
+            }
+            
+            # Track what each employee is working on
+            for queue_item in queue:
+                component = queue_item.get('component', {})
+                component_name = component.get('name', 'Unknown')
+                state = queue_item.get('state', 'Unknown')
+                
+                if state == 'Running':
+                    coverage_analysis['active_assignments'][component_name] = emp_name
+                    coverage_analysis['team_workload'][emp_name]['active_tasks'].append({
+                        'component': component_name,
+                        'progress': queue_item.get('completedMinutes', 0) / max(queue_item.get('totalMinutes', 1), 1) * 100,
+                        'tier_required': classify_task_tier(component_name)
+                    })
+                elif state == 'Completed':
+                    coverage_analysis['team_workload'][emp_name]['completed_tasks'].append(component_name)
     
-    # Generate specific work queue assignments
-    for feature in priority_features[:2]:  # Top 2 features for standup
-        dependencies = feature.get('dependencies', [])
-        for dep in dependencies[:3]:  # Top 3 dependencies per feature
-            # Find best team member for this dependency
-            best_member = find_best_team_member_for_task(dep, team_analysis['employee_details'])
-            if best_member:
-                details['team_assignments'].append({
-                    'task': dep,
+    return coverage_analysis
+
+def identify_unassigned_requirements(data, coverage_analysis):
+    """Identify high-priority components/modules that need to be assigned to workers."""
+    unassigned_requirements = []
+    
+    # Get high-priority features and their requirements
+    priority_features = analyze_feature_priorities(data)[:3]  # Top 3 priorities
+    
+    for feature in priority_features:
+        requirements = feature.get('dependencies', [])
+        for requirement in requirements:
+            # Check if this requirement is currently being worked on
+            if requirement not in coverage_analysis['active_assignments']:
+                # This requirement is not assigned to anyone - find the best worker
+                suggested_worker = find_optimal_worker_for_requirement(requirement, coverage_analysis, data)
+                
+                unassigned_requirements.append({
+                    'requirement': requirement,
                     'feature': feature['name'],
-                    'assignee': best_member['name'],
-                    'reason': f"Tier {best_member['recommended_tier']} - {best_member['role']}",
-                    'current_queue_size': best_member['current_queue']
+                    'priority_score': feature['wsjf_score'],
+                    'suggested_worker': suggested_worker,
+                    'tier_needed': classify_task_tier(requirement),
+                    'action': f"Add {requirement} to {suggested_worker['name']}'s work queue" if suggested_worker else f"Need to hire Tier {classify_task_tier(requirement)} worker for {requirement}"
                 })
+    
+    return unassigned_requirements
+
+def find_optimal_worker_for_requirement(requirement, coverage_analysis, data):
+    """Find the best available worker for a specific requirement."""
+    required_tier = classify_task_tier(requirement)
+    
+    # Find all workers capable of handling this tier
+    capable_workers = []
+    for emp_name, workload_info in coverage_analysis['team_workload'].items():
+        worker_tier = workload_info['tier']
+        if worker_tier >= required_tier:
+            capable_workers.append({
+                'name': emp_name,
+                'tier': worker_tier,
+                'queue_size': workload_info['queue_size'],
+                'active_tasks_count': len(workload_info['active_tasks']),
+                'workload_score': workload_info['queue_size'] + len(workload_info['active_tasks'])
+            })
+    
+    if not capable_workers:
+        return None
+    
+    # Sort by workload (ascending) and tier capability (descending for tie-breaking)
+    capable_workers.sort(key=lambda x: (x['workload_score'], -x['tier']))
+    
+    return capable_workers[0] if capable_workers else None
+
+def generate_automation_suggestions(unassigned_requirements, coverage_analysis):
+    """Generate specific automation suggestions for work queue management."""
+    suggestions = []
+    
+    for req in unassigned_requirements:
+        if req['suggested_worker']:
+            suggestions.append({
+                'type': 'assignment',
+                'action': f"Assign {req['requirement']} to {req['suggested_worker']['name']}",
+                'priority': 'HIGH' if req['priority_score'] > 7 else 'MEDIUM',
+                'rationale': f"Required for {req['feature']} (WSJF: {req['priority_score']:.2f})",
+                'worker': req['suggested_worker']['name'],
+                'component': req['requirement'],
+                'tier_match': req['suggested_worker']['tier'] >= req['tier_needed']
+            })
+        else:
+            suggestions.append({
+                'type': 'hiring',
+                'action': f"Hire Tier {req['tier_needed']} worker for {req['requirement']}",
+                'priority': 'HIGH',
+                'rationale': f"No available workers for {req['feature']} requirement",
+                'component': req['requirement'],
+                'tier_needed': req['tier_needed']
+            })
+    
+    return suggestions
+
+def generate_dev_standup_details(priority_features, data):
+    """Generate automated work queue management strategy for dev team standup."""
+    
+    # Analyze current work queue coverage
+    coverage_analysis = analyze_work_queue_coverage(data)
+    
+    # Identify unassigned high-priority requirements
+    unassigned_requirements = identify_unassigned_requirements(data, coverage_analysis)
+    
+    # Generate automation suggestions
+    automation_suggestions = generate_automation_suggestions(unassigned_requirements, coverage_analysis)
+    
+    details = {
+        'coverage_analysis': coverage_analysis,
+        'unassigned_requirements': unassigned_requirements,
+        'automation_suggestions': automation_suggestions,
+        'team_status': {},
+        'immediate_actions': []
+    }
+    
+    # Analyze team status and generate immediate actions
+    for emp_name, workload in coverage_analysis['team_workload'].items():
+        active_tasks = workload['active_tasks']
+        queue_size = workload['queue_size']
+        
+        # Determine team member status
+        if len(active_tasks) == 0 and queue_size == 0:
+            status = "IDLE - Ready for new assignments"
+            priority = "HIGH"
+        elif len(active_tasks) > 0:
+            status = f"ACTIVE - Working on {len(active_tasks)} tasks"
+            priority = "LOW"
+        elif queue_size > 3:
+            status = f"OVERLOADED - {queue_size} items in queue"
+            priority = "MEDIUM"
+        else:
+            status = f"QUEUED - {queue_size} items pending"
+            priority = "LOW"
+        
+        details['team_status'][emp_name] = {
+            'status': status,
+            'priority': priority,
+            'tier': workload['tier'],
+            'active_tasks': active_tasks,
+            'queue_size': queue_size
+        }
+    
+    # Generate immediate action items
+    for suggestion in automation_suggestions:
+        if suggestion['type'] == 'assignment':
+            details['immediate_actions'].append({
+                'action': f"🎯 ADD TO QUEUE: {suggestion['component']}",
+                'worker': suggestion['worker'],
+                'priority': suggestion['priority'],
+                'reason': suggestion['rationale']
+            })
+        elif suggestion['type'] == 'hiring':
+            details['immediate_actions'].append({
+                'action': f"👥 HIRE: Tier {suggestion['tier_needed']} Worker",
+                'component': suggestion['component'],
+                'priority': suggestion['priority'],
+                'reason': suggestion['rationale']
+            })
     
     return details
 
@@ -1175,66 +1339,119 @@ def show_executive_overview(data):
                         display_facilities_details(task['details'])
                     elif task['type'] == 'Recruiting':
                         display_recruiting_details(task['details'])
-        
-        # Display WSJF Feature Analysis
-        st.subheader("📊 WSJF Feature Priority Analysis")
-        priority_features = analyze_feature_priorities(data)
-        if priority_features:
-            feature_df = pd.DataFrame(priority_features[:10])  # Top 10 features
-            feature_df = feature_df[['name', 'product', 'wsjf_score', 'business_value', 'time_criticality', 'effort_estimate']]
-            feature_df.columns = ['Feature', 'Product', 'WSJF Score', 'Business Value', 'Time Criticality', 'Effort Estimate']
-            
-            st.dataframe(
-                feature_df,
-                use_container_width=True,
-                column_config={
-                    "WSJF Score": st.column_config.ProgressColumn(
-                        "WSJF Score",
-                        help="Weighted Shortest Job First priority score",
-                        min_value=0,
-                        max_value=10,
-                    ),
-                }
-            )
-            
-            # WSJF Score visualization
-            fig = px.bar(
-                feature_df.head(5), 
-                x='WSJF Score', 
-                y='Feature',
-                orientation='h',
-                title='Top 5 Features by WSJF Score',
-                color='WSJF Score',
-                color_continuous_scale='viridis'
-            )
-            fig.update_layout(height=300)
-            st.plotly_chart(fig, use_container_width=True)
-        else:
-            st.info("No features found for WSJF analysis.")
     
     else:
         st.info("No executive tasks generated. System will create tasks as business conditions change.")
 
 # Task detail display functions
 def display_dev_standup_details(details):
-    """Display detailed Dev Team Stand-Up information."""
-    st.markdown("### 🛠️ Development Team Stand-Up Agenda")
+    """Display automated work queue management strategy."""
+    st.markdown("### 🤖 Automated Work Queue Management")
+    st.markdown("*AI-driven development strategy - ready for execution*")
     
-    # Priority features to discuss
-    if details.get('priority_features'):
-        st.markdown("**🎯 Priority Features for Sprint:**")
-        for i, feature in enumerate(details['priority_features'][:3], 1):
-            st.markdown(f"{i}. **{feature['name']}** (WSJF: {feature['wsjf_score']:.2f})")
-            st.markdown(f"   - Product: {feature['product']}")
-            st.markdown(f"   - Effort: {feature['effort_estimate']}/10 | Business Value: {feature['business_value']}/10")
+    # Immediate Actions Section
+    if details.get('immediate_actions'):
+        st.subheader("🚀 Immediate Actions Required")
+        
+        high_priority_actions = [action for action in details['immediate_actions'] if action['priority'] == 'HIGH']
+        medium_priority_actions = [action for action in details['immediate_actions'] if action['priority'] == 'MEDIUM']
+        
+        if high_priority_actions:
+            st.markdown("**🔥 HIGH PRIORITY:**")
+            for action in high_priority_actions:
+                if 'worker' in action:
+                    st.error(f"**{action['action']}** → {action['worker']}")
+                    st.markdown(f"   💡 *{action['reason']}*")
+                else:
+                    st.warning(f"**{action['action']}** for {action['component']}")
+                    st.markdown(f"   💡 *{action['reason']}*")
+        
+        if medium_priority_actions:
+            st.markdown("**⚡ MEDIUM PRIORITY:**")
+            for action in medium_priority_actions:
+                st.info(f"**{action['action']}** → {action.get('worker', 'TBD')}")
+                st.markdown(f"   💡 *{action['reason']}*")
+    else:
+        st.success("✅ **All high-priority components are assigned!** Team is optimally allocated.")
     
-    # Team assignments
-    if details.get('team_assignments'):
-        st.markdown("**👥 Specific Task Assignments:**")
-        for assignment in details['team_assignments']:
-            st.markdown(f"- **{assignment['assignee']}** ({assignment['reason']})")
-            st.markdown(f"  → Work on: {assignment['task']} for {assignment['feature']}")
-            st.markdown(f"  → Current queue: {assignment['current_queue_size']} items")
+    # Team Status Overview
+    if details.get('team_status'):
+        st.subheader("👥 Team Status Overview")
+        
+        # Create columns for team status
+        team_members = list(details['team_status'].items())
+        if len(team_members) <= 2:
+            cols = st.columns(len(team_members))
+        else:
+            cols = st.columns(3)
+        
+        for i, (emp_name, status_info) in enumerate(team_members):
+            with cols[i % len(cols)]:
+                status = status_info['status']
+                priority = status_info['priority']
+                
+                if priority == "HIGH":
+                    st.error(f"**{emp_name}** (Tier {status_info['tier']})")
+                elif priority == "MEDIUM":
+                    st.warning(f"**{emp_name}** (Tier {status_info['tier']})")
+                else:
+                    st.success(f"**{emp_name}** (Tier {status_info['tier']})")
+                
+                st.write(f"Status: {status}")
+                
+                if status_info['active_tasks']:
+                    st.write("🔄 Active Work:")
+                    for task in status_info['active_tasks'][:2]:  # Show top 2 tasks
+                        progress = task['progress']
+                        st.write(f"  • {task['component']} ({progress:.0f}%)")
+    
+    # Work Queue Coverage Analysis
+    if details.get('coverage_analysis'):
+        st.subheader("📋 Work Queue Coverage Analysis")
+        
+        coverage = details['coverage_analysis']
+        active_assignments = coverage.get('active_assignments', {})
+        
+        if active_assignments:
+            st.markdown("**� Currently Active Assignments:**")
+            for component, worker in active_assignments.items():
+                st.write(f"• **{component}** → {worker}")
+        else:
+            st.warning("⚠️ No active development work detected!")
+    
+    # Unassigned Requirements
+    if details.get('unassigned_requirements'):
+        st.subheader("🎯 Unassigned High-Priority Requirements")
+        
+        for req in details['unassigned_requirements'][:5]:  # Show top 5
+            with st.expander(f"🔧 {req['requirement']} (Priority: {req['priority_score']:.2f})"):
+                st.write(f"**Required for:** {req['feature']}")
+                st.write(f"**Tier needed:** {req['tier_needed']}")
+                if req['suggested_worker']:
+                    st.success(f"**Suggested assignment:** {req['suggested_worker']['name']}")
+                    st.write(f"**Action:** {req['action']}")
+                else:
+                    st.error("**Action:** Need to hire qualified worker")
+                    st.write(f"**Required:** {req['action']}")
+    
+    # Automation Intelligence Summary
+    st.subheader("🧠 AI Strategy Summary")
+    total_suggestions = len(details.get('automation_suggestions', []))
+    assignment_suggestions = len([s for s in details.get('automation_suggestions', []) if s['type'] == 'assignment'])
+    hiring_suggestions = len([s for s in details.get('automation_suggestions', []) if s['type'] == 'hiring'])
+    
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.metric("Total Actions", total_suggestions)
+    with col2:
+        st.metric("Queue Assignments", assignment_suggestions)
+    with col3:
+        st.metric("Hiring Needs", hiring_suggestions)
+    
+    if total_suggestions == 0:
+        st.info("🎯 **Perfect Alignment!** Your team is optimally assigned to high-priority work.")
+    else:
+        st.warning(f"📋 **{total_suggestions} actions needed** to optimize development pipeline.")
 
 def display_sales_meeting_details(details):
     """Display detailed Sales Meeting information."""
@@ -1342,9 +1559,92 @@ def show_product_management(data):
     dependency_graph, dependencies = build_dependency_tree(data)
     
     # Create tabs for different views
-    tab1, tab2, tab3 = st.tabs(["🌲 Dependency Tree", "📊 Tier Analysis", "⚙️ Production Flow"])
+    tab1, tab2, tab3, tab4 = st.tabs(["🎯 WSJF Priority", "🌲 Dependency Tree", "📊 Tier Analysis", "⚙️ Production Flow"])
+    
+    # Create tabs for different views
+    tab1, tab2, tab3, tab4 = st.tabs(["🎯 WSJF Priority", "🌲 Dependency Tree", "📊 Tier Analysis", "⚙️ Production Flow"])
     
     with tab1:
+        st.subheader("📊 WSJF Feature Priority Analysis")
+        st.markdown("*Weighted Shortest Job First scoring for strategic feature prioritization*")
+        
+        priority_features = analyze_feature_priorities(data)
+        if priority_features:
+            # Show top features table
+            feature_df = pd.DataFrame(priority_features[:10])  # Top 10 features
+            feature_df = feature_df[['name', 'product', 'wsjf_score', 'business_value', 'time_criticality', 'effort_estimate', 'status']]
+            feature_df.columns = ['Feature', 'Product', 'WSJF Score', 'Business Value', 'Time Criticality', 'Effort Estimate', 'Progress %']
+            
+            st.dataframe(
+                feature_df,
+                use_container_width=True,
+                column_config={
+                    "WSJF Score": st.column_config.ProgressColumn(
+                        "WSJF Score",
+                        help="Weighted Shortest Job First priority score",
+                        min_value=0,
+                        max_value=10,
+                    ),
+                    "Progress %": st.column_config.ProgressColumn(
+                        "Progress %",
+                        help="Feature completion percentage",
+                        min_value=0,
+                        max_value=100,
+                    ),
+                }
+            )
+            
+            # WSJF Score visualization
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                fig = px.bar(
+                    feature_df.head(5), 
+                    x='WSJF Score', 
+                    y='Feature',
+                    orientation='h',
+                    title='Top 5 Features by WSJF Score',
+                    color='WSJF Score',
+                    color_continuous_scale='viridis'
+                )
+                fig.update_layout(height=300)
+                st.plotly_chart(fig, use_container_width=True)
+            
+            with col2:
+                # Business value vs effort scatter plot
+                fig2 = px.scatter(
+                    feature_df,
+                    x='Effort Estimate',
+                    y='Business Value',
+                    size='WSJF Score',
+                    color='Time Criticality',
+                    hover_name='Feature',
+                    title='Value vs Effort Analysis',
+                    color_continuous_scale='Reds'
+                )
+                fig2.update_layout(height=300)
+                st.plotly_chart(fig2, use_container_width=True)
+            
+            # Strategic recommendations
+            st.subheader("🎯 Strategic Recommendations")
+            top_feature = priority_features[0]
+            st.success(f"**Highest Priority:** {top_feature['name']} (WSJF: {top_feature['wsjf_score']:.2f})")
+            st.info(f"**Focus Area:** {top_feature['product']} - Business Value: {top_feature['business_value']:.1f}/10")
+            
+            # Show development pipeline items separately
+            dev_items = [f for f in priority_features if 'Dev)' in f['name']]
+            if dev_items:
+                st.subheader("🔧 Development Pipeline Priority")
+                for item in dev_items[:3]:
+                    with st.expander(f"⚙️ {item['name']} - WSJF: {item['wsjf_score']:.2f}"):
+                        st.write(f"**Assigned to:** {item.get('employee', 'Unassigned')}")
+                        st.write(f"**Status:** {item.get('state', 'Unknown')}")
+                        st.write(f"**Progress:** {item['status']:.1f}%")
+                        st.write(f"**Dependencies:** {', '.join(item['dependencies']) if item['dependencies'] else 'None'}")
+        else:
+            st.info("No features found for WSJF analysis.")
+    
+    with tab2:
         st.subheader("Component & Module Dependencies")
         
         # Create interactive dependency visualization
@@ -1419,7 +1719,7 @@ def show_product_management(data):
         
         st.plotly_chart(fig, use_container_width=True)
     
-    with tab2:
+    with tab3:
         st.subheader("Tier Distribution Analysis")
         
         # Analyze tier distribution
@@ -1454,7 +1754,7 @@ def show_product_management(data):
                     row_items = items[i:i+items_per_row]
                     st.write(" • ".join(row_items))
     
-    with tab3:
+    with tab4:
         st.subheader("Production Flow Optimization")
         
         # Current inventory analysis
