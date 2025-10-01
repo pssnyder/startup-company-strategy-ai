@@ -10,8 +10,8 @@ import numpy as np
 
 # --- Page Configuration ---
 st.set_page_config(
-    page_title="Momentum AI - Phoenix Dashboard",
-    page_icon="🚀",
+    page_title="Momentum AI - Project Phoenix",
+    page_icon="🔥",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -448,9 +448,460 @@ def generate_hierarchy_recommendations(tier_counts, employee_details):
     
     return recommendations
 
+# --- WSJF Scoring and Executive Task Management ---
+def calculate_wsjf_score(feature, business_value, time_criticality, effort_estimate, risk_reduction=1):
+    """
+    Calculate WSJF (Weighted Shortest Job First) score for feature prioritization.
+    WSJF = (Business Value + Time Criticality + Risk Reduction) / Effort
+    """
+    numerator = business_value + time_criticality + risk_reduction
+    return numerator / max(effort_estimate, 1)  # Avoid division by zero
+
+def analyze_feature_priorities(data):
+    """Analyze current features and calculate WSJF scores for prioritization."""
+    features = []
+    
+    # Get current products and their development status
+    products = data.get('products', [])
+    for product in products:
+        features_list = product.get('features', [])
+        for feature in features_list:
+            # Calculate business value based on market demand and revenue potential
+            business_value = calculate_business_value(feature, product, data)
+            # Calculate time criticality based on market position and competition
+            time_criticality = calculate_time_criticality(feature, product, data)
+            # Estimate effort based on feature complexity
+            effort_estimate = estimate_feature_effort(feature, data)
+            # Calculate risk reduction based on technical debt and dependencies
+            risk_reduction = calculate_risk_reduction(feature, data)
+            
+            wsjf_score = calculate_wsjf_score(feature, business_value, time_criticality, effort_estimate, risk_reduction)
+            
+            features.append({
+                'name': feature.get('name', 'Unknown Feature'),
+                'product': product.get('name', 'Unknown Product'),
+                'business_value': business_value,
+                'time_criticality': time_criticality,
+                'effort_estimate': effort_estimate,
+                'risk_reduction': risk_reduction,
+                'wsjf_score': wsjf_score,
+                'status': feature.get('progress', 0),
+                'dependencies': feature.get('dependencies', [])
+            })
+    
+    # Sort by WSJF score (highest first)
+    features.sort(key=lambda x: x['wsjf_score'], reverse=True)
+    return features
+
+def calculate_business_value(feature, product, data):
+    """Calculate business value score (1-10 scale)."""
+    # Base value from product marketability
+    base_value = min(product.get('price', 1000) / 1000, 5)  # Normalize price
+    
+    # Add value for customer demand
+    demand_modifier = min(len(product.get('buyers', [])) / 10, 3)
+    
+    # Add value for feature completeness impact
+    feature_impact = 2 if feature.get('progress', 0) < 50 else 1
+    
+    return min(base_value + demand_modifier + feature_impact, 10)
+
+def calculate_time_criticality(feature, product, data):
+    """Calculate time criticality score (1-10 scale)."""
+    # Higher criticality for products with active buyers
+    buyer_urgency = min(len(product.get('buyers', [])) * 2, 5)
+    
+    # Higher criticality for features blocking other development
+    blocking_factor = len(feature.get('dependencies', [])) * 0.5
+    
+    # Market timing factor
+    market_timing = 3  # Base market timing score
+    
+    return min(buyer_urgency + blocking_factor + market_timing, 10)
+
+def estimate_feature_effort(feature, data):
+    """Estimate development effort (1-10 scale, higher = more effort)."""
+    # Base effort from feature complexity
+    base_effort = len(feature.get('dependencies', [])) + 1
+    
+    # Effort modifier based on team capability
+    team_modifier = calculate_team_capability_modifier(data)
+    
+    return min(base_effort * team_modifier, 10)
+
+def calculate_risk_reduction(feature, data):
+    """Calculate risk reduction value (1-10 scale)."""
+    # Higher value for features that reduce technical debt
+    debt_reduction = 2 if 'optimization' in feature.get('name', '').lower() else 1
+    
+    # Higher value for features that improve system stability
+    stability_improvement = 2 if 'security' in feature.get('name', '').lower() else 1
+    
+    # Base risk reduction
+    base_risk = 2
+    
+    return min(debt_reduction + stability_improvement + base_risk, 10)
+
+def calculate_team_capability_modifier(data):
+    """Calculate team capability modifier for effort estimation."""
+    employees = []
+    workstations = data.get('office', {}).get('workstations', [])
+    for ws in workstations:
+        employee = ws.get('employee')
+        if employee:
+            employees.append(employee)
+    
+    if not employees:
+        return 2.0  # High effort if no team
+    
+    # Calculate average team skill level
+    total_skill = sum(emp.get('speed', 10) for emp in employees)
+    avg_skill = total_skill / len(employees)
+    
+    # Convert to effort modifier (higher skill = lower effort)
+    return max(1.0, 3.0 - (avg_skill / 50))
+
+def generate_executive_tasks(data):
+    """Generate intelligent executive calendar tasks based on current business state."""
+    tasks = []
+    
+    # Get prioritized features for development tasks
+    priority_features = analyze_feature_priorities(data)[:3]  # Top 3 priorities
+    
+    # Dev Team Stand-Up tasks
+    if priority_features:
+        dev_details = generate_dev_standup_details(priority_features, data)
+        tasks.append({
+            'type': 'Dev Team Stand-Up',
+            'title': 'Dev Team Stand-Up',
+            'priority': 'High',
+            'category': 'Development',
+            'details': dev_details,
+            'icon': '👥'
+        })
+    
+    # Sales and Marketing tasks
+    sales_tasks = generate_sales_tasks(data)
+    tasks.extend(sales_tasks)
+    
+    # HR and People Management tasks
+    hr_tasks = generate_hr_tasks(data)
+    tasks.extend(hr_tasks)
+    
+    # Operations and Facilities tasks
+    ops_tasks = generate_operations_tasks(data)
+    tasks.extend(ops_tasks)
+    
+    # Recruiting tasks
+    recruiting_tasks = generate_recruiting_tasks(data)
+    tasks.extend(recruiting_tasks)
+    
+    return tasks
+
+def generate_dev_standup_details(priority_features, data):
+    """Generate detailed dev team standup information."""
+    details = {
+        'priority_features': priority_features,
+        'team_assignments': [],
+        'queue_adjustments': [],
+        'blockers': []
+    }
+    
+    # Get team analysis
+    team_analysis = analyze_team_hierarchy(data)
+    
+    # Generate specific work queue assignments
+    for feature in priority_features[:2]:  # Top 2 features for standup
+        dependencies = feature.get('dependencies', [])
+        for dep in dependencies[:3]:  # Top 3 dependencies per feature
+            # Find best team member for this dependency
+            best_member = find_best_team_member_for_task(dep, team_analysis['employee_details'])
+            if best_member:
+                details['team_assignments'].append({
+                    'task': dep,
+                    'feature': feature['name'],
+                    'assignee': best_member['name'],
+                    'reason': f"Tier {best_member['recommended_tier']} - {best_member['role']}",
+                    'current_queue_size': best_member['current_queue']
+                })
+    
+    return details
+
+def find_best_team_member_for_task(task, team_members):
+    """Find the best team member for a specific task based on tier and workload."""
+    if not team_members:
+        return None
+    
+    # Classify task complexity
+    task_tier = classify_task_tier(task)
+    
+    # Find members capable of handling this tier
+    capable_members = [m for m in team_members if m['recommended_tier'] >= task_tier]
+    
+    if not capable_members:
+        return None
+    
+    # Sort by current queue size (ascending) and complexity rating (descending)
+    capable_members.sort(key=lambda x: (x['current_queue'], -x['complexity_rating']))
+    
+    return capable_members[0]
+
+def classify_task_tier(task):
+    """Classify task complexity tier based on name."""
+    task_lower = task.lower()
+    if 'component' in task_lower:
+        return 1
+    elif 'module' in task_lower:
+        return 2
+    elif 'system' in task_lower or 'integration' in task_lower:
+        return 3
+    else:
+        return 2  # Default to tier 2
+
+def generate_sales_tasks(data):
+    """Generate sales and marketing related tasks."""
+    tasks = []
+    
+    # Check for advertising opportunities
+    products = data.get('products', [])
+    for product in products:
+        if len(product.get('buyers', [])) < 5:  # Low buyer count
+            sales_rep = find_sales_team_member(data)
+            if sales_rep:
+                tasks.append({
+                    'type': 'Sales Meeting',
+                    'title': f'Meeting with {sales_rep} - {product.get("name", "Product")} Marketing',
+                    'priority': 'Medium',
+                    'category': 'Sales',
+                    'details': {
+                        'product': product.get('name'),
+                        'current_buyers': len(product.get('buyers', [])),
+                        'suggested_ad_budget': calculate_suggested_ad_budget(product),
+                        'target_segments': identify_target_segments(product, data),
+                        'sales_rep': sales_rep
+                    },
+                    'icon': '💰'
+                })
+    
+    return tasks
+
+def generate_hr_tasks(data):
+    """Generate HR and people management tasks."""
+    tasks = []
+    
+    # Check employee satisfaction and needs
+    employees = []
+    workstations = data.get('office', {}).get('workstations', [])
+    for ws in workstations:
+        employee = ws.get('employee')
+        if employee:
+            employees.append(employee)
+    
+    # Check for low morale or unmet demands
+    low_morale_employees = [emp for emp in employees if emp.get('mood', 100) < 70]
+    
+    if low_morale_employees:
+        tasks.append({
+            'type': 'HR Policy Review',
+            'title': 'HR Policy Review - Employee Satisfaction',
+            'priority': 'High',
+            'category': 'Human Resources',
+            'details': {
+                'affected_employees': [emp.get('name', 'Unknown') for emp in low_morale_employees],
+                'morale_issues': analyze_morale_issues(low_morale_employees),
+                'recommended_actions': generate_morale_recommendations(low_morale_employees, data),
+                'budget_impact': calculate_morale_budget_impact(low_morale_employees)
+            },
+            'icon': '👤'
+        })
+    
+    return tasks
+
+def generate_operations_tasks(data):
+    """Generate operations and facilities related tasks."""
+    tasks = []
+    
+    # Check office capacity and furniture needs
+    office = data.get('office', {})
+    workstations = office.get('workstations', [])
+    
+    # Calculate space utilization
+    total_workstations = len(workstations)
+    occupied_workstations = len([ws for ws in workstations if ws.get('employee')])
+    utilization = occupied_workstations / max(total_workstations, 1)
+    
+    if utilization > 0.8:  # High utilization
+        tasks.append({
+            'type': 'Facilities Planning',
+            'title': 'Facilities Upgrade - Office Expansion',
+            'priority': 'Medium',
+            'category': 'Operations',
+            'details': {
+                'current_capacity': total_workstations,
+                'utilization_rate': f"{utilization:.1%}",
+                'recommended_expansion': calculate_office_expansion_needs(data),
+                'furniture_needs': identify_furniture_needs(workstations),
+                'estimated_cost': estimate_expansion_cost(data)
+            },
+            'icon': '🏢'
+        })
+    
+    return tasks
+
+def generate_recruiting_tasks(data):
+    """Generate recruiting and hiring related tasks."""
+    tasks = []
+    
+    # Check for hiring needs based on team analysis
+    team_analysis = analyze_team_hierarchy(data)
+    tier_coverage = team_analysis.get('tier_coverage', {})
+    
+    # Check for tier gaps
+    for tier in [1, 2, 3, 4]:
+        if tier_coverage.get(tier, 0) < 2:  # Need at least 2 people per tier
+            tasks.append({
+                'type': 'Recruiting',
+                'title': f'Recruiting - Tier {tier} Specialist',
+                'priority': 'High' if tier <= 2 else 'Medium',
+                'category': 'Recruiting',
+                'details': {
+                    'target_tier': tier,
+                    'current_coverage': tier_coverage.get(tier, 0),
+                    'recommended_roles': get_recommended_roles_for_tier(tier),
+                    'budget_range': calculate_hiring_budget_range(tier, data),
+                    'skills_needed': get_skills_for_tier(tier),
+                    'urgency_reason': get_tier_urgency_reason(tier, team_analysis)
+                },
+                'icon': '🎯'
+            })
+    
+    return tasks
+
+# Helper functions for task generation
+def find_sales_team_member(data):
+    """Find a sales team member name."""
+    employees = []
+    workstations = data.get('office', {}).get('workstations', [])
+    for ws in workstations:
+        employee = ws.get('employee')
+        if employee and 'sales' in employee.get('employeeTypeName', '').lower():
+            return employee.get('name', 'Sales Team Member')
+    return 'Sales Team Member'  # Default if no sales person found
+
+def calculate_suggested_ad_budget(product):
+    """Calculate suggested advertising budget for a product."""
+    base_budget = min(product.get('price', 1000) * 0.1, 5000)  # 10% of price, max 5000
+    return int(base_budget)
+
+def identify_target_segments(product, data):
+    """Identify target market segments for advertising."""
+    segments = ['Tech Enthusiasts', 'Business Professionals', 'General Consumers']
+    # Simple logic - could be enhanced with more sophisticated analysis
+    return segments[:2]  # Return top 2 segments
+
+def analyze_morale_issues(low_morale_employees):
+    """Analyze what's causing low morale."""
+    issues = []
+    for emp in low_morale_employees:
+        mood = emp.get('mood', 100)
+        if mood < 50:
+            issues.append(f"{emp.get('name', 'Employee')}: Critical morale ({mood}%)")
+        elif mood < 70:
+            issues.append(f"{emp.get('name', 'Employee')}: Low morale ({mood}%)")
+    return issues
+
+def generate_morale_recommendations(low_morale_employees, data):
+    """Generate recommendations to improve employee morale."""
+    recommendations = [
+        "Review salary packages and consider raises",
+        "Implement team building activities",
+        "Upgrade office amenities and furniture",
+        "Provide professional development opportunities",
+        "Review workload distribution"
+    ]
+    return recommendations[:3]  # Return top 3 recommendations
+
+def calculate_morale_budget_impact(low_morale_employees):
+    """Calculate estimated budget impact of morale improvements."""
+    base_cost_per_employee = 2000  # Base cost for improvements per employee
+    return len(low_morale_employees) * base_cost_per_employee
+
+def calculate_office_expansion_needs(data):
+    """Calculate office expansion requirements."""
+    employees = []
+    workstations = data.get('office', {}).get('workstations', [])
+    for ws in workstations:
+        employee = ws.get('employee')
+        if employee:
+            employees.append(employee)
+    
+    current_capacity = len(workstations)
+    current_employees = len(employees)
+    recommended_capacity = int(current_employees * 1.5)  # 50% buffer
+    
+    return max(recommended_capacity - current_capacity, 2)
+
+def identify_furniture_needs(workstations):
+    """Identify furniture and equipment needs."""
+    needs = []
+    for ws in workstations:
+        if ws.get('employee') and not ws.get('furniture', {}).get('desk'):
+            needs.append("Additional desks")
+        if ws.get('employee') and not ws.get('furniture', {}).get('chair'):
+            needs.append("Ergonomic chairs")
+    
+    # Remove duplicates and add standard needs
+    unique_needs = list(set(needs))
+    if len(unique_needs) == 0:
+        unique_needs = ["Upgraded workstations", "Additional monitors", "Office decorations"]
+    
+    return unique_needs
+
+def estimate_expansion_cost(data):
+    """Estimate cost of office expansion."""
+    expansion_needs = calculate_office_expansion_needs(data)
+    cost_per_workstation = 5000
+    return expansion_needs * cost_per_workstation
+
+def get_recommended_roles_for_tier(tier):
+    """Get recommended employee roles for each tier."""
+    tier_roles = {
+        1: ["Developer", "Designer"],
+        2: ["Developer", "Designer"],
+        3: ["Lead Developer", "Lead Designer"],
+        4: ["Lead Developer", "Lead Designer", "Researcher"]
+    }
+    return tier_roles.get(tier, ["Developer"])
+
+def calculate_hiring_budget_range(tier, data):
+    """Calculate budget range for hiring at specific tier."""
+    base_salaries = {1: 50000, 2: 70000, 3: 100000, 4: 150000}
+    base_salary = base_salaries.get(tier, 60000)
+    return f"${base_salary:,} - ${int(base_salary * 1.3):,}"
+
+def get_skills_for_tier(tier):
+    """Get required skills for each tier."""
+    tier_skills = {
+        1: ["Basic programming", "Component development"],
+        2: ["Module development", "Integration skills"],
+        3: ["System architecture", "Team leadership"],
+        4: ["Advanced systems", "Research & innovation"]
+    }
+    return tier_skills.get(tier, ["General development"])
+
+def get_tier_urgency_reason(tier, team_analysis):
+    """Get urgency reason for hiring at specific tier."""
+    tier_reasons = {
+        1: "Critical for basic component development",
+        2: "Essential for module integration",
+        3: "Required for complex system development",
+        4: "Needed for advanced feature development"
+    }
+    return tier_reasons.get(tier, "Required for team balance")
+
 # --- Page Navigation ---
 def main():
-    st.sidebar.title("🚀 Phoenix Dashboard")
+    st.sidebar.title("🐦‍🔥 Project Phoenix")
     st.sidebar.markdown("---")
     
     pages = {
@@ -528,6 +979,187 @@ def show_executive_overview(data):
                 st.write(insight['action'])
     else:
         st.info("No strategic insights available yet. Continue operations to generate data.")
+    
+    st.divider()
+    
+    # --- Executive Calendar & Business Tasks ---
+    st.header("📅 Executive Calendar - Today's Business Tasks")
+    st.markdown("*AI-generated action items based on current business intelligence*")
+    
+    # Generate executive tasks
+    executive_tasks = generate_executive_tasks(data)
+    
+    if executive_tasks:
+        # Organize tasks by priority
+        high_priority = [t for t in executive_tasks if t.get('priority') == 'High']
+        medium_priority = [t for t in executive_tasks if t.get('priority') == 'Medium']
+        low_priority = [t for t in executive_tasks if t.get('priority') == 'Low']
+        
+        # Display high priority tasks first
+        if high_priority:
+            st.subheader("🔥 High Priority")
+            for task in high_priority:
+                with st.expander(f"{task['icon']} {task['title']}", expanded=False):
+                    st.markdown(f"**Category:** {task['category']}")
+                    st.markdown(f"**Priority:** {task['priority']}")
+                    
+                    # Display task-specific details
+                    if task['type'] == 'Dev Team Stand-Up':
+                        display_dev_standup_details(task['details'])
+                    elif task['type'] == 'Sales Meeting':
+                        display_sales_meeting_details(task['details'])
+                    elif task['type'] == 'HR Policy Review':
+                        display_hr_policy_details(task['details'])
+                    elif task['type'] == 'Facilities Planning':
+                        display_facilities_details(task['details'])
+                    elif task['type'] == 'Recruiting':
+                        display_recruiting_details(task['details'])
+        
+        # Display medium priority tasks
+        if medium_priority:
+            st.subheader("⚡ Medium Priority")
+            for task in medium_priority:
+                with st.expander(f"{task['icon']} {task['title']}", expanded=False):
+                    st.markdown(f"**Category:** {task['category']}")
+                    st.markdown(f"**Priority:** {task['priority']}")
+                    
+                    # Display task-specific details
+                    if task['type'] == 'Sales Meeting':
+                        display_sales_meeting_details(task['details'])
+                    elif task['type'] == 'Facilities Planning':
+                        display_facilities_details(task['details'])
+                    elif task['type'] == 'Recruiting':
+                        display_recruiting_details(task['details'])
+        
+        # Display WSJF Feature Analysis
+        st.subheader("📊 WSJF Feature Priority Analysis")
+        priority_features = analyze_feature_priorities(data)
+        if priority_features:
+            feature_df = pd.DataFrame(priority_features[:10])  # Top 10 features
+            feature_df = feature_df[['name', 'product', 'wsjf_score', 'business_value', 'time_criticality', 'effort_estimate']]
+            feature_df.columns = ['Feature', 'Product', 'WSJF Score', 'Business Value', 'Time Criticality', 'Effort Estimate']
+            
+            st.dataframe(
+                feature_df,
+                use_container_width=True,
+                column_config={
+                    "WSJF Score": st.column_config.ProgressColumn(
+                        "WSJF Score",
+                        help="Weighted Shortest Job First priority score",
+                        min_value=0,
+                        max_value=10,
+                    ),
+                }
+            )
+            
+            # WSJF Score visualization
+            fig = px.bar(
+                feature_df.head(5), 
+                x='WSJF Score', 
+                y='Feature',
+                orientation='h',
+                title='Top 5 Features by WSJF Score',
+                color='WSJF Score',
+                color_continuous_scale='viridis'
+            )
+            fig.update_layout(height=300)
+            st.plotly_chart(fig, use_container_width=True)
+        else:
+            st.info("No features found for WSJF analysis.")
+    
+    else:
+        st.info("No executive tasks generated. System will create tasks as business conditions change.")
+
+# Task detail display functions
+def display_dev_standup_details(details):
+    """Display detailed Dev Team Stand-Up information."""
+    st.markdown("### 🛠️ Development Team Stand-Up Agenda")
+    
+    # Priority features to discuss
+    if details.get('priority_features'):
+        st.markdown("**🎯 Priority Features for Sprint:**")
+        for i, feature in enumerate(details['priority_features'][:3], 1):
+            st.markdown(f"{i}. **{feature['name']}** (WSJF: {feature['wsjf_score']:.2f})")
+            st.markdown(f"   - Product: {feature['product']}")
+            st.markdown(f"   - Effort: {feature['effort_estimate']}/10 | Business Value: {feature['business_value']}/10")
+    
+    # Team assignments
+    if details.get('team_assignments'):
+        st.markdown("**👥 Specific Task Assignments:**")
+        for assignment in details['team_assignments']:
+            st.markdown(f"- **{assignment['assignee']}** ({assignment['reason']})")
+            st.markdown(f"  → Work on: {assignment['task']} for {assignment['feature']}")
+            st.markdown(f"  → Current queue: {assignment['current_queue_size']} items")
+
+def display_sales_meeting_details(details):
+    """Display detailed Sales Meeting information."""
+    st.markdown("### 💼 Sales Strategy Meeting")
+    
+    st.markdown(f"**🎯 Product Focus:** {details.get('product', 'N/A')}")
+    st.markdown(f"**📊 Current Buyers:** {details.get('current_buyers', 0)}")
+    st.markdown(f"**💰 Suggested Ad Budget:** ${details.get('suggested_ad_budget', 0):,}")
+    
+    if details.get('target_segments'):
+        st.markdown("**🎯 Target Market Segments:**")
+        for segment in details['target_segments']:
+            st.markdown(f"- {segment}")
+    
+    st.markdown(f"**👤 Sales Rep:** {details.get('sales_rep', 'TBD')}")
+
+def display_hr_policy_details(details):
+    """Display detailed HR Policy information."""
+    st.markdown("### 👥 HR Policy Review Meeting")
+    
+    if details.get('affected_employees'):
+        st.markdown("**🚨 Affected Employees:**")
+        for emp in details['affected_employees']:
+            st.markdown(f"- {emp}")
+    
+    if details.get('morale_issues'):
+        st.markdown("**⚠️ Morale Issues:**")
+        for issue in details['morale_issues']:
+            st.markdown(f"- {issue}")
+    
+    if details.get('recommended_actions'):
+        st.markdown("**💡 Recommended Actions:**")
+        for action in details['recommended_actions']:
+            st.markdown(f"- {action}")
+    
+    st.markdown(f"**💰 Estimated Budget Impact:** ${details.get('budget_impact', 0):,}")
+
+def display_facilities_details(details):
+    """Display detailed Facilities Planning information."""
+    st.markdown("### 🏢 Facilities Planning Meeting")
+    
+    st.markdown(f"**📊 Current Capacity:** {details.get('current_capacity', 0)} workstations")
+    st.markdown(f"**📈 Utilization Rate:** {details.get('utilization_rate', '0%')}")
+    st.markdown(f"**➕ Recommended Expansion:** {details.get('recommended_expansion', 0)} additional workstations")
+    
+    if details.get('furniture_needs'):
+        st.markdown("**🪑 Furniture & Equipment Needs:**")
+        for need in details['furniture_needs']:
+            st.markdown(f"- {need}")
+    
+    st.markdown(f"**💰 Estimated Cost:** ${details.get('estimated_cost', 0):,}")
+
+def display_recruiting_details(details):
+    """Display detailed Recruiting information."""
+    st.markdown("### 🎯 Recruiting Strategy")
+    
+    st.markdown(f"**🎚️ Target Tier:** {details.get('target_tier', 'N/A')}")
+    st.markdown(f"**📊 Current Coverage:** {details.get('current_coverage', 0)} employees")
+    st.markdown(f"**💰 Budget Range:** {details.get('budget_range', 'TBD')}")
+    st.markdown(f"**⚡ Urgency:** {details.get('urgency_reason', 'Team expansion')}")
+    
+    if details.get('recommended_roles'):
+        st.markdown("**👤 Recommended Roles:**")
+        for role in details['recommended_roles']:
+            st.markdown(f"- {role}")
+    
+    if details.get('skills_needed'):
+        st.markdown("**🔧 Required Skills:**")
+        for skill in details['skills_needed']:
+            st.markdown(f"- {skill}")
 
 def show_product_management(data):
     """Advanced product management analytics and planning."""
@@ -624,8 +1256,10 @@ def show_product_management(data):
         
         fig = go.Figure(data=[edge_trace, node_trace],
                        layout=go.Layout(
-                        title='Development Dependency Tree<br><sub>Green=Tier 1 (No deps), Yellow=Tier 2, Orange=Tier 3, Red=Tier 4</sub>',
-                        titlefont_size=16,
+                        title=dict(
+                            text='Development Dependency Tree<br><sub>Green=Tier 1 (No deps), Yellow=Tier 2, Orange=Tier 3, Red=Tier 4</sub>',
+                            font=dict(size=16)
+                        ),
                         showlegend=False,
                         hovermode='closest',
                         margin=dict(b=20,l=5,r=5,t=40),
@@ -650,7 +1284,7 @@ def show_product_management(data):
             node_type = dependency_graph.nodes[node].get('type', 'Unknown')
             
             if tier not in tier_data:
-                tier_data[tier] = {'Components': 0, 'Modules': 0, 'UI': 0, 'System': 0, 'items': []}
+                tier_data[tier] = {'Component': 0, 'Module': 0, 'UI': 0, 'System': 0, 'items': []}
             
             tier_data[tier][node_type] += 1
             tier_data[tier]['items'].append(node)
@@ -661,9 +1295,9 @@ def show_product_management(data):
             col1, col2 = st.columns([1, 3])
             
             with col1:
-                st.metric(f"**Tier {tier}**", f"{sum(tier_info[k] for k in ['Components', 'Modules', 'UI', 'System'])}")
-                st.write(f"Components: {tier_info['Components']}")
-                st.write(f"Modules: {tier_info['Modules']}")
+                st.metric(f"**Tier {tier}**", f"{sum(tier_info[k] for k in ['Component', 'Module', 'UI', 'System'])}")
+                st.write(f"Components: {tier_info['Component']}")
+                st.write(f"Modules: {tier_info['Module']}")
                 st.write(f"UI Elements: {tier_info['UI']}")
                 st.write(f"System: {tier_info['System']}")
             
