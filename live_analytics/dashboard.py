@@ -34,22 +34,6 @@ def load_data():
 
 data = load_data()
 
-# --- Data Loading ---
-@st.cache_data
-def load_data():
-    """Loads the save game data from the local JSON file."""
-    save_file_path = Path(__file__).parent / "save_data" / "sg_momentum ai.json"
-    try:
-        with open(save_file_path, 'r') as f:
-            data = json.load(f)
-        return data
-    except FileNotFoundError:
-        st.error(f"Error: The save file was not found at {save_file_path}. Please ensure the file exists.")
-        return None
-    except json.JSONDecodeError:
-        st.error(f"Error: Could not decode the JSON from {save_file_path}. The file might be corrupted.")
-        return None
-
 # --- Business Intelligence Functions ---
 def analyze_product_performance(data):
     """Analyze product performance metrics and generate insights."""
@@ -461,33 +445,88 @@ def analyze_feature_priorities(data):
     """Analyze current features and calculate WSJF scores for prioritization."""
     features = []
     
-    # Get current products and their development status
-    products = data.get('products', [])
-    for product in products:
-        features_list = product.get('features', [])
-        for feature in features_list:
-            # Calculate business value based on market demand and revenue potential
-            business_value = calculate_business_value(feature, product, data)
-            # Calculate time criticality based on market position and competition
-            time_criticality = calculate_time_criticality(feature, product, data)
-            # Estimate effort based on feature complexity
-            effort_estimate = estimate_feature_effort(feature, data)
-            # Calculate risk reduction based on technical debt and dependencies
-            risk_reduction = calculate_risk_reduction(feature, data)
-            
-            wsjf_score = calculate_wsjf_score(feature, business_value, time_criticality, effort_estimate, risk_reduction)
-            
-            features.append({
-                'name': feature.get('name', 'Unknown Feature'),
-                'product': product.get('name', 'Unknown Product'),
-                'business_value': business_value,
-                'time_criticality': time_criticality,
-                'effort_estimate': effort_estimate,
-                'risk_reduction': risk_reduction,
-                'wsjf_score': wsjf_score,
-                'status': feature.get('progress', 0),
-                'dependencies': feature.get('dependencies', [])
-            })
+    # Get current feature instances (actual game data structure)
+    feature_instances = data.get('featureInstances', [])
+    products_list = data.get('products', [])
+    
+    # Create a product lookup for feature mapping
+    product_lookup = {product.get('id'): product for product in products_list}
+    
+    for feature in feature_instances:
+        # Find the corresponding product
+        product_id = feature.get('productId')
+        product = product_lookup.get(product_id, {})
+        
+        # Calculate business value based on market demand and revenue potential
+        business_value = calculate_business_value(feature, product, data)
+        # Calculate time criticality based on market position and competition
+        time_criticality = calculate_time_criticality(feature, product, data)
+        # Estimate effort based on feature complexity
+        effort_estimate = estimate_feature_effort(feature, data)
+        # Calculate risk reduction based on technical debt and dependencies
+        risk_reduction = calculate_risk_reduction(feature, data)
+        
+        wsjf_score = calculate_wsjf_score(feature, business_value, time_criticality, effort_estimate, risk_reduction)
+        
+        # Calculate feature progress based on efficiency vs max efficiency
+        efficiency = feature.get('efficiency', {})
+        current_efficiency = efficiency.get('current', 0)
+        max_efficiency = efficiency.get('max', 1)
+        progress = (current_efficiency / max_efficiency) * 100 if max_efficiency > 0 else 0
+        
+        features.append({
+            'name': feature.get('featureName', 'Unknown Feature'),
+            'product': product.get('name', 'Unknown Product'),
+            'business_value': business_value,
+            'time_criticality': time_criticality,
+            'effort_estimate': effort_estimate,
+            'risk_reduction': risk_reduction,
+            'wsjf_score': wsjf_score,
+            'status': progress,
+            'dependencies': list(feature.get('requirements', {}).keys()),
+            'activated': feature.get('activated', False),
+            'quality': feature.get('quality', {}).get('current', 0),
+            'price_per_month': feature.get('pricePerMonth', 0)
+        })
+    
+    # Also analyze development items in employee queues as potential features
+    workstations = data.get('office', {}).get('workstations', [])
+    for ws in workstations:
+        employee = ws.get('employee')
+        if employee:
+            queue = employee.get('queue', [])
+            for queue_item in queue:
+                component = queue_item.get('component', {})
+                if component.get('state') != 'Completed':  # Only include active development
+                    # Treat development items as potential features
+                    business_value = calculate_dev_business_value(component, data)
+                    time_criticality = calculate_dev_time_criticality(component, queue_item, data)
+                    effort_estimate = estimate_dev_effort(component, queue_item, data)
+                    risk_reduction = calculate_dev_risk_reduction(component, data)
+                    
+                    wsjf_score = calculate_wsjf_score(component, business_value, time_criticality, effort_estimate, risk_reduction)
+                    
+                    # Calculate progress
+                    total_minutes = queue_item.get('totalMinutes', 1)
+                    completed_minutes = queue_item.get('completedMinutes', 0)
+                    progress = (completed_minutes / total_minutes) * 100 if total_minutes > 0 else 0
+                    
+                    features.append({
+                        'name': f"{component.get('name', 'Unknown Component')} (Dev)",
+                        'product': 'Development Pipeline',
+                        'business_value': business_value,
+                        'time_criticality': time_criticality,
+                        'effort_estimate': effort_estimate,
+                        'risk_reduction': risk_reduction,
+                        'wsjf_score': wsjf_score,
+                        'status': progress,
+                        'dependencies': list(component.get('requirements', {}).keys()),
+                        'activated': False,
+                        'quality': 0,
+                        'price_per_month': 0,
+                        'employee': employee.get('name', 'Unknown'),
+                        'state': queue_item.get('state', 'Unknown')
+                    })
     
     # Sort by WSJF score (highest first)
     features.sort(key=lambda x: x['wsjf_score'], reverse=True)
@@ -495,52 +534,93 @@ def analyze_feature_priorities(data):
 
 def calculate_business_value(feature, product, data):
     """Calculate business value score (1-10 scale)."""
-    # Base value from product marketability
-    base_value = min(product.get('price', 1000) / 1000, 5)  # Normalize price
+    # Base value from feature revenue potential
+    price_per_month = feature.get('pricePerMonth', 0)
+    base_value = min(price_per_month / 100, 3) if price_per_month > 0 else 2
     
-    # Add value for customer demand
-    demand_modifier = min(len(product.get('buyers', [])) / 10, 3)
+    # Add value for feature activation status
+    activation_value = 3 if feature.get('activated', False) else 1
     
-    # Add value for feature completeness impact
-    feature_impact = 2 if feature.get('progress', 0) < 50 else 1
+    # Add value for feature quality (higher quality = more business value)
+    quality = feature.get('quality', {}).get('current', 0)
+    quality_value = min(quality / 1000, 3)  # Normalize quality
     
-    return min(base_value + demand_modifier + feature_impact, 10)
+    # Add value for product user base (from product stats if available)
+    product_value = 0
+    if product:
+        # Try to get user statistics from the product
+        stats = product.get('stats', {})
+        if stats:
+            registered_users = stats.get('registeredUsers', [])
+            if registered_users:
+                latest_users = registered_users[-1].get('amount', 0)
+                product_value = min(latest_users / 10000, 2)  # Normalize users
+    
+    return min(base_value + activation_value + quality_value + product_value, 10)
 
 def calculate_time_criticality(feature, product, data):
     """Calculate time criticality score (1-10 scale)."""
-    # Higher criticality for products with active buyers
-    buyer_urgency = min(len(product.get('buyers', [])) * 2, 5)
+    # Higher criticality for activated features (users depend on them)
+    activation_urgency = 6 if feature.get('activated', False) else 3
     
-    # Higher criticality for features blocking other development
-    blocking_factor = len(feature.get('dependencies', [])) * 0.5
+    # Higher criticality for features with many requirements (blocking others)
+    requirements = feature.get('requirements', {})
+    blocking_factor = min(len(requirements) * 0.5, 3)
     
-    # Market timing factor
-    market_timing = 3  # Base market timing score
+    # Higher criticality for features with low efficiency (need improvement)
+    efficiency = feature.get('efficiency', {})
+    current_eff = efficiency.get('current', 1)
+    max_eff = efficiency.get('max', 1)
+    efficiency_ratio = current_eff / max_eff if max_eff > 0 else 1
+    efficiency_urgency = 3 if efficiency_ratio < 0.5 else 1  # Low efficiency = high urgency
     
-    return min(buyer_urgency + blocking_factor + market_timing, 10)
+    # Product-based urgency (if product has users, features are more critical)
+    product_urgency = 0
+    if product:
+        stats = product.get('stats', {})
+        if stats:
+            registered_users = stats.get('registeredUsers', [])
+            if registered_users and len(registered_users) > 0:
+                latest_users = registered_users[-1].get('amount', 0)
+                product_urgency = min(latest_users / 5000, 2)  # More users = higher urgency
+    
+    return min(activation_urgency + blocking_factor + efficiency_urgency + product_urgency, 10)
 
 def estimate_feature_effort(feature, data):
     """Estimate development effort (1-10 scale, higher = more effort)."""
-    # Base effort from feature complexity
-    base_effort = len(feature.get('dependencies', [])) + 1
+    # Base effort from feature requirements complexity
+    requirements = feature.get('requirements', {})
+    base_effort = len(requirements) + 1
+    
+    # Add effort based on feature complexity (efficiency ratio indicates complexity)
+    efficiency = feature.get('efficiency', {})
+    max_eff = efficiency.get('max', 1)
+    complexity_effort = min(max_eff / 1000, 3)  # Higher max efficiency = more complex feature
     
     # Effort modifier based on team capability
     team_modifier = calculate_team_capability_modifier(data)
     
-    return min(base_effort * team_modifier, 10)
+    total_effort = (base_effort + complexity_effort) * team_modifier
+    return min(total_effort, 10)
 
 def calculate_risk_reduction(feature, data):
     """Calculate risk reduction value (1-10 scale)."""
+    feature_name = feature.get('featureName', '').lower()
+    
     # Higher value for features that reduce technical debt
-    debt_reduction = 2 if 'optimization' in feature.get('name', '').lower() else 1
+    debt_reduction = 2 if 'optimization' in feature_name or 'refactor' in feature_name else 1
     
     # Higher value for features that improve system stability
-    stability_improvement = 2 if 'security' in feature.get('name', '').lower() else 1
+    stability_improvement = 3 if any(keyword in feature_name for keyword in ['security', 'backend', 'infrastructure']) else 1
     
-    # Base risk reduction
-    base_risk = 2
+    # Higher value for activated features (they reduce business risk)
+    business_risk = 3 if feature.get('activated', False) else 1
     
-    return min(debt_reduction + stability_improvement + base_risk, 10)
+    # Higher value for features with good quality (reduce technical risk)
+    quality = feature.get('quality', {}).get('current', 0)
+    quality_risk = min(quality / 2000, 2)  # Higher quality = more risk reduction
+    
+    return min(debt_reduction + stability_improvement + business_risk + quality_risk, 10)
 
 def calculate_team_capability_modifier(data):
     """Calculate team capability modifier for effort estimation."""
@@ -560,6 +640,71 @@ def calculate_team_capability_modifier(data):
     
     # Convert to effort modifier (higher skill = lower effort)
     return max(1.0, 3.0 - (avg_skill / 50))
+
+# Development item analysis functions
+def calculate_dev_business_value(component, data):
+    """Calculate business value for development items."""
+    component_name = component.get('name', '').lower()
+    
+    # Higher value for user-facing components
+    if 'ui' in component_name or 'interface' in component_name or 'frontend' in component_name:
+        return 7
+    # Medium value for core functionality
+    elif 'backend' in component_name or 'network' in component_name:
+        return 6
+    # Lower value for supporting components
+    elif 'component' in component.get('type', '').lower():
+        return 4
+    # Higher value for modules (more complex features)
+    elif 'module' in component.get('type', '').lower():
+        return 8
+    else:
+        return 5
+
+def calculate_dev_time_criticality(component, queue_item, data):
+    """Calculate time criticality for development items."""
+    # Higher criticality for items currently being worked on
+    state = queue_item.get('state', '')
+    if state == 'Running':
+        base_criticality = 8
+    elif state == 'Completed':
+        return 1  # Low criticality for completed items
+    else:
+        base_criticality = 5
+    
+    # Higher criticality for items that unblock other development
+    component_type = component.get('type', '').lower()
+    if 'component' in component_type:
+        return base_criticality + 2  # Components unlock modules
+    else:
+        return base_criticality
+
+def estimate_dev_effort(component, queue_item, data):
+    """Estimate effort for development items."""
+    # Use actual time data from the game
+    total_minutes = queue_item.get('totalMinutes', 60)
+    
+    # Convert to effort scale (1-10)
+    # Normalize based on typical component times (120-1260 minutes observed)
+    effort_score = min(total_minutes / 126, 10)  # 126 minutes = effort score of 1
+    
+    return max(1, effort_score)
+
+def calculate_dev_risk_reduction(component, data):
+    """Calculate risk reduction for development items."""
+    component_name = component.get('name', '').lower()
+    
+    # Higher risk reduction for foundational components
+    if 'component' in component.get('type', '').lower():
+        return 6  # Components reduce technical debt
+    # Medium risk reduction for modules
+    elif 'module' in component.get('type', '').lower():
+        return 4
+    # Higher risk reduction for security/stability related items
+    elif 'security' in component_name or 'backend' in component_name:
+        return 7
+    else:
+        return 3
 
 def generate_executive_tasks(data):
     """Generate intelligent executive calendar tasks based on current business state."""
