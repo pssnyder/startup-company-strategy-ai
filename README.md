@@ -27,7 +27,7 @@ The system follows a clean 5-layer architecture:
 
 ```bash
 # Clone the repository
-git clone <your-repo-url>
+git clone https://github.com/pssnyder/startup-company-strategy-ai
 cd startup-company-strategy-ai
 
 # Install dependencies
