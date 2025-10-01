@@ -3,6 +3,7 @@ import json
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
+import networkx as nx
 from pathlib import Path
 from datetime import datetime, timedelta
 import numpy as np
@@ -204,6 +205,249 @@ def analyze_feature_development(data):
     
     return analysis
 
+def build_dependency_tree(data):
+    """Build comprehensive dependency tree for all game items."""
+    # Define known component dependencies based on game mechanics
+    dependencies = {
+        # Basic Components (Tier 1 - No dependencies)
+        'BlueprintComponent': [],
+        'UiComponent': [],
+        'GraphicsComponent': [],
+        'BackendComponent': [],
+        'NetworkComponent': [],
+        'DatabaseComponent': [],
+        'SemanticComponent': [],
+        'EncryptionComponent': [],
+        'FilesystemComponent': [],
+        'VideoComponent': [],
+        'SmtpComponent': [],
+        'I18nComponent': [],
+        'SearchAlgorithmComponent': [],
+        'CompressionComponent': [],
+        'VirtualHardware': [],
+        'OperatingSystem': [],
+        'Firewall': [],
+        'WireframeComponent': [],
+        
+        # Research Components (Tier 1)
+        'Copywriting': [],
+        'TextFormat': [],
+        'ImageFormat': [],
+        'VideoFormat': [],
+        'AudioFormat': [],
+        'ContractAgreement': [],
+        'Survey': [],
+        'UserFeedback': [],
+        'PhoneInterview': [],
+        'AnalyticsResearch': [],
+        'BehaviorObservation': [],
+        'AbTesting': [],
+        'DocumentationComponent': [],
+        'ProcessManagement': [],
+        'ContinuousIntegration': [],
+        'CronJob': [],
+        
+        # Modules (Tier 2 - Depend on components)
+        'InterfaceModule': ['UiComponent', 'GraphicsComponent'],
+        'FrontendModule': ['UiComponent', 'GraphicsComponent', 'NetworkComponent'],
+        'BackendModule': ['BackendComponent', 'DatabaseComponent'],
+        'InputModule': ['UiComponent', 'BackendComponent'],
+        'StorageModule': ['DatabaseComponent', 'FilesystemComponent'],
+        'ContentManagementModule': ['BackendModule', 'StorageModule', 'InterfaceModule'],
+        'SeoModule': ['BackendModule', 'SearchAlgorithmComponent'],
+        'AuthenticationModule': ['BackendModule', 'EncryptionComponent'],
+        'PaymentGatewayModule': ['BackendModule', 'EncryptionComponent', 'NetworkComponent'],
+        'VideoPlaybackModule': ['VideoComponent', 'FrontendModule'],
+        'EmailModule': ['SmtpComponent', 'BackendModule'],
+        'LocalizationModule': ['I18nComponent', 'BackendModule'],
+        'SearchModule': ['SearchAlgorithmComponent', 'BackendModule'],
+        'BandwidthCompressionModule': ['CompressionComponent', 'NetworkComponent'],
+        'DatabaseLayer': ['DatabaseComponent', 'BackendComponent'],
+        'NotificationModule': ['BackendModule', 'NetworkComponent'],
+        'ApiClientModule': ['NetworkComponent', 'BackendModule'],
+        'CodeOptimizationModule': ['BackendModule', 'ProcessManagement'],
+        
+        # Advanced Modules (Tier 3 - Depend on other modules)
+        'VirtualContainer': ['OperatingSystem', 'VirtualHardware', 'BackendModule'],
+        'Cluster': ['VirtualContainer', 'NetworkComponent'],
+        'SwarmManagement': ['Cluster', 'ProcessManagement'],
+        
+        # UI Elements (Tier 2)
+        'UiElement': ['UiComponent'],
+        'UiSet': ['UiElement', 'GraphicsComponent'],
+        'ResponsiveUi': ['UiSet', 'FrontendModule'],
+        'DesignGuidelines': ['ResponsiveUi', 'WireframeComponent']
+    }
+    
+    # Build dependency graph
+    G = nx.DiGraph()
+    
+    # Add nodes with tier classification
+    for item, deps in dependencies.items():
+        tier = calculate_dependency_tier(item, dependencies)
+        G.add_node(item, tier=tier, type=classify_item_type(item))
+        
+        # Add edges for dependencies
+        for dep in deps:
+            G.add_edge(dep, item)
+    
+    return G, dependencies
+
+def calculate_dependency_tier(item, dependencies, visited=None):
+    """Calculate the tier level of an item based on its dependency depth."""
+    if visited is None:
+        visited = set()
+    
+    if item in visited:
+        return 0  # Circular dependency fallback
+    
+    visited.add(item)
+    
+    deps = dependencies.get(item, [])
+    if not deps:
+        return 1  # Base tier for items with no dependencies
+    
+    max_dep_tier = max((calculate_dependency_tier(dep, dependencies, visited.copy()) for dep in deps), default=0)
+    return max_dep_tier + 1
+
+def classify_item_type(item):
+    """Classify items by type for visual organization."""
+    if 'Module' in item:
+        return 'Module'
+    elif 'Component' in item:
+        return 'Component'
+    elif 'Ui' in item or 'Element' in item:
+        return 'UI'
+    else:
+        return 'System'
+
+def analyze_team_hierarchy(data):
+    """Analyze current team structure and recommend tier assignments."""
+    employees = []
+    
+    # Extract employees from workstations
+    workstations = data.get('office', {}).get('workstations', [])
+    for ws in workstations:
+        employee = ws.get('employee')
+        if employee:
+            employees.append(employee)
+    
+    # Analyze team composition
+    team_analysis = {
+        'total_employees': len(employees),
+        'employee_details': [],
+        'tier_recommendations': {},
+        'coverage_analysis': {},
+        'hierarchy_issues': []
+    }
+    
+    for emp in employees:
+        role = emp.get('employeeTypeName', 'Unknown')
+        level = emp.get('level', 'Beginner')
+        speed = emp.get('speed', 0)
+        
+        # Determine recommended tier based on role and level
+        recommended_tier = determine_employee_tier(role, level, speed)
+        
+        emp_analysis = {
+            'name': emp.get('name', 'Unknown'),
+            'role': role,
+            'level': level,
+            'speed': speed,
+            'recommended_tier': recommended_tier,
+            'current_queue': len(emp.get('queue', [])),
+            'complexity_rating': calculate_complexity_rating(role, level, speed)
+        }
+        
+        team_analysis['employee_details'].append(emp_analysis)
+    
+    # Analyze tier coverage
+    tier_counts = {}
+    for emp in team_analysis['employee_details']:
+        tier = emp['recommended_tier']
+        tier_counts[tier] = tier_counts.get(tier, 0) + 1
+    
+    team_analysis['tier_coverage'] = tier_counts
+    
+    # Generate hierarchy recommendations
+    team_analysis['hierarchy_recommendations'] = generate_hierarchy_recommendations(tier_counts, team_analysis['employee_details'])
+    
+    return team_analysis
+
+def determine_employee_tier(role, level, speed):
+    """Determine appropriate tier assignment for an employee."""
+    base_tier = 1
+    
+    # Role-based tier adjustment
+    if role in ['Developer', 'Designer']:
+        base_tier = 1
+    elif role in ['LeadDeveloper', 'LeadDesigner']:
+        base_tier = 2
+    elif role in ['Researcher']:
+        base_tier = 2
+    elif role in ['ChiefExecutiveOfficer']:
+        base_tier = 3
+    
+    # Level adjustment
+    if level == 'Intermediate':
+        base_tier += 1
+    elif level == 'Expert':
+        base_tier += 2
+    
+    # Speed adjustment (high performers can handle higher complexity)
+    if speed > 150:
+        base_tier += 1
+    elif speed > 100:
+        base_tier += 0.5
+    
+    return min(int(base_tier), 4)  # Cap at tier 4
+
+def calculate_complexity_rating(role, level, speed):
+    """Calculate overall complexity rating for an employee."""
+    role_score = {'Developer': 3, 'Designer': 3, 'LeadDeveloper': 5, 'LeadDesigner': 5, 'Researcher': 4, 'ChiefExecutiveOfficer': 6}.get(role, 1)
+    level_score = {'Beginner': 1, 'Intermediate': 2, 'Expert': 3}.get(level, 1)
+    speed_score = min(speed / 50, 4)  # Normalize speed to 0-4 scale
+    
+    return (role_score + level_score + speed_score) / 3
+
+def generate_hierarchy_recommendations(tier_counts, employee_details):
+    """Generate recommendations for optimal team hierarchy."""
+    recommendations = []
+    
+    # Check for tier 1 coverage (essential for dependency chains)
+    tier_1_count = tier_counts.get(1, 0)
+    if tier_1_count < 2:
+        recommendations.append({
+            'priority': 'Critical',
+            'issue': 'Insufficient Tier 1 Workers',
+            'recommendation': f'Hire {2 - tier_1_count} more junior developers/designers for component production',
+            'impact': 'Dependency chain bottlenecks will block all higher-tier work'
+        })
+    
+    # Check tier balance
+    total_employees = sum(tier_counts.values())
+    if total_employees > 0:
+        tier_1_ratio = tier_1_count / total_employees
+        if tier_1_ratio < 0.4:
+            recommendations.append({
+                'priority': 'High',
+                'issue': 'Tier Imbalance',
+                'recommendation': 'Increase proportion of Tier 1 workers to 40-50% of team',
+                'impact': 'Higher tiers will be starved of dependencies'
+            })
+    
+    # Check for leadership coverage
+    tier_3_plus = sum(tier_counts.get(i, 0) for i in range(3, 5))
+    if tier_3_plus == 0 and total_employees > 3:
+        recommendations.append({
+            'priority': 'Medium',
+            'issue': 'No Senior Leadership',
+            'recommendation': 'Promote or hire senior-level talent for complex module development',
+            'impact': 'Advanced features and modules cannot be developed efficiently'
+        })
+    
+    return recommendations
+
 # --- Page Navigation ---
 def main():
     st.sidebar.title("🚀 Phoenix Dashboard")
@@ -315,6 +559,242 @@ def show_product_management(data):
     
     st.divider()
     
+    # --- Development Dependency Tree ---
+    st.header("🌳 Development Dependency Tree")
+    
+    dependency_graph, dependencies = build_dependency_tree(data)
+    
+    # Create tabs for different views
+    tab1, tab2, tab3 = st.tabs(["🌲 Dependency Tree", "📊 Tier Analysis", "⚙️ Production Flow"])
+    
+    with tab1:
+        st.subheader("Component & Module Dependencies")
+        
+        # Create interactive dependency visualization
+        pos = nx.spring_layout(dependency_graph, k=3, iterations=50)
+        
+        # Prepare data for plotly
+        edge_x = []
+        edge_y = []
+        for edge in dependency_graph.edges():
+            x0, y0 = pos[edge[0]]
+            x1, y1 = pos[edge[1]]
+            edge_x.extend([x0, x1, None])
+            edge_y.extend([y0, y1, None])
+        
+        edge_trace = go.Scatter(x=edge_x, y=edge_y,
+                               line=dict(width=0.5, color='#888'),
+                               hoverinfo='none',
+                               mode='lines')
+        
+        node_x = []
+        node_y = []
+        node_text = []
+        node_color = []
+        node_size = []
+        
+        for node in dependency_graph.nodes():
+            x, y = pos[node]
+            node_x.append(x)
+            node_y.append(y)
+            
+            # Get node attributes
+            tier = dependency_graph.nodes[node].get('tier', 1)
+            node_type = dependency_graph.nodes[node].get('type', 'Unknown')
+            
+            node_text.append(f"{node}<br>Tier {tier}<br>Type: {node_type}")
+            
+            # Color by tier
+            tier_colors = {1: '#90EE90', 2: '#FFD700', 3: '#FFA500', 4: '#FF6347'}
+            node_color.append(tier_colors.get(tier, '#808080'))
+            
+            # Size by dependencies
+            deps_count = len(list(dependency_graph.predecessors(node)))
+            node_size.append(max(10 + deps_count * 3, 15))
+        
+        node_trace = go.Scatter(x=node_x, y=node_y,
+                               mode='markers+text',
+                               hoverinfo='text',
+                               text=[node.replace('Component', '').replace('Module', '') for node in dependency_graph.nodes()],
+                               hovertext=node_text,
+                               textposition="middle center",
+                               marker=dict(size=node_size,
+                                         color=node_color,
+                                         line=dict(width=2, color='black')))
+        
+        fig = go.Figure(data=[edge_trace, node_trace],
+                       layout=go.Layout(
+                        title='Development Dependency Tree<br><sub>Green=Tier 1 (No deps), Yellow=Tier 2, Orange=Tier 3, Red=Tier 4</sub>',
+                        titlefont_size=16,
+                        showlegend=False,
+                        hovermode='closest',
+                        margin=dict(b=20,l=5,r=5,t=40),
+                        annotations=[ dict(
+                            text="Node size indicates dependency count. Click and drag to explore.",
+                            showarrow=False,
+                            xref="paper", yref="paper",
+                            x=0.005, y=-0.002 ) ],
+                        xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+                        yaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+                        height=600))
+        
+        st.plotly_chart(fig, use_container_width=True)
+    
+    with tab2:
+        st.subheader("Tier Distribution Analysis")
+        
+        # Analyze tier distribution
+        tier_data = {}
+        for node in dependency_graph.nodes():
+            tier = dependency_graph.nodes[node].get('tier', 1)
+            node_type = dependency_graph.nodes[node].get('type', 'Unknown')
+            
+            if tier not in tier_data:
+                tier_data[tier] = {'Components': 0, 'Modules': 0, 'UI': 0, 'System': 0, 'items': []}
+            
+            tier_data[tier][node_type] += 1
+            tier_data[tier]['items'].append(node)
+        
+        # Display tier breakdown
+        for tier in sorted(tier_data.keys()):
+            tier_info = tier_data[tier]
+            col1, col2 = st.columns([1, 3])
+            
+            with col1:
+                st.metric(f"**Tier {tier}**", f"{sum(tier_info[k] for k in ['Components', 'Modules', 'UI', 'System'])}")
+                st.write(f"Components: {tier_info['Components']}")
+                st.write(f"Modules: {tier_info['Modules']}")
+                st.write(f"UI Elements: {tier_info['UI']}")
+                st.write(f"System: {tier_info['System']}")
+            
+            with col2:
+                st.write(f"**Tier {tier} Items:**")
+                items_per_row = 4
+                items = tier_info['items']
+                for i in range(0, len(items), items_per_row):
+                    row_items = items[i:i+items_per_row]
+                    st.write(" • ".join(row_items))
+    
+    with tab3:
+        st.subheader("Production Flow Optimization")
+        
+        # Current inventory analysis
+        inventory = data.get('inventory', {})
+        
+        st.write("**Current Inventory vs Dependency Requirements:**")
+        
+        inventory_df = pd.DataFrame([
+            {
+                'Item': item,
+                'Current Stock': inventory.get(item, 0),
+                'Tier': dependency_graph.nodes[item].get('tier', 1) if item in dependency_graph.nodes else 'Unknown',
+                'Type': dependency_graph.nodes[item].get('type', 'Unknown') if item in dependency_graph.nodes else 'Unknown'
+            }
+            for item in sorted(set(list(inventory.keys()) + list(dependency_graph.nodes())))
+            if item in inventory or item in dependency_graph.nodes
+        ])
+        
+        # Filter and sort by tier for production planning
+        inventory_df = inventory_df.sort_values(['Tier', 'Type', 'Item'])
+        
+        st.dataframe(
+            inventory_df,
+            use_container_width=True,
+            column_config={
+                "Current Stock": st.column_config.NumberColumn(
+                    "Current Stock",
+                    help="Available inventory",
+                    format="%d"
+                ),
+                "Tier": st.column_config.NumberColumn(
+                    "Tier",
+                    help="Dependency tier (1=no deps, higher=more complex)",
+                    format="%d"
+                )
+            }
+        )
+    
+    st.divider()
+    
+    # --- Team Hierarchy Analysis ---
+    st.header("👥 Team Hierarchy & Dependency Coverage")
+    
+    team_analysis = analyze_team_hierarchy(data)
+    
+    col1, col2 = st.columns([2, 1])
+    
+    with col1:
+        st.subheader("Current Team Structure")
+        
+        if team_analysis['employee_details']:
+            team_df = pd.DataFrame([
+                {
+                    'Employee': emp['name'],
+                    'Role': emp['role'],
+                    'Level': emp['level'],
+                    'Speed': emp['speed'],
+                    'Recommended Tier': emp['recommended_tier'],
+                    'Complexity Rating': f"{emp['complexity_rating']:.1f}",
+                    'Queue Items': emp['current_queue']
+                }
+                for emp in team_analysis['employee_details']
+            ])
+            
+            st.dataframe(
+                team_df,
+                use_container_width=True,
+                column_config={
+                    "Speed": st.column_config.NumberColumn(format="%d"),
+                    "Recommended Tier": st.column_config.NumberColumn(
+                        "Recommended Tier",
+                        help="1=Basic components, 2=Simple modules, 3=Complex modules, 4=Advanced systems",
+                        format="%d"
+                    ),
+                    "Complexity Rating": st.column_config.NumberColumn(format="%.1f")
+                }
+            )
+        else:
+            st.info("No employees found in current save data.")
+    
+    with col2:
+        st.subheader("Tier Coverage Analysis")
+        
+        if team_analysis['tier_coverage']:
+            tier_coverage_df = pd.DataFrame([
+                {'Tier': tier, 'Employees': count}
+                for tier, count in sorted(team_analysis['tier_coverage'].items())
+            ])
+            
+            fig = px.bar(
+                tier_coverage_df,
+                x='Tier',
+                y='Employees',
+                title="Team Distribution by Tier",
+                color='Employees',
+                color_continuous_scale='Viridis'
+            )
+            fig.update_layout(height=300)
+            st.plotly_chart(fig, use_container_width=True)
+        
+        st.subheader("Hierarchy Recommendations")
+        
+        if team_analysis.get('hierarchy_recommendations'):
+            for rec in team_analysis['hierarchy_recommendations']:
+                if rec['priority'] == 'Critical':
+                    st.error(f"🚨 **{rec['issue']}**")
+                elif rec['priority'] == 'High':
+                    st.warning(f"⚠️ **{rec['issue']}**")
+                else:
+                    st.info(f"💡 **{rec['issue']}**")
+                
+                st.write(f"*Recommendation*: {rec['recommendation']}")
+                st.write(f"*Impact*: {rec['impact']}")
+                st.write("")
+        else:
+            st.success("✅ Team hierarchy appears well-balanced!")
+    
+    st.divider()
+    
     # --- Feature Development Pipeline ---
     st.header("🔧 Feature Development Pipeline")
     
@@ -383,8 +863,6 @@ def show_product_management(data):
             else:
                 st.success("✅ All component requirements met!")
     
-    st.divider()
-    
     # --- Development Recommendations ---
     st.header("🎯 Development Recommendations")
     
@@ -412,19 +890,19 @@ def show_product_management(data):
                 'impact': 'Feature Completion'
             })
         
-        # Inactive features
-        inactive_features = [f for f in feature_analysis['feature_details'] if not f['activated']]
-        if inactive_features:
-            recommendations.append({
-                'priority': 'Low',
-                'action': f"Activate {inactive_features[0]['name']}",
-                'reason': f"Feature ready but not active ({inactive_features[0]['completion_ratio']:.1f}% complete)",
-                'impact': 'User Value & Revenue'
-            })
+        # Team hierarchy recommendations
+        if team_analysis.get('hierarchy_recommendations'):
+            for rec in team_analysis['hierarchy_recommendations'][:2]:  # Top 2
+                recommendations.append({
+                    'priority': rec['priority'],
+                    'action': rec['recommendation'],
+                    'reason': rec['issue'],
+                    'impact': rec['impact']
+                })
         
         if recommendations:
             for i, rec in enumerate(recommendations):
-                priority_color = {'High': '🔴', 'Medium': '🟡', 'Low': '🟢'}[rec['priority']]
+                priority_color = {'Critical': '🔴', 'High': '�', 'Medium': '�', 'Low': '🟢'}.get(rec['priority'], '⚪')
                 st.write(f"{priority_color} **{rec['priority']} Priority**: {rec['action']}")
                 st.write(f"   *Reason*: {rec['reason']}")
                 st.write(f"   *Impact*: {rec['impact']}")
