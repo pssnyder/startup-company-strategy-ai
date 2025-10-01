@@ -1,18 +1,14 @@
 # Core dependencies for the AI Advisor
 aiohttp>=3.8.0  # For Gemini API calls
 pathlib2>=2.3.0  # For better path handling on older Python versions
-pandas
-streamlit
-pandas
-streamlit
-pandas
-streamlit
-watchdog
-matplotlib
-plotly>=3.0.0  # For file system monitoring
 pandas>=2.0.0  # For data analysis and trending
+streamlit>=1.28.0  # Web dashboard framework
+watchdog>=3.0.0  # For file system monitoring
+matplotlib>=3.5.0  # For plotting
+plotly>=5.0.0  # For interactive visualizations
 numpy>=1.24.0  # For numerical computations
 requests>=2.31.0  # For HTTP requests
+networkx>=3.0  # For dependency graph analysis
 
 # Development dependencies (optional)
 pytest>=7.0.0  # For testing

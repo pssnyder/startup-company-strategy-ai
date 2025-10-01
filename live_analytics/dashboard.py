@@ -1561,9 +1561,6 @@ def show_product_management(data):
     # Create tabs for different views
     tab1, tab2, tab3, tab4 = st.tabs(["🎯 WSJF Priority", "🌲 Dependency Tree", "📊 Tier Analysis", "⚙️ Production Flow"])
     
-    # Create tabs for different views
-    tab1, tab2, tab3, tab4 = st.tabs(["🎯 WSJF Priority", "🌲 Dependency Tree", "📊 Tier Analysis", "⚙️ Production Flow"])
-    
     with tab1:
         st.subheader("📊 WSJF Feature Priority Analysis")
         st.markdown("*Weighted Shortest Job First scoring for strategic feature prioritization*")
@@ -1645,79 +1642,288 @@ def show_product_management(data):
             st.info("No features found for WSJF analysis.")
     
     with tab2:
-        st.subheader("Component & Module Dependencies")
+        st.subheader("🌳 Hierarchical Dependency Tree")
+        st.markdown("*Select a product/feature to see its complete dependency chain from top to bottom*")
         
-        # Create interactive dependency visualization
-        pos = nx.spring_layout(dependency_graph, k=3, iterations=50)
+        # Product/Feature selector
+        available_features = []
+        if data and 'featureInstances' in data:
+            available_features = [f.get('featureName', 'Unknown') for f in data['featureInstances']]
         
-        # Prepare data for plotly
-        edge_x = []
-        edge_y = []
-        for edge in dependency_graph.edges():
-            x0, y0 = pos[edge[0]]
-            x1, y1 = pos[edge[1]]
+        # Add some key products for demo purposes if no features available
+        if not available_features:
+            available_features = ['Video Feature', 'Login System', 'Payment Gateway', 'Search Engine', 'Content Management']
+        
+        selected_feature = st.selectbox(
+            "Select a Product/Feature to analyze:",
+            available_features,
+            help="Choose a product or feature to see its complete dependency hierarchy"
+        )
+        
+        if selected_feature:
+            dependency_tree_data = build_hierarchical_dependency_tree(selected_feature, dependencies)
+            
+            if dependency_tree_data:
+                # Create hierarchical visualization using Plotly treemap or tree structure
+                col1, col2 = st.columns([2, 1])
+                
+                with col1:
+                    fig = create_dependency_tree_visualization(dependency_tree_data, selected_feature)
+                    st.plotly_chart(fig, use_container_width=True)
+                
+                with col2:
+                    st.subheader(f"📋 Build Sequence for {selected_feature}")
+                    
+                    # Show build sequence from bottom to top
+                    build_sequence = get_build_sequence(dependency_tree_data)
+                    
+                    for phase, items in build_sequence.items():
+                        with st.expander(f"🔧 {phase}", expanded=True):
+                            for i, item in enumerate(items, 1):
+                                tier = get_item_tier(item, dependencies)
+                                tier_color = {1: "🟢", 2: "🟡", 3: "🟠", 4: "🔴"}.get(tier, "⚪")
+                                st.write(f"{i}. {tier_color} **{item}** (Tier {tier})")
+                    
+                    st.info("💡 **Build from bottom up**: Start with Tier 1 components, then modules, then integration.")
+            
+            else:
+                st.warning(f"No dependency data available for '{selected_feature}'. This may be a basic component with no dependencies.")
+        
+        # Show component legend
+        st.divider()
+        st.subheader("🏷️ Component Tier Legend")
+        
+        col1, col2, col3, col4 = st.columns(4)
+        with col1:
+            st.markdown("🟢 **Tier 1**  \nBasic Components  \n(No dependencies)")
+        with col2:
+            st.markdown("🟡 **Tier 2**  \nSimple Modules  \n(Few dependencies)")
+        with col3:
+            st.markdown("🟠 **Tier 3**  \nComplex Modules  \n(Multiple deps)")
+        with col4:
+            st.markdown("🔴 **Tier 4**  \nAdvanced Systems  \n(Many dependencies)")
+
+
+def build_hierarchical_dependency_tree(feature_name, dependencies):
+    """Build a hierarchical tree structure for a specific feature."""
+    # Map feature names to their technical dependencies
+    feature_mappings = {
+        'Video Feature': ['VideoPlaybackModule'],
+        'Login System': ['AuthenticationModule'],
+        'Payment Gateway': ['PaymentGatewayModule'],
+        'Search Engine': ['SearchModule'],
+        'Content Management': ['ContentManagementModule'],
+        'Landing Page': ['FrontendModule', 'SeoModule'],
+        'Database': ['DatabaseLayer'],
+        'API System': ['ApiClientModule'],
+        'Email System': ['EmailModule'],
+        'File Upload': ['StorageModule'],
+        'User Interface': ['InterfaceModule', 'ResponsiveUi'],
+        'Backend Services': ['BackendModule'],
+        'Notifications': ['NotificationModule'],
+        'Localization': ['LocalizationModule'],
+        'Compression': ['BandwidthCompressionModule'],
+    }
+    
+    # Get the main dependencies for this feature
+    main_deps = feature_mappings.get(feature_name, [])
+    if not main_deps and feature_name in dependencies:
+        main_deps = [feature_name]
+    
+    if not main_deps:
+        return None
+    
+    def build_tree_recursive(item, visited=None):
+        """Recursively build dependency tree."""
+        if visited is None:
+            visited = set()
+        
+        if item in visited:
+            return {"name": item, "children": [], "circular": True}
+        
+        visited.add(item)
+        
+        item_deps = dependencies.get(item, [])
+        children = []
+        
+        for dep in item_deps:
+            child_tree = build_tree_recursive(dep, visited.copy())
+            children.append(child_tree)
+        
+        return {
+            "name": item,
+            "children": children,
+            "tier": get_item_tier(item, dependencies),
+            "type": classify_item_type(item)
+        }
+    
+    # Build tree for each main dependency
+    trees = []
+    for dep in main_deps:
+        tree = build_tree_recursive(dep)
+        trees.append(tree)
+    
+    return {
+        "name": feature_name,
+        "children": trees,
+        "tier": len(main_deps) + 2,  # Features are typically higher tier
+        "type": "Feature"
+    }
+
+
+def create_dependency_tree_visualization(tree_data, feature_name):
+    """Create a hierarchical tree visualization using Plotly."""
+    
+    # Flatten tree to get all nodes and their relationships
+    def flatten_tree(node, parent=None, level=0, x_pos=0.0):
+        nodes = []
+        edges = []
+        
+        # Add current node
+        node_info = {
+            'name': node['name'],
+            'level': level,
+            'tier': node.get('tier', 1),
+            'type': node.get('type', 'Unknown'),
+            'x': x_pos,
+            'parent': parent
+        }
+        nodes.append(node_info)
+        
+        # Add edge to parent
+        if parent:
+            edges.append({'from': parent, 'to': node['name']})
+        
+        # Process children
+        children = node.get('children', [])
+        if children:
+            child_width = 1.0 / len(children) if len(children) > 1 else 1.0
+            for i, child in enumerate(children):
+                child_x = x_pos + (i - len(children)/2 + 0.5) * child_width
+                child_nodes, child_edges = flatten_tree(child, node['name'], level + 1, child_x)
+                nodes.extend(child_nodes)
+                edges.extend(child_edges)
+        
+        return nodes, edges
+    
+    nodes, edges = flatten_tree(tree_data)
+    
+    # Create positions
+    max_level = max(node['level'] for node in nodes) if nodes else 0
+    
+    # Prepare edge traces
+    edge_x = []
+    edge_y = []
+    
+    # Create a position lookup
+    pos_lookup = {node['name']: (node['x'], -node['level']) for node in nodes}
+    
+    for edge in edges:
+        if edge['from'] in pos_lookup and edge['to'] in pos_lookup:
+            x0, y0 = pos_lookup[edge['from']]
+            x1, y1 = pos_lookup[edge['to']]
             edge_x.extend([x0, x1, None])
             edge_y.extend([y0, y1, None])
+    
+    edge_trace = go.Scatter(
+        x=edge_x, y=edge_y,
+        line=dict(width=2, color='#888'),
+        hoverinfo='none',
+        mode='lines'
+    )
+    
+    # Prepare node traces
+    node_x = [node['x'] for node in nodes]
+    node_y = [-node['level'] for node in nodes]
+    node_text = [node['name'].replace('Component', '').replace('Module', '') for node in nodes]
+    node_hover = [f"{node['name']}<br>Tier {node['tier']}<br>Level {node['level']}<br>Type: {node['type']}" for node in nodes]
+    
+    # Color by tier
+    tier_colors = {1: '#90EE90', 2: '#FFD700', 3: '#FFA500', 4: '#FF6347', 5: '#9370DB'}
+    node_colors = [tier_colors.get(node['tier'], '#808080') for node in nodes]
+    
+    # Size by level (root larger)
+    node_sizes = [30 if node['level'] == 0 else 20 if node['level'] == 1 else 15 for node in nodes]
+    
+    node_trace = go.Scatter(
+        x=node_x, y=node_y,
+        mode='markers+text',
+        hoverinfo='text',
+        text=node_text,
+        hovertext=node_hover,
+        textposition="middle center",
+        textfont=dict(size=10, color='black'),
+        marker=dict(
+            size=node_sizes,
+            color=node_colors,
+            line=dict(width=2, color='black')
+        )
+    )
+    
+    fig = go.Figure(
+        data=[edge_trace, node_trace],
+        layout=go.Layout(
+            title=dict(
+                text=f'Dependency Hierarchy for {feature_name}<br><sub>Top-down view: Features → Modules → Components</sub>',
+                font=dict(size=16)
+            ),
+            showlegend=False,
+            hovermode='closest',
+            margin=dict(b=40, l=40, r=40, t=80),
+            xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+            yaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+            height=500,
+            plot_bgcolor='rgba(0,0,0,0)'
+        )
+    )
+    
+    return fig
+
+
+def get_build_sequence(tree_data):
+    """Generate build sequence from dependency tree."""
+    def collect_items_by_tier(node, items_by_tier=None):
+        if items_by_tier is None:
+            items_by_tier = {}
         
-        edge_trace = go.Scatter(x=edge_x, y=edge_y,
-                               line=dict(width=0.5, color='#888'),
-                               hoverinfo='none',
-                               mode='lines')
+        tier = node.get('tier', 1)
+        if tier not in items_by_tier:
+            items_by_tier[tier] = []
         
-        node_x = []
-        node_y = []
-        node_text = []
-        node_color = []
-        node_size = []
+        if node['name'] not in items_by_tier[tier]:
+            items_by_tier[tier].append(node['name'])
         
-        for node in dependency_graph.nodes():
-            x, y = pos[node]
-            node_x.append(x)
-            node_y.append(y)
-            
-            # Get node attributes
-            tier = dependency_graph.nodes[node].get('tier', 1)
-            node_type = dependency_graph.nodes[node].get('type', 'Unknown')
-            
-            node_text.append(f"{node}<br>Tier {tier}<br>Type: {node_type}")
-            
-            # Color by tier
-            tier_colors = {1: '#90EE90', 2: '#FFD700', 3: '#FFA500', 4: '#FF6347'}
-            node_color.append(tier_colors.get(tier, '#808080'))
-            
-            # Size by dependencies
-            deps_count = len(list(dependency_graph.predecessors(node)))
-            node_size.append(max(10 + deps_count * 3, 15))
+        for child in node.get('children', []):
+            collect_items_by_tier(child, items_by_tier)
         
-        node_trace = go.Scatter(x=node_x, y=node_y,
-                               mode='markers+text',
-                               hoverinfo='text',
-                               text=[node.replace('Component', '').replace('Module', '') for node in dependency_graph.nodes()],
-                               hovertext=node_text,
-                               textposition="middle center",
-                               marker=dict(size=node_size,
-                                         color=node_color,
-                                         line=dict(width=2, color='black')))
+        return items_by_tier
+    
+    items_by_tier = collect_items_by_tier(tree_data)
+    
+    # Create build phases
+    build_sequence = {}
+    
+    for tier in sorted(items_by_tier.keys()):
+        items = items_by_tier[tier]
+        if tier == 1:
+            phase_name = "Phase 1: Core Components"
+        elif tier == 2:
+            phase_name = "Phase 2: Basic Modules"
+        elif tier == 3:
+            phase_name = "Phase 3: Complex Modules"
+        elif tier == 4:
+            phase_name = "Phase 4: Advanced Systems"
+        else:
+            phase_name = f"Phase {tier}: Integration & Features"
         
-        fig = go.Figure(data=[edge_trace, node_trace],
-                       layout=go.Layout(
-                        title=dict(
-                            text='Development Dependency Tree<br><sub>Green=Tier 1 (No deps), Yellow=Tier 2, Orange=Tier 3, Red=Tier 4</sub>',
-                            font=dict(size=16)
-                        ),
-                        showlegend=False,
-                        hovermode='closest',
-                        margin=dict(b=20,l=5,r=5,t=40),
-                        annotations=[ dict(
-                            text="Node size indicates dependency count. Click and drag to explore.",
-                            showarrow=False,
-                            xref="paper", yref="paper",
-                            x=0.005, y=-0.002 ) ],
-                        xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
-                        yaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
-                        height=600))
-        
-        st.plotly_chart(fig, use_container_width=True)
+        build_sequence[phase_name] = items
+    
+    return build_sequence
+
+
+def get_item_tier(item, dependencies):
+    """Get the tier level of an item."""
+    return calculate_dependency_tier(item, dependencies)
     
     with tab3:
         st.subheader("Tier Distribution Analysis")
