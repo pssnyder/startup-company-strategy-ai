@@ -8,10 +8,10 @@ An intelligent AI-powered strategic advisor for the business simulation game "St
 - Actionable Recommendations: Each insight comes with specific strategic actions
 
 ### Business Intelligence Evolution:
-**Stage 1:** Raw data collection  (save files, transactions)
-**Stage 2:** Organized logical processing (structured analysis functions)
-**Stage 3:** Automated visibility with trends (dashboards, metrics, progress bars, charts)
-**Stage 4:** Data-driven strategy automation (insight generation, pattern recognition, automatic recommendations)
+- **Stage 1:** Raw data collection  (save files, transactions)
+- **Stage 2:** Organized logical processing (structured analysis functions)
+- **Stage 3:** Automated visibility with trends (dashboards, metrics, progress bars, charts)
+- **Stage 4:** Data-driven strategy automation (insight generation, pattern recognition, automatic recommendations)
 
 ## 🎯 Features
 
