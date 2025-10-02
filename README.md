@@ -2,10 +2,15 @@
 
 An intelligent AI-powered strategic advisor for the business simulation game "Startup Company". This tool analyzes your game saves and provides comprehensive strategic recommendations using Google's Gemini AI.
 
-## ✅ Project Status (Stage 4 Automation)
+## ✅ Project Status (Stage 4 Strategic Insight Automation)
 - Real-time Strategic Alerts: Automated critical issue detection
 - Pattern-Based Insights: System automatically identifies opportunities, risks, and optimization areas
 - Actionable Recommendations: Each insight comes with specific strategic actions
+
+## Business Intelligence Gateway 
+- Current Company: Momentum AI
+- CEO: Alex Corbin
+- 🐦‍🔥[Project Phoenix Insights](https://project-phoenix.streamlit.app/)
 
 ### Business Intelligence Evolution:
 - **Stage 1:** Raw data collection  (save files, transactions)
