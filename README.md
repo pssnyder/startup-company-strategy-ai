@@ -2,10 +2,13 @@
 
 An intelligent AI-powered strategic advisor for the business simulation game "Startup Company". This tool analyzes your game saves and provides comprehensive strategic recommendations using Google's Gemini AI.
 
-## ✅ Project Status (Stage 4 Strategic Insight Automation)
-- Real-time Strategic Alerts: Automated critical issue detection
-- Pattern-Based Insights: System automatically identifies opportunities, risks, and optimization areas
-- Actionable Recommendations: Each insight comes with specific strategic actions
+## ✅ Project Status (Stage 4+ Strategic Insight Automation)
+- **Real-time Strategic Alerts**: Automated critical issue detection
+- **Pattern-Based Insights**: System automatically identifies opportunities, risks, and optimization areas
+- **Actionable Recommendations**: Each insight comes with specific strategic actions
+- **Live Game Integration**: Auto-sync with game saves for real-time dashboard updates
+- **Team Assignment Intelligence**: AI-powered resource allocation and work prioritization
+- **Feature Development Tracking**: Real-time dependency analysis and component production planning
 
 ## Business Intelligence Gateway 
 - Current Company: Momentum AI
@@ -21,12 +24,16 @@ An intelligent AI-powered strategic advisor for the business simulation game "St
 
 ## 🎯 Features
 
-- **Save File Analysis**: Parse Startup Company save files to extract game state
+- **Live Game Integration**: Real-time monitoring of game saves with automatic dashboard updates
+- **Intelligent Feature Analysis**: Real feature name detection and dependency mapping from actual game data
+- **Team Assignment Intelligence**: AI-powered recommendations for optimal resource allocation
+- **Production Planning**: Smart component production prioritization with WSJF scoring
+- **Save File Analysis**: Parse Startup Company save files to extract comprehensive game state
 - **Strategic Insights**: AI-powered analysis of business metrics and performance  
 - **Risk Assessment**: Identify critical issues like low user satisfaction or cash flow problems
-- **Production Planning**: Optimize resource allocation and component production
-- **Financial Analysis**: Track runway, burn rate, and financial health
-- **Actionable Recommendations**: Get specific, prioritized action plans
+- **Dependency Visualization**: Interactive hierarchical trees showing feature requirements and blocking components
+- **Financial Analysis**: Track runway, burn rate, and financial health with trend analysis
+- **Actionable Recommendations**: Get specific, prioritized action plans with team assignments
 
 ## 🏗️ Architecture
 
@@ -64,11 +71,14 @@ python startup_monitor.py
 ```
 
 This creates a **live game companion** that:
-- 🔄 **Auto-monitors** your game's autosave files
+- 🔄 **Auto-monitors** your game's autosave files with intelligent fallback
 - 📊 **Real-time alerts** for critical issues (low satisfaction, cash flow)
 - 📈 **Trend analysis** tracks your progress over time
 - 🤖 **AI insights** every 5 minutes with strategic recommendations
 - 💾 **Historical data** logging for pattern analysis
+- 👥 **Team assignments** showing who should work on which components
+- 🌳 **Live dependency trees** with real inventory counts and blocking components
+- 🎯 **WSJF prioritization** for feature development planning
 
 ### Manual Analysis
 

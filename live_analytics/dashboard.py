@@ -8,6 +8,22 @@ from pathlib import Path
 from datetime import datetime, timedelta
 import numpy as np
 
+# Import our enhanced systems
+from utilities.live_file_sync import (
+    load_game_data, 
+    get_environment_status,
+    is_running_locally,
+    verify_data_sources
+)
+from utilities.enhanced_feature_analysis import get_comprehensive_feature_analysis
+from utilities.workforce_management import (
+    analyze_employee_work_queues, 
+    analyze_production_requirements,
+    generate_standup_agenda,
+    generate_calendar_events,
+    calculate_optimal_team_composition
+)
+
 # --- Page Configuration ---
 st.set_page_config(
     page_title="Momentum AI - Project Phoenix",
@@ -16,21 +32,19 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# --- Data Loading ---
-@st.cache_data
-def load_data():
-    """Loads the save game data from the local JSON file."""
-    save_file_path = Path(__file__).parent / "save_data" / "sg_momentum ai.json"
+# --- Live Data Loading ---
+def load_live_data():
+    """Load data with live file sync support"""
     try:
-        with open(save_file_path, 'r') as f:
-            data = json.load(f)
-        return data
-    except FileNotFoundError:
-        st.error(f"Error: The save file was not found at {save_file_path}. Please ensure the file exists.")
+        return load_game_data()
+    except Exception as e:
+        st.error(f"Error loading game data: {e}")
         return None
-    except json.JSONDecodeError:
-        st.error(f"Error: Could not decode the JSON from {save_file_path}. The file might be corrupted.")
-        return None
+
+@st.cache_data(ttl=30)  # Cache for 30 seconds to allow for real-time updates
+def load_data():
+    """Legacy function - redirects to live data loading"""
+    return load_live_data()
 
 data = load_data()
 
@@ -1210,14 +1224,29 @@ def get_tier_urgency_reason(tier, team_analysis):
 
 # --- Page Navigation ---
 def main():
+    # Note: File monitoring disabled to prevent auto-refresh
+    # User will manually refresh when they want to see updates
+    # if is_running_locally():
+    #     if 'file_observer' not in st.session_state:
+    #         st.session_state.file_observer = setup_live_monitoring()
+
     st.sidebar.title("🐦‍🔥 Project Phoenix")
     st.sidebar.markdown("---")
+    
+    # Data Source Debug Panel (expandable)
+    with st.sidebar.expander("🔧 Data Source Debug", expanded=False):
+        if st.button("🔍 Verify Data Sources"):
+            verification = verify_data_sources()
+            st.json(verification)
     
     pages = {
         "🏠 Executive Overview": show_executive_overview,
         "📦 Product Management": show_product_management,
         "👥 Human Resources": show_human_resources,
-        "🔬 Research & Development": show_research_development
+        "🔬 Research & Development": show_research_development,
+        "📅 Daily Standup": show_daily_standup,
+        "📋 Production Planning": show_production_planning,
+        "🎯 Talent Acquisition": show_talent_acquisition
     }
     
     selected_page = st.sidebar.selectbox("Navigate to:", list(pages.keys()))
@@ -1245,7 +1274,37 @@ def show_executive_overview(data):
     st.title("🏠 Executive Overview")
     st.markdown("**Real-time strategic overview of Momentum AI**")
     
-    # --- Key Metrics ---
+    # --- Live Sync Status ---
+    env_status = get_environment_status()
+    
+    col_env1, col_env2, col_env3 = st.columns([3, 2, 1])
+    
+    with col_env1:
+        if env_status['auto_sync']:
+            st.success(f"🔄 **{env_status['data_source']}**")
+        elif env_status['backup_available']:
+            if env_status['live_file_available']:
+                st.warning(f"📁 **{env_status['data_source']}** (Live file sync disabled)")
+            else:
+                st.info(f"☁️ **{env_status['data_source']}**")
+        else:
+            st.error("❌ **No Data Source Available**")
+    
+    with col_env2:
+        st.caption(f"📅 **Data as of:** {env_status['last_updated']}")
+        if env_status.get('data_source_detail'):
+            with st.expander("📋 Source Details"):
+                st.code(env_status['data_source_detail'], language=None)
+    
+    with col_env3:
+        if st.button("🔄 Refresh", help="Refresh dashboard data"):
+            st.cache_data.clear()
+            # Clear session state data source to force reload
+            if 'data_source' in st.session_state:
+                del st.session_state.data_source
+            st.rerun()
+    
+    st.divider()
     col1, col2, col3, col4 = st.columns(4)
     
     balance = data.get('balance', 0)
@@ -1553,6 +1612,117 @@ def show_product_management(data):
     
     st.divider()
     
+    # --- Enhanced Feature Development Analysis ---
+    st.header("🚀 Feature Development Intelligence")
+    feature_analysis = get_comprehensive_feature_analysis(data)
+    
+    # Feature Overview Metrics
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        st.metric("Total Features", feature_analysis['feature_summary']['total'])
+    with col2:
+        st.metric("Ready to Build", feature_analysis['feature_summary']['ready_to_build'], 
+                 delta=None, help="Features with all components available")
+    with col3:
+        st.metric("Partially Ready", feature_analysis['feature_summary']['partially_ready'],
+                 help="Features missing some components")
+    with col4:
+        st.metric("Blocked", feature_analysis['feature_summary']['blocked'],
+                 delta=feature_analysis['feature_summary']['blocked'] * -1 if feature_analysis['feature_summary']['blocked'] > 0 else None,
+                 help="Features missing many components")
+    
+    # Feature Status Table
+    if feature_analysis['features']:
+        st.subheader("📋 Feature Status Overview")
+        
+        feature_data = []
+        for feature in feature_analysis['features']:
+            missing_count = len(feature['missing_components'])
+            missing_list = ', '.join(feature['blocking_components'][:3])  # Show first 3
+            if len(feature['blocking_components']) > 3:
+                missing_list += f" (+{len(feature['blocking_components']) - 3} more)"
+            
+            feature_data.append({
+                'Feature Name': feature['name'],
+                'Status': feature['status'].replace('_', ' ').title(),
+                'Readiness': f"{feature['readiness_score']:.0f}%",
+                'Missing Components': missing_count,
+                'Blocking Components': missing_list if missing_list else "None"
+            })
+        
+        df = pd.DataFrame(feature_data)
+        st.dataframe(
+            df,
+            use_container_width=True,
+            column_config={
+                "Readiness": st.column_config.ProgressColumn(
+                    "Readiness",
+                    help="Percentage of required components available",
+                    min_value=0,
+                    max_value=100,
+                ),
+                "Status": st.column_config.TextColumn(
+                    "Status",
+                    help="Current development status",
+                )
+            }
+        )
+    
+    # Team Assignment Analysis
+    if feature_analysis['missing_components']:
+        st.subheader("👥 Team Assignment Recommendations")
+        
+        assignments = feature_analysis['team_assignments']
+        
+        col1, col2 = st.columns([2, 1])
+        
+        with col1:
+            st.markdown("**Component Production Assignments:**")
+            
+            assignment_data = []
+            for component, assignment in assignments['assignments'].items():
+                assignment_data.append({
+                    'Component': component,
+                    'Needed': assignment['needed'],
+                    'Assigned Role': assignment['assigned_role'],
+                    'Priority': assignment['priority'],
+                    'Est. Days': assignment['estimated_days']
+                })
+            
+            assign_df = pd.DataFrame(assignment_data)
+            st.dataframe(assign_df, use_container_width=True)
+        
+        with col2:
+            st.markdown("**Workload by Role:**")
+            
+            for role, workload in assignments['workload_by_role'].items():
+                with st.container():
+                    st.markdown(f"**{role}**")
+                    st.markdown(f"- {workload['components']} components")
+                    st.markdown(f"- {workload['total_items']} total items")
+                    st.markdown(f"- ~{workload['estimated_days']} days")
+                    st.markdown("---")
+    
+    # Production Queue Status
+    production = feature_analysis['production_analysis']
+    if production['active_plans'] > 0:
+        st.subheader("⚙️ Current Production Queue")
+        
+        col1, col2 = st.columns([3, 1])
+        
+        with col1:
+            for plan in production['plan_details']:
+                with st.expander(f"📋 {plan['name']} ({plan['total_items']} items)"):
+                    for component, count in plan['components'].items():
+                        st.markdown(f"- {component}: {count}")
+        
+        with col2:
+            st.metric("Active Plans", production['active_plans'])
+            planned_total = sum(production['planned_production'].values())
+            st.metric("Total Planned Items", planned_total)
+    
+    st.divider()
+    
     # --- Development Dependency Tree ---
     st.header("🌳 Development Dependency Tree")
     
@@ -1645,10 +1815,14 @@ def show_product_management(data):
         st.subheader("🌳 Hierarchical Dependency Tree")
         st.markdown("*Select a product/feature to see its complete dependency chain from top to bottom*")
         
-        # Product/Feature selector
+        # Product/Feature selector - use enhanced feature analysis
         available_features = []
-        if data and 'featureInstances' in data:
-            available_features = [f.get('featureName', 'Unknown') for f in data['featureInstances']]
+        if feature_analysis and feature_analysis['features']:
+            available_features = [f['name'] for f in feature_analysis['features']]
+        
+        # Fallback to basic extraction if enhanced analysis failed
+        if not available_features and data and 'featureInstances' in data:
+            available_features = [f.get('name', f'Feature_{i}') for i, f in enumerate(data['featureInstances'])]
         
         # Add some key products for demo purposes if no features available
         if not available_features:
@@ -1704,37 +1878,50 @@ def show_product_management(data):
             st.markdown("🔴 **Tier 4**  \nAdvanced Systems  \n(Many dependencies)")
 
 
+def extract_real_feature_dependencies():
+    """Extract real feature dependencies from save file."""
+    try:
+        with open('save_data/sg_momentum ai.json', 'r') as f:
+            data = json.load(f)
+        
+        # Extract inventory
+        inventory = data.get('inventory', {})
+        
+        # Extract feature requirements
+        feature_dependencies = {}
+        feature_instances = data.get('featureInstances', [])
+        
+        for i, feature_data in enumerate(feature_instances):
+            feature_name = feature_data.get('name', f'Feature_{i}')
+            requirements = feature_data.get('requirements', {})
+            
+            if requirements:
+                # Convert requirements dict to list of components needed
+                deps = []
+                for component, count in requirements.items():
+                    if count > 0:
+                        deps.append(component)
+                feature_dependencies[feature_name] = deps
+            
+        return feature_dependencies, inventory
+    except Exception as e:
+        st.error(f"Error loading feature dependencies: {e}")
+        return {}, {}
+
 def build_hierarchical_dependency_tree(feature_name, dependencies):
-    """Build a hierarchical tree structure for a specific feature."""
-    # Map feature names to their technical dependencies
-    feature_mappings = {
-        'Video Feature': ['VideoPlaybackModule'],
-        'Login System': ['AuthenticationModule'],
-        'Payment Gateway': ['PaymentGatewayModule'],
-        'Search Engine': ['SearchModule'],
-        'Content Management': ['ContentManagementModule'],
-        'Landing Page': ['FrontendModule', 'SeoModule'],
-        'Database': ['DatabaseLayer'],
-        'API System': ['ApiClientModule'],
-        'Email System': ['EmailModule'],
-        'File Upload': ['StorageModule'],
-        'User Interface': ['InterfaceModule', 'ResponsiveUi'],
-        'Backend Services': ['BackendModule'],
-        'Notifications': ['NotificationModule'],
-        'Localization': ['LocalizationModule'],
-        'Compression': ['BandwidthCompressionModule'],
-    }
+    """Build a hierarchical tree structure for a specific feature using real save data."""
     
-    # Get the main dependencies for this feature
-    main_deps = feature_mappings.get(feature_name, [])
-    if not main_deps and feature_name in dependencies:
-        main_deps = [feature_name]
+    # Get real dependencies from save file
+    real_dependencies, inventory = extract_real_feature_dependencies()
     
-    if not main_deps:
+    # Use real dependencies if available, fallback to provided dependencies
+    feature_deps = real_dependencies.get(feature_name, dependencies.get(feature_name, []))
+    
+    if not feature_deps:
         return None
-    
+
     def build_tree_recursive(item, visited=None):
-        """Recursively build dependency tree."""
+        """Recursively build dependency tree with inventory information."""
         if visited is None:
             visited = set()
         
@@ -1743,6 +1930,10 @@ def build_hierarchical_dependency_tree(feature_name, dependencies):
         
         visited.add(item)
         
+        # Get inventory count for this component
+        available_count = inventory.get(item, 0)
+        
+        # For components, check if there are sub-dependencies
         item_deps = dependencies.get(item, [])
         children = []
         
@@ -1754,20 +1945,23 @@ def build_hierarchical_dependency_tree(feature_name, dependencies):
             "name": item,
             "children": children,
             "tier": get_item_tier(item, dependencies),
-            "type": classify_item_type(item)
+            "type": classify_item_type(item),
+            "available": available_count,
+            "status": "available" if available_count > 0 else "needed"
         }
     
-    # Build tree for each main dependency
+    # Build tree for each dependency
     trees = []
-    for dep in main_deps:
+    for dep in feature_deps:
         tree = build_tree_recursive(dep)
         trees.append(tree)
     
     return {
         "name": feature_name,
         "children": trees,
-        "tier": len(main_deps) + 2,  # Features are typically higher tier
-        "type": "Feature"
+        "tier": len(feature_deps) + 2,
+        "type": "Feature",
+        "total_dependencies": len(feature_deps)
     }
 
 
@@ -1779,14 +1973,16 @@ def create_dependency_tree_visualization(tree_data, feature_name):
         nodes = []
         edges = []
         
-        # Add current node
+        # Add current node with inventory information
         node_info = {
             'name': node['name'],
             'level': level,
             'tier': node.get('tier', 1),
             'type': node.get('type', 'Unknown'),
             'x': x_pos,
-            'parent': parent
+            'parent': parent,
+            'available': node.get('available', 0),
+            'status': node.get('status', 'unknown')
         }
         nodes.append(node_info)
         
@@ -1832,15 +2028,38 @@ def create_dependency_tree_visualization(tree_data, feature_name):
         mode='lines'
     )
     
-    # Prepare node traces
+    # Prepare node traces with inventory information
     node_x = [node['x'] for node in nodes]
     node_y = [-node['level'] for node in nodes]
-    node_text = [node['name'].replace('Component', '').replace('Module', '') for node in nodes]
-    node_hover = [f"{node['name']}<br>Tier {node['tier']}<br>Level {node['level']}<br>Type: {node['type']}" for node in nodes]
+    node_text = []
+    node_hover = []
+    node_colors = []
     
-    # Color by tier
-    tier_colors = {1: '#90EE90', 2: '#FFD700', 3: '#FFA500', 4: '#FF6347', 5: '#9370DB'}
-    node_colors = [tier_colors.get(node['tier'], '#808080') for node in nodes]
+    for node in nodes:
+        # Create display text with inventory count
+        display_name = node['name'].replace('Component', '').replace('Module', '')
+        if node.get('available', 0) > 0:
+            display_name += f"({node['available']})"
+        node_text.append(display_name)
+        
+        # Create hover text with full information
+        hover_text = f"{node['name']}<br>Tier {node['tier']}<br>Level {node['level']}<br>Type: {node['type']}"
+        if 'available' in node:
+            hover_text += f"<br>Available: {node['available']}"
+            hover_text += f"<br>Status: {node['status']}"
+        node_hover.append(hover_text)
+        
+        # Color by availability status
+        if node['type'] == 'Feature':
+            node_colors.append('#4CAF50')  # Green for features
+        elif node.get('status') == 'available':
+            node_colors.append('#81C784')  # Light green for available components
+        elif node.get('status') == 'needed':
+            node_colors.append('#F44336')  # Red for needed components
+        else:
+            # Fallback to tier coloring
+            tier_colors = {1: '#90EE90', 2: '#FFD700', 3: '#FFA500', 4: '#FF6347', 5: '#9370DB'}
+            node_colors.append(tier_colors.get(node['tier'], '#808080'))
     
     # Size by level (root larger)
     node_sizes = [30 if node['level'] == 0 else 20 if node['level'] == 1 else 15 for node in nodes]
@@ -1864,7 +2083,7 @@ def create_dependency_tree_visualization(tree_data, feature_name):
         data=[edge_trace, node_trace],
         layout=go.Layout(
             title=dict(
-                text=f'Dependency Hierarchy for {feature_name}<br><sub>Top-down view: Features → Modules → Components</sub>',
+                text=f'Live Dependency Status for {feature_name}<br><sub>Real inventory: Green=Available, Red=Needed (counts shown)</sub>',
                 font=dict(size=16)
             ),
             showlegend=False,
@@ -2248,6 +2467,326 @@ def show_research_development(data):
             cols[i % num_columns].markdown(f"- {item}")
     else:
         st.info("No research completed yet.")
+
+def show_daily_standup(data):
+    """Daily standup agenda with individual work queues and calendar events."""
+    st.title("📅 Daily Standup")
+    st.markdown("**Team status, work queues, and today's agenda**")
+    
+    # Analyze employee work queues
+    employee_analysis = analyze_employee_work_queues(data)
+    
+    if not employee_analysis:
+        st.warning("No employee data available for analysis.")
+        return
+    
+    # Generate standup agenda
+    standup_agenda = generate_standup_agenda(employee_analysis)
+    
+    # Generate calendar events
+    production_requirements = analyze_production_requirements(data)
+    calendar_events = generate_calendar_events(employee_analysis, production_requirements)
+    
+    # Display today's calendar events first
+    st.header("📅 Today's Calendar")
+    today_events = [event for event in calendar_events if event['date'] == datetime.now().strftime('%Y-%m-%d')]
+    
+    if today_events:
+        for event in today_events:
+            priority_icon = {'URGENT': '🚨', 'DAILY': '📋', 'WEEKLY': '📊'}.get(event.get('priority', ''), '📅')
+            
+            with st.expander(f"{priority_icon} {event['title']} - {event['time']}", expanded=True):
+                st.write(f"**Duration:** {event['duration']}")
+                
+                if event['type'] == 'STANDUP':
+                    st.write("**Agenda:**")
+                    for item in event['agenda']:
+                        status_icon = '🟢' if 'Available' in item['status'] else '🔄'
+                        capacity_bar = '█' * int(item['capacity_rating'] / 20) + '░' * (5 - int(item['capacity_rating'] / 20))
+                        
+                        st.write(f"{status_icon} **{item['employee']}** ({item['specialization']})")
+                        st.write(f"   Status: {item['status']}")
+                        st.write(f"   Details: {item['details']}")
+                        st.write(f"   Capacity: {capacity_bar} ({item['capacity_rating']:.1f})")
+                        st.write("")
+                
+                elif event['type'] == 'PRODUCT_REVIEW':
+                    st.write(f"**Focus:** {event['focus']}")
+                    
+                    # Show key metrics for product review
+                    features_summary = production_requirements['features_summary']
+                    col1, col2, col3, col4 = st.columns(4)
+                    
+                    with col1:
+                        st.metric("In Development", features_summary['in_development'])
+                    with col2:
+                        st.metric("Needs Dev", features_summary['needs_development'])
+                    with col3:
+                        st.metric("Needs Art", features_summary['needs_art'])
+                    with col4:
+                        st.metric("Completed", features_summary['completed'])
+                
+                elif event['type'] == 'HEADHUNTING':
+                    st.write("**Critical Skill Gaps Identified:**")
+                    for gap in event['critical_gaps']:
+                        st.error(f"🎯 {gap['skill'].title()}: {gap['message']}")
+                        st.write(f"   Impact: {gap['impact']}")
+    else:
+        st.info("No special events scheduled for today.")
+    
+    # Individual work queue analysis
+    st.header("👥 Team Work Queues")
+    
+    for emp_id, emp_data in employee_analysis.items():
+        with st.expander(f"👤 {emp_data['name']} - {emp_data['specialization']}", expanded=False):
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                st.write(f"**Role:** {emp_data['role']}")
+                st.write(f"**Tier:** {emp_data['tier']}")
+                st.write(f"**Salary:** ${emp_data['salary']:,}")
+                st.write(f"**Effectiveness:** {emp_data['effectiveness']}%")
+            
+            with col2:
+                st.write("**Skills:**")
+                for skill, value in emp_data['skills'].items():
+                    skill_bar = '█' * int(value / 20) + '░' * (5 - int(value / 20))
+                    st.write(f"{skill.title()}: {skill_bar} ({value})")
+            
+            if emp_data['current_assignment']:
+                assignment = emp_data['current_assignment']
+                st.write("**Current Assignment:**")
+                st.write(f"Feature: {assignment['feature_name']}")
+                st.write(f"Role: {assignment['assignment_role']}")
+                
+                # Progress visualization
+                dev_progress = assignment['dev_progress'] * 100
+                art_progress = assignment['art_progress'] * 100
+                
+                progress_col1, progress_col2 = st.columns(2)
+                with progress_col1:
+                    st.progress(dev_progress / 100, text=f"Dev Progress: {dev_progress:.0f}%")
+                with progress_col2:
+                    st.progress(art_progress / 100, text=f"Art Progress: {art_progress:.0f}%")
+            else:
+                st.info("Available for new assignment")
+
+def show_production_planning(data):
+    """Production capacity analysis and work queue optimization."""
+    st.title("📋 Production Planning")
+    st.markdown("**Capacity analysis and workflow optimization**")
+    
+    # Analyze production requirements
+    production_requirements = analyze_production_requirements(data)
+    
+    # Show production status overview
+    st.header("📊 Production Status Overview")
+    features_summary = production_requirements['features_summary']
+    
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        st.metric("🔄 In Development", features_summary['in_development'])
+    with col2:
+        st.metric("⏳ Needs Development", features_summary['needs_development'])
+    with col3:
+        st.metric("🎨 Needs Art", features_summary['needs_art'])
+    with col4:
+        st.metric("✅ Completed", features_summary['completed'])
+    
+    # Capacity analysis
+    st.header("⚡ Capacity Analysis")
+    capacity_analysis = production_requirements['capacity_analysis']
+    
+    # Create capacity visualization
+    skills = list(capacity_analysis.keys())
+    demand_values = [capacity_analysis[skill]['demand'] for skill in skills]
+    available_values = [capacity_analysis[skill]['available'] for skill in skills]
+    utilization_values = [capacity_analysis[skill]['utilization'] for skill in skills]
+    
+    # Capacity chart
+    fig = go.Figure()
+    
+    fig.add_trace(go.Bar(
+        name='Demand',
+        x=skills,
+        y=demand_values,
+        marker_color='lightcoral'
+    ))
+    
+    fig.add_trace(go.Bar(
+        name='Available',
+        x=skills,
+        y=available_values,
+        marker_color='lightblue'
+    ))
+    
+    fig.update_layout(
+        title="Skill Demand vs Available Capacity",
+        xaxis_title="Skills",
+        yaxis_title="Capacity Units",
+        barmode='group'
+    )
+    
+    st.plotly_chart(fig, use_container_width=True)
+    
+    # Utilization chart
+    fig_util = go.Figure(data=[
+        go.Bar(x=skills, y=utilization_values, marker_color='green')
+    ])
+    
+    fig_util.update_layout(
+        title="Skill Utilization Rates",
+        xaxis_title="Skills",
+        yaxis_title="Utilization %",
+        yaxis=dict(range=[0, 150])  # Show up to 150% to highlight overutilization
+    )
+    
+    # Add reference line at 100%
+    fig_util.add_hline(y=100, line_dash="dash", line_color="red", 
+                       annotation_text="100% Capacity")
+    
+    st.plotly_chart(fig_util, use_container_width=True)
+    
+    # Recommendations
+    st.header("💡 Work Queue Recommendations")
+    recommendations = production_requirements['recommendations']
+    
+    if recommendations:
+        # Group recommendations by priority
+        high_priority = [r for r in recommendations if r['priority'] == 'HIGH']
+        medium_priority = [r for r in recommendations if r['priority'] == 'MEDIUM']
+        low_priority = [r for r in recommendations if r['priority'] == 'LOW']
+        
+        if high_priority:
+            st.subheader("🚨 High Priority Actions")
+            for rec in high_priority:
+                st.error(f"**{rec['type']}**: {rec['message']}")
+                st.write(f"Impact: {rec['impact']}")
+                st.write("")
+        
+        if medium_priority:
+            st.subheader("⚠️ Medium Priority Actions")
+            for rec in medium_priority:
+                st.warning(f"**{rec['type']}**: {rec['message']}")
+                st.write(f"Impact: {rec['impact']}")
+                st.write("")
+        
+        if low_priority:
+            st.subheader("💡 Low Priority Optimizations")
+            for rec in low_priority:
+                st.info(f"**{rec['type']}**: {rec['message']}")
+                st.write(f"Impact: {rec['impact']}")
+                st.write("")
+    else:
+        st.success("🎉 Production capacity is well-balanced! No immediate actions required.")
+
+def show_talent_acquisition(data):
+    """Talent acquisition and hiring strategy with ROI analysis."""
+    st.title("🎯 Talent Acquisition")
+    st.markdown("**Strategic hiring recommendations and ROI analysis**")
+    
+    # Analyze employee work queues and production requirements
+    employee_analysis = analyze_employee_work_queues(data)
+    production_requirements = analyze_production_requirements(data)
+    
+    # Calculate optimal team composition
+    team_optimization = calculate_optimal_team_composition(production_requirements)
+    
+    # Current team overview
+    st.header("👥 Current Team Overview")
+    
+    if employee_analysis:
+        total_employees = len(employee_analysis)
+        total_salary_cost = sum(emp['salary'] for emp in employee_analysis.values())
+        avg_capacity = sum(emp['capacity_rating'] for emp in employee_analysis.values()) / total_employees
+        
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.metric("Total Employees", total_employees)
+        with col2:
+            st.metric("Monthly Salary Cost", f"${total_salary_cost:,}")
+        with col3:
+            st.metric("Avg Capacity Rating", f"{avg_capacity:.1f}")
+        
+        # Team composition by specialization
+        specializations = {}
+        for emp in employee_analysis.values():
+            spec = emp['specialization']
+            if spec not in specializations:
+                specializations[spec] = 0
+            specializations[spec] += 1
+        
+        st.subheader("Team Composition")
+        spec_df = pd.DataFrame(list(specializations.items()), columns=['Specialization', 'Count'])
+        
+        fig_pie = px.pie(spec_df, values='Count', names='Specialization', 
+                        title="Current Team by Specialization")
+        st.plotly_chart(fig_pie, use_container_width=True)
+    
+    # Hiring recommendations
+    st.header("🎯 Strategic Hiring Recommendations")
+    hiring_recs = team_optimization['hiring_recommendations']
+    
+    if hiring_recs:
+        st.write("Based on current production requirements and capacity gaps:")
+        
+        for i, rec in enumerate(hiring_recs):
+            with st.expander(f"Hire {rec['skill'].title()} Specialist (Tier {rec['tier']})", expanded=True):
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    st.metric("Estimated Salary", f"${rec['estimated_salary']:,}")
+                    st.metric("Gap Coverage", f"{rec['gap_coverage']:.1f} units")
+                
+                with col2:
+                    st.metric("ROI Estimate", f"{rec['roi_estimate']:.1%}")
+                    roi_color = "green" if rec['roi_estimate'] > 0.2 else "orange" if rec['roi_estimate'] > 0 else "red"
+                    st.markdown(f"<span style='color: {roi_color}'>{'Strong ROI' if rec['roi_estimate'] > 0.2 else 'Moderate ROI' if rec['roi_estimate'] > 0 else 'Questionable ROI'}</span>", unsafe_allow_html=True)
+        
+        # Total investment summary
+        st.subheader("💰 Investment Summary")
+        total_cost = team_optimization['total_hiring_cost']
+        total_improvement = team_optimization['expected_capacity_improvement']
+        
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.metric("Total Monthly Cost", f"${total_cost:,}")
+        with col2:
+            st.metric("Capacity Improvement", f"{total_improvement:.1f} units")
+        with col3:
+            cost_per_unit = total_cost / max(total_improvement, 0.1)
+            st.metric("Cost per Capacity Unit", f"${cost_per_unit:,.0f}")
+    else:
+        st.success("🎉 Current team capacity appears sufficient for immediate needs!")
+    
+    # Market analysis (if candidate data available)
+    st.header("📊 Talent Market Analysis")
+    candidates = data.get("candidates", [])
+    
+    if candidates:
+        candidate_skills = {}
+        candidate_salaries = {}
+        
+        for candidate in candidates:
+            role = candidate.get("employeeTypeName", "Unknown")
+            salary = candidate.get("salary", 0)
+            level = candidate.get("level", 1)
+            
+            if role not in candidate_skills:
+                candidate_skills[role] = []
+                candidate_salaries[role] = []
+            
+            candidate_skills[role].append(level)
+            candidate_salaries[role].append(salary)
+        
+        st.subheader("Available Candidates by Role")
+        for role, levels in candidate_skills.items():
+            avg_level = sum(levels) / len(levels)
+            avg_salary = sum(candidate_salaries[role]) / len(candidate_salaries[role])
+            
+            st.write(f"**{role}**: {len(levels)} candidates, Avg Level: {avg_level:.1f}, Avg Salary: ${avg_salary:,.0f}")
+    else:
+        st.info("No candidate data available. Consider opening recruitment channels.")
 
 if __name__ == "__main__":
     main()
