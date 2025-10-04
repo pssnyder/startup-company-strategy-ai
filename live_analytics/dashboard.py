@@ -23,6 +23,21 @@ from utilities.workforce_management import (
     generate_calendar_events,
     calculate_optimal_team_composition
 )
+from utilities.enhanced_workforce_management import (
+    analyze_sales_team,
+    analyze_research_team,
+    analyze_developer_teams,
+    generate_professional_development_plan
+)
+from utilities.data_center_monitoring import analyze_data_center_performance
+from utilities.focused_team_management import analyze_manageable_team_members
+from utilities.static_evaluation_engine import run_static_evaluation
+from utilities.smart_recruitment import (
+    analyze_hiring_needs,
+    filter_candidates_by_role,
+    get_top_candidates_for_role,
+    generate_instant_hire_suggestion
+)
 
 # --- Page Configuration ---
 st.set_page_config(
@@ -88,50 +103,47 @@ def analyze_product_performance(data):
             insights.append({
                 'type': 'opportunity',
                 'title': 'Low Market Penetration',
-                'message': f"Only {market_penetration:.1f}% of potential users acquired. Strong growth opportunity.",
-                'action': 'Consider increasing marketing spend or improving conversion rate.'
+                'message': f"Current market share: {market_penetration:.1f}%",
+                'metric': 'Market penetration below 10% threshold',
+                'action_type': 'MARKETING_EXPANSION'
             })
         elif market_penetration > 50:
             insights.append({
                 'type': 'success',
                 'title': 'Strong Market Position',
-                'message': f"Captured {market_penetration:.1f}% of potential market.",
-                'action': 'Focus on retention and monetization strategies.'
+                'message': f"Current market share: {market_penetration:.1f}%",
+                'metric': 'Market penetration above 50% threshold',
+                'action_type': 'RETENTION_OPTIMIZATION'
             })
     
-    # Satisfaction insights
+    # Satisfaction thresholds
     if analysis['satisfaction'] < 60:
         insights.append({
             'type': 'critical',
-            'title': 'User Satisfaction Critical',
-            'message': f"Satisfaction at {analysis['satisfaction']}% - users may churn.",
-            'action': 'Immediate focus on product quality and performance improvements.'
+            'title': 'User Satisfaction Below Target',
+            'message': f"Current satisfaction: {analysis['satisfaction']}%",
+            'metric': 'Below 60% satisfaction threshold',
+            'action_type': 'QUALITY_IMPROVEMENT_REQUIRED'
         })
     elif analysis['satisfaction'] > 80:
         insights.append({
             'type': 'success',
             'title': 'High User Satisfaction',
-            'message': f"Excellent satisfaction at {analysis['satisfaction']}%.",
-            'action': 'Leverage satisfaction for viral growth and premium features.'
+            'message': f"Current satisfaction: {analysis['satisfaction']}%",
+            'metric': 'Above 80% satisfaction threshold',
+            'action_type': 'SATISFACTION_MAINTAINED'
         })
     
-    # Quality vs Efficiency balance
+    # Quality vs Efficiency ratio analysis
     if analysis['quality'] > 0 and analysis['efficiency'] > 0:
         qe_ratio = analysis['quality'] / analysis['efficiency']
-        if qe_ratio > 3:
-            insights.append({
-                'type': 'optimization',
-                'title': 'Quality Over-Investment',
-                'message': f"Quality ({analysis['quality']}) significantly exceeds efficiency ({analysis['efficiency']}).",
-                'action': 'Consider focusing on efficiency improvements for better ROI.'
-            })
-        elif qe_ratio < 0.5:
-            insights.append({
-                'type': 'warning',
-                'title': 'Efficiency Over Quality',
-                'message': f"Efficiency ({analysis['efficiency']}) much higher than quality ({analysis['quality']}).",
-                'action': 'Balance with quality improvements to maintain user satisfaction.'
-            })
+        insights.append({
+            'type': 'metric',
+            'title': 'Quality/Efficiency Ratio',
+            'message': f"Q/E Ratio: {qe_ratio:.2f}",
+            'metric': f"Quality: {analysis['quality']}, Efficiency: {analysis['efficiency']}",
+            'action_type': 'RATIO_TRACKED' if 0.5 <= qe_ratio <= 3 else 'RATIO_IMBALANCED'
+        })
     
     analysis['insights'] = insights
     return analysis
@@ -1246,7 +1258,8 @@ def main():
         "🔬 Research & Development": show_research_development,
         "📅 Daily Standup": show_daily_standup,
         "📋 Production Planning": show_production_planning,
-        "🎯 Talent Acquisition": show_talent_acquisition
+        "�️ Data Center Monitoring": show_data_center_monitoring,
+        "�💼 Sales Team Meeting": show_sales_team_meeting
     }
     
     selected_page = st.sidebar.selectbox("Navigate to:", list(pages.keys()))
@@ -1342,9 +1355,24 @@ def show_executive_overview(data):
                 st.info(f"💡 **{insight['title']}**: {insight['message']}")
             elif insight['type'] == 'success':
                 st.success(f"✅ **{insight['title']}**: {insight['message']}")
+            elif insight['type'] == 'metric':
+                st.info(f"📊 **{insight['title']}**: {insight['message']}")
             
-            with st.expander(f"Recommended Action: {insight['title']}"):
-                st.write(insight['action'])
+            # Display data-driven metrics instead of abstract actions
+            with st.expander(f"Metric Details: {insight['title']}", expanded=False):
+                st.markdown(f"**Measurement**: {insight['metric']}")
+                st.markdown(f"**Action Category**: {insight['action_type']}")
+                
+                # Show specific data thresholds that triggered this insight
+                if insight['action_type'] == 'MARKETING_EXPANSION':
+                    st.markdown("• **Threshold**: Market penetration <10%")
+                    st.markdown("• **Game Action**: Increase marketing budget allocation")
+                elif insight['action_type'] == 'QUALITY_IMPROVEMENT_REQUIRED':
+                    st.markdown("• **Threshold**: Satisfaction <60%") 
+                    st.markdown("• **Game Action**: Assign developers to bug fixes and feature improvements")
+                elif insight['action_type'] == 'RATIO_IMBALANCED':
+                    st.markdown("• **Threshold**: Quality/Efficiency ratio outside 0.5-3.0 range")
+                    st.markdown("• **Game Action**: Rebalance work queue priorities")
     else:
         st.info("No strategic insights available yet. Continue operations to generate data.")
     
@@ -2419,34 +2447,228 @@ def show_human_resources(data):
     st.title("👥 Human Resources")
     st.markdown("**Talent acquisition and workforce optimization**")
     
-    # Recruitment Intelligence section (moved from main dashboard)
-    st.header("🎯 Recruitment Intelligence")
+    # Smart Hiring Analysis (NEW)
+    st.header("🎯 Strategic Hiring Analysis")
+    hiring_analysis = analyze_hiring_needs(data)
+    
+    if hiring_analysis['urgent_needs']:
+        st.subheader("🚨 Urgent Hiring Needs")
+        for need in hiring_analysis['urgent_needs']:
+            st.error(f"**{need['role']}**: {need['reason']}")
+            st.write(f"Focus: {need['component_focus']}")
+    
+    if hiring_analysis['hiring_priorities']:
+        st.subheader("📋 Hiring Priority Queue")
+        for priority in hiring_analysis['hiring_priorities'][:5]:  # Show top 5
+            urgency_icon = {'URGENT': '🚨', 'HIGH': '⚡', 'MEDIUM': '📋'}[priority['urgency']]
+            st.write(f"{urgency_icon} **{priority['role']}** - {priority['reason']}")
+    
+    # Instant Hire Suggestions
     candidates = data.get("candidates", [])
+    if candidates and hiring_analysis['urgent_needs']:
+        st.subheader("⚡ Instant Hire Recommendations")
+        instant_hire_suggestions = generate_instant_hire_suggestion(hiring_analysis, candidates)
+        
+        if instant_hire_suggestions['has_suggestions']:
+            for suggestion in instant_hire_suggestions['suggestions']:
+                candidate = suggestion['recommended_candidate']
+                need = suggestion['need']
+                
+                with st.expander(f"🎯 Hire {candidate['name']} for {need['role']}", expanded=True):
+                    col1, col2 = st.columns(2)
+                    
+                    with col1:
+                        st.write(f"**Candidate:** {candidate['name']}")
+                        st.write(f"**Speed:** {candidate['speed']}")
+                        st.write(f"**Level:** {candidate['level']}")
+                        st.write(f"**Expected Salary:** ${candidate['expected_salary']:,}")
+                    
+                    with col2:
+                        st.write(f"**Addresses:** {need['component_focus']}")
+                        st.write(f"**Urgency:** {need['urgency']}")
+                        recommendation = candidate['hire_recommendation']['overall_recommendation']
+                        rec_color = {'INSTANT_HIRE': '🟢', 'STRONG_CANDIDATE': '🟡', 'CONSIDER': '🟠'}.get(recommendation, '⚪')
+                        st.write(f"**Recommendation:** {rec_color} {recommendation}")
+                    
+                    st.success(f"💡 {suggestion['justification']}")
+                    
+                    if st.button(f"💰 Instant Hire {candidate['name']}", key=f"hire_{candidate['name']}"):
+                        st.success(f"✅ Would hire {candidate['name']} for ${candidate['expected_salary']:,} (Feature not implemented)")
+        else:
+            st.info("No instant hire candidates available for urgent needs.")
+    
+    # Targeted Recruitment by Role
+    if hiring_analysis['recommended_actions']:
+        st.header("🔍 Targeted Recruitment")
+        
+        for action in hiring_analysis['recommended_actions']:
+            role = action['role']
+            
+            with st.expander(f"{action['message']}", expanded=False):
+                st.write(f"**Focus:** {action['focus']}")
+                st.write(f"**Timeline:** {action['timeline']}")
+                st.write(f"**Reason:** {action['reason']}")
+                
+                if candidates:
+                    # Show filtered candidates for this role
+                    role_candidates = get_top_candidates_for_role(candidates, role, 3)
+                    
+                    if role_candidates:
+                        st.write(f"**Top {role} Candidates:**")
+                        
+                        for i, candidate in enumerate(role_candidates):
+                            rec = candidate['hire_recommendation']['overall_recommendation']
+                            rec_icon = {'INSTANT_HIRE': '🟢', 'STRONG_CANDIDATE': '🟡', 'CONSIDER': '🟠', 'PASS': '🔴'}[rec]
+                            
+                            st.write(f"{i+1}. {rec_icon} **{candidate['name']}** - Speed: {candidate['speed']}, Salary: ${candidate['expected_salary']:,}")
+                    else:
+                        st.write(f"❌ No {role} candidates available")
+    
+    # Professional Development section
+    st.header("📚 Professional Development")
+    dev_plan = generate_professional_development_plan(data)
+    
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.metric("Total Training Opportunities", dev_plan['total_training_opportunities'])
+    with col2:
+        st.metric("High Priority Training", len(dev_plan['high_priority_training']))
+    with col3:
+        st.metric("Estimated Cost", f"${dev_plan['estimated_total_cost']:,}")
+    
+    # High Priority Training
+    if dev_plan['high_priority_training']:
+        st.subheader("🚨 Urgent Training Needs")
+        for training in dev_plan['high_priority_training']:
+            with st.expander(f"{training['employee']} - {training['training_need']}", expanded=False):
+                col1, col2 = st.columns(2)
+                with col1:
+                    st.write(f"**Role:** {training['type']}")
+                    st.write(f"**Priority:** {training['priority']}")
+                with col2:
+                    st.write(f"**Duration:** {training['estimated_duration']}")
+                    st.write(f"**Outcome:** {training['expected_outcome']}")
+    
+    # Training Schedule
+    if dev_plan['recommended_schedule']:
+        st.subheader("📅 Recommended Training Schedule")
+        schedule_df = pd.DataFrame(dev_plan['recommended_schedule'])
+        st.dataframe(schedule_df, use_container_width=True)
+    
+    # Current Team Analysis
+    st.header("👥 Current Team Analysis")
+    
+    # Sales Team
+    sales_analysis = analyze_sales_team(data)
+    if sales_analysis['sales_executives']:
+        st.subheader("💼 Sales Team")
+        for exec_data in sales_analysis['sales_executives']:
+            with st.expander(f"🎯 {exec_data['name']} - Sales Executive", expanded=False):
+                col1, col2 = st.columns(2)
+                with col1:
+                    st.write(f"**Level:** {exec_data['level']}")
+                    st.write(f"**Speed:** {exec_data['speed']}")
+                    st.write(f"**Salary:** ${exec_data['salary']:,}")
+                with col2:
+                    st.write(f"**Active Leads:** {exec_data['total_leads']}")
+                    st.write(f"**Capacity:** {exec_data['capacity']}")
+                
+                if exec_data['leads']:
+                    st.write("**Lead Portfolio:**")
+                    for i, lead in enumerate(exec_data['leads']):
+                        priority_icon = {'HIGH': '🔴', 'MEDIUM': '🟡', 'LOW': '🟢'}[lead['priority']]
+                        st.write(f"{priority_icon} Lead {i+1}: {lead['impressions']:,} impressions ({lead['priority']} priority)")
+    
+    # Research Team
+    research_analysis = analyze_research_team(data)
+    if research_analysis['researchers']:
+        st.subheader("🔬 Research Team")
+        for researcher in research_analysis['researchers']:
+            with st.expander(f"🧪 {researcher['name']} - Researcher", expanded=False):
+                col1, col2 = st.columns(2)
+                with col1:
+                    st.write(f"**Level:** {researcher['level']}")
+                    st.write(f"**Speed:** {researcher['speed']:.0f}")
+                    st.write(f"**Salary:** ${researcher['salary']:,}")
+                with col2:
+                    st.write(f"**Research Skill:** {researcher.get('research_skill', 'N/A')}")
+                    training = researcher['training_opportunity']
+                    if training['has_opportunities']:
+                        st.write(f"**Training Needed:** ⚠️ {len(training['training_needs'])} areas")
+                    else:
+                        st.write("**Training Status:** ✅ Up to date")
+    
+    # Development Team
+    dev_analysis = analyze_developer_teams(data)
+    all_devs = dev_analysis['developers'] + dev_analysis['designers'] + dev_analysis['lead_developers']
+    
+    if all_devs:
+        st.subheader("💻 Development Team")
+        for dev in all_devs:
+            role_icon = {'Developer': '👨‍💻', 'Designer': '🎨', 'LeadDeveloper': '👨‍💼'}
+            icon = role_icon.get(dev['type'], '👤')
+            
+            with st.expander(f"{icon} {dev['name']} - {dev['type']}", expanded=False):
+                col1, col2 = st.columns(2)
+                with col1:
+                    st.write(f"**Level:** {dev['level']}")
+                    st.write(f"**Speed:** {dev['speed']:.0f}")
+                    st.write(f"**Salary:** ${dev['salary']:,}")
+                with col2:
+                    if dev['skills']:
+                        st.write("**Skills:**")
+                        for skill, value in dev['skills'].items():
+                            st.write(f"  {skill}: {value}")
+                    
+                    training = dev['training_opportunities']
+                    if training['has_opportunities']:
+                        st.write(f"**Training Opportunities:** {len(training['training_needs'])}")
+                    else:
+                        st.write("**Training Status:** ✅ Optimal")
+    
+    # General Recruitment Intelligence section
+    st.header("📊 Recruitment Market Analysis")
     if candidates:
         candidate_list = []
         for c in candidates:
-            negotiation = c.get("negotiation", {})
-            expected_salary = "N/A"
-            if negotiation and negotiation.get("completed") is False:
-                candidate_offers = [o.get("total") for o in negotiation.get("offers", []) if o.get("fromCandidate")]
-                if candidate_offers:
-                    expected_salary = candidate_offers[-1]
-
+            # Fixed: Salary field is actually their expected salary for instant hire
+            expected_salary = c.get('salary', 0)
+            
             candidate_list.append({
                 "Name": c.get("name"),
                 "Role": c.get("employeeTypeName"),
                 "Level": c.get("level"),
                 "Speed": c.get("speed"),
-                "Current Salary": c.get('salary', 0),
-                "Expected Salary": expected_salary
+                "Expected Salary": expected_salary  # This is what they want to be hired
             })
         
         df_candidates = pd.DataFrame(candidate_list)
         st.dataframe(df_candidates, use_container_width=True,
                        column_config={
-                           "Current Salary": st.column_config.NumberColumn(format="$%d"),
                            "Expected Salary": st.column_config.NumberColumn(format="$%d"),
                        })
+        
+        # Recruitment market analysis
+        st.subheader("� Market Analysis by Role")
+        
+        # Analyze candidate market
+        role_summary = {}
+        for candidate in candidates:
+            role = candidate.get('employeeTypeName', 'Unknown')
+            if role not in role_summary:
+                role_summary[role] = {'count': 0, 'avg_salary': 0, 'salaries': []}
+            
+            role_summary[role]['count'] += 1
+            role_summary[role]['salaries'].append(candidate.get('salary', 0))
+        
+        for role, stats in role_summary.items():
+            if stats['salaries']:
+                avg_salary = sum(stats['salaries']) / len(stats['salaries'])
+                min_salary = min(stats['salaries'])
+                max_salary = max(stats['salaries'])
+                
+                st.write(f"**{role}**: {stats['count']} available")
+                st.write(f"  💰 Salary range: ${min_salary:,} - ${max_salary:,} (avg: ${avg_salary:,.0f})")
     else:
         st.info("No active candidates to display.")
 
@@ -2469,107 +2691,187 @@ def show_research_development(data):
         st.info("No research completed yet.")
 
 def show_daily_standup(data):
-    """Daily standup agenda with individual work queues and calendar events."""
+    """Daily standup agenda with focused team management - only work queue adjustable roles."""
     st.title("📅 Daily Standup")
-    st.markdown("**Team status, work queues, and today's agenda**")
+    st.markdown("**Team status for developers, designers, marketers, and SysAdmins with adjustable work queues**")
+    st.markdown("*Excludes researchers (training-focused) and CEO (executive meetings)*")
+    st.markdown("---")
     
-    # Analyze employee work queues
-    employee_analysis = analyze_employee_work_queues(data)
+    # Use focused team management to get only manageable team members
+    team_analysis = analyze_manageable_team_members(data)
     
-    if not employee_analysis:
-        st.warning("No employee data available for analysis.")
+    if not team_analysis['manageable_team']:
+        st.warning("No team members with adjustable work queues found.")
         return
     
-    # Generate standup agenda
-    standup_agenda = generate_standup_agenda(employee_analysis)
+    # Overview metrics
+    st.header("📊 Team Overview")
     
-    # Generate calendar events
-    production_requirements = analyze_production_requirements(data)
-    calendar_events = generate_calendar_events(employee_analysis, production_requirements)
+    col1, col2, col3, col4 = st.columns(4)
     
-    # Display today's calendar events first
-    st.header("📅 Today's Calendar")
-    today_events = [event for event in calendar_events if event['date'] == datetime.now().strftime('%Y-%m-%d')]
+    with col1:
+        total_members = len(team_analysis['manageable_team'])
+        st.metric("Team Members", total_members)
     
-    if today_events:
-        for event in today_events:
-            priority_icon = {'URGENT': '🚨', 'DAILY': '📋', 'WEEKLY': '📊'}.get(event.get('priority', ''), '📅')
+    with col2:
+        available_members = len([m for m in team_analysis['manageable_team'] if m['availability'] == 'Available'])
+        st.metric("Available", available_members)
+    
+    with col3:
+        avg_productivity = sum(m['productivity_score'] for m in team_analysis['manageable_team']) / total_members
+        st.metric("Avg Productivity", f"{avg_productivity:.1f}%")
+    
+    with col4:
+        high_priority_tasks = team_analysis['high_priority_assignments']
+        st.metric("High Priority Tasks", len(high_priority_tasks))
+    
+    # High Priority Assignments
+    if team_analysis['high_priority_assignments']:
+        st.header("🚨 High Priority Assignments")
+        
+        for assignment in team_analysis['high_priority_assignments']:
+            st.error(f"**{assignment['component']}** → **{assignment['assigned_to']}**")
+            st.markdown(f"   📝 *{assignment['reason']}*")
+    
+    # Team Member Status
+    st.header("� Individual Status Updates")
+    
+    # Group by role for better organization
+    roles = {}
+    for member in team_analysis['manageable_team']:
+        role = member['role']
+        if role not in roles:
+            roles[role] = []
+        roles[role].append(member)
+    
+    for role, members in roles.items():
+        st.subheader(f"🏷️ {role}s ({len(members)})")
+        
+        for member in members:
+            status_icon = {
+                'Available': '�',
+                'Busy': '🟡', 
+                'Assigned': '�',
+                'Training': '�'
+            }.get(member['availability'], '⚪')
             
-            with st.expander(f"{priority_icon} {event['title']} - {event['time']}", expanded=True):
-                st.write(f"**Duration:** {event['duration']}")
+            with st.expander(f"{status_icon} {member['name']} (Level {member['level']})", expanded=False):
                 
-                if event['type'] == 'STANDUP':
-                    st.write("**Agenda:**")
-                    for item in event['agenda']:
-                        status_icon = '🟢' if 'Available' in item['status'] else '🔄'
-                        capacity_bar = '█' * int(item['capacity_rating'] / 20) + '░' * (5 - int(item['capacity_rating'] / 20))
-                        
-                        st.write(f"{status_icon} **{item['employee']}** ({item['specialization']})")
-                        st.write(f"   Status: {item['status']}")
-                        st.write(f"   Details: {item['details']}")
-                        st.write(f"   Capacity: {capacity_bar} ({item['capacity_rating']:.1f})")
-                        st.write("")
+                col1, col2 = st.columns(2)
                 
-                elif event['type'] == 'PRODUCT_REVIEW':
-                    st.write(f"**Focus:** {event['focus']}")
+                with col1:
+                    st.markdown(f"**Status:** {member['availability']}")
+                    st.markdown(f"**Specialization:** {member['specialization']}")
+                    st.markdown(f"**Current Task:** {member['current_assignment']}")
                     
-                    # Show key metrics for product review
-                    features_summary = production_requirements['features_summary']
-                    col1, col2, col3, col4 = st.columns(4)
-                    
-                    with col1:
-                        st.metric("In Development", features_summary['in_development'])
-                    with col2:
-                        st.metric("Needs Dev", features_summary['needs_development'])
-                    with col3:
-                        st.metric("Needs Art", features_summary['needs_art'])
-                    with col4:
-                        st.metric("Completed", features_summary['completed'])
+                    # Productivity bar
+                    productivity = member['productivity_score']
+                    productivity_bar = '█' * int(productivity / 20) + '░' * (5 - int(productivity / 20))
+                    st.markdown(f"**Productivity:** {productivity_bar} ({productivity:.1f}%)")
                 
-                elif event['type'] == 'HEADHUNTING':
-                    st.write("**Critical Skill Gaps Identified:**")
-                    for gap in event['critical_gaps']:
-                        st.error(f"🎯 {gap['skill'].title()}: {gap['message']}")
-                        st.write(f"   Impact: {gap['impact']}")
-    else:
-        st.info("No special events scheduled for today.")
+                with col2:
+                    # Work queue recommendations
+                    if member['work_queue_recommendations']:
+                        st.markdown("**Queue Recommendations:**")
+                        for rec in member['work_queue_recommendations']:
+                            priority_color = {
+                                'HIGH': '🔴',
+                                'MEDIUM': '🟡',
+                                'LOW': '🟢'
+                            }.get(rec['priority'], '⚪')
+                            
+                            st.markdown(f"{priority_color} {rec['task']} ({rec['priority']})")
+                    else:
+                        st.success("✅ Optimally assigned")
     
-    # Individual work queue analysis
-    st.header("👥 Team Work Queues")
+    # Team Capacity Analysis
+    st.header("📈 Team Capacity Analysis")
     
-    for emp_id, emp_data in employee_analysis.items():
-        with st.expander(f"👤 {emp_data['name']} - {emp_data['specialization']}", expanded=False):
-            col1, col2 = st.columns(2)
+    capacity_data = team_analysis['capacity_analysis']
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.subheader("🎯 Role Distribution")
+        
+        # Create role distribution chart
+        role_counts = {}
+        for member in team_analysis['manageable_team']:
+            role = member['role']
+            role_counts[role] = role_counts.get(role, 0) + 1
+        
+        if role_counts:
+            role_df = pd.DataFrame([
+                {'Role': role, 'Count': count}
+                for role, count in role_counts.items()
+            ])
             
-            with col1:
-                st.write(f"**Role:** {emp_data['role']}")
-                st.write(f"**Tier:** {emp_data['tier']}")
-                st.write(f"**Salary:** ${emp_data['salary']:,}")
-                st.write(f"**Effectiveness:** {emp_data['effectiveness']}%")
+            fig = px.pie(role_df, values='Count', names='Role', 
+                        title='Team Composition')
+            st.plotly_chart(fig, use_container_width=True)
+    
+    with col2:
+        st.subheader("⚡ Capacity Utilization")
+        
+        # Show capacity by role
+        for role in capacity_data:
+            role_info = capacity_data[role]
+            utilization = role_info['utilization']
             
-            with col2:
-                st.write("**Skills:**")
-                for skill, value in emp_data['skills'].items():
-                    skill_bar = '█' * int(value / 20) + '░' * (5 - int(value / 20))
-                    st.write(f"{skill.title()}: {skill_bar} ({value})")
-            
-            if emp_data['current_assignment']:
-                assignment = emp_data['current_assignment']
-                st.write("**Current Assignment:**")
-                st.write(f"Feature: {assignment['feature_name']}")
-                st.write(f"Role: {assignment['assignment_role']}")
-                
-                # Progress visualization
-                dev_progress = assignment['dev_progress'] * 100
-                art_progress = assignment['art_progress'] * 100
-                
-                progress_col1, progress_col2 = st.columns(2)
-                with progress_col1:
-                    st.progress(dev_progress / 100, text=f"Dev Progress: {dev_progress:.0f}%")
-                with progress_col2:
-                    st.progress(art_progress / 100, text=f"Art Progress: {art_progress:.0f}%")
+            if utilization >= 90:
+                st.error(f"🔴 **{role}**: {utilization:.1f}% (Overloaded)")
+            elif utilization >= 75:
+                st.warning(f"🟡 **{role}**: {utilization:.1f}% (High Load)")
             else:
-                st.info("Available for new assignment")
+                st.success(f"🟢 **{role}**: {utilization:.1f}% (Good)")
+    
+    # Action Items Summary
+    st.header("✅ Action Items")
+    
+    action_items = []
+    
+    # Generate action items based on team analysis
+    for assignment in team_analysis['high_priority_assignments']:
+        action_items.append(f"🚨 **URGENT**: {assignment['assigned_to']} focus on {assignment['component']}")
+    
+    for role, info in capacity_data.items():
+        if info['utilization'] > 90:
+            action_items.append(f"⚡ **{role} Team**: Reduce workload or add capacity")
+        elif info['utilization'] < 40:
+            action_items.append(f"💡 **{role} Team**: Available for additional tasks")
+    
+    # Check for training opportunities
+    for member in team_analysis['manageable_team']:
+        if member['level'] < 3 and member['availability'] == 'Available':
+            action_items.append(f"📚 **{member['name']}**: Consider training to improve skills")
+    
+    if action_items:
+        for item in action_items:
+            st.write(item)
+    else:
+        st.success("🎉 No immediate action items - team is optimally balanced!")
+    
+    # Standup Meeting Notes Template
+    st.header("📝 Meeting Notes Template")
+    
+    with st.expander("📋 Standup Notes", expanded=False):
+        st.markdown("### Team Standup - " + datetime.now().strftime("%Y-%m-%d"))
+        st.markdown("**Attendees:**")
+        for member in team_analysis['manageable_team']:
+            st.markdown(f"- {member['name']} ({member['role']})")
+        
+        st.markdown("\n**High Priority Items:**")
+        for assignment in team_analysis['high_priority_assignments']:
+            st.markdown(f"- {assignment['component']} (Assigned: {assignment['assigned_to']})")
+        
+        st.markdown("\n**Team Capacity:**")
+        for role, info in capacity_data.items():
+            st.markdown(f"- {role}: {info['utilization']:.1f}% utilization")
+        
+        st.markdown("\n**Next Steps:**")
+        st.markdown("- [ ] Complete high-priority assignments")
+        st.markdown("- [ ] Monitor team capacity levels")
+        st.markdown("- [ ] Address any overloaded team members")
 
 def show_production_planning(data):
     """Production capacity analysis and work queue optimization."""
@@ -2680,113 +2982,676 @@ def show_production_planning(data):
     else:
         st.success("🎉 Production capacity is well-balanced! No immediate actions required.")
 
-def show_talent_acquisition(data):
-    """Talent acquisition and hiring strategy with ROI analysis."""
-    st.title("🎯 Talent Acquisition")
-    st.markdown("**Strategic hiring recommendations and ROI analysis**")
+def show_sales_team_meeting(data):
+    """Sales team meeting with Annie's lead management and negotiation strategy."""
+    st.title("💼 Sales Team Meeting")
+    st.markdown("**Lead management, negotiation strategy, and sales optimization**")
     
-    # Analyze employee work queues and production requirements
-    employee_analysis = analyze_employee_work_queues(data)
-    production_requirements = analyze_production_requirements(data)
+    # Analyze sales team
+    sales_analysis = analyze_sales_team(data)
     
-    # Calculate optimal team composition
-    team_optimization = calculate_optimal_team_composition(production_requirements)
+    if not sales_analysis['sales_executives']:
+        st.warning("No sales executives found in the team.")
+        return
     
-    # Current team overview
-    st.header("👥 Current Team Overview")
+    # Sales team overview
+    st.header("📊 Sales Team Overview")
+    col1, col2, col3 = st.columns(3)
     
-    if employee_analysis:
-        total_employees = len(employee_analysis)
-        total_salary_cost = sum(emp['salary'] for emp in employee_analysis.values())
-        avg_capacity = sum(emp['capacity_rating'] for emp in employee_analysis.values()) / total_employees
+    with col1:
+        st.metric("Sales Executives", len(sales_analysis['sales_executives']))
+    with col2:
+        st.metric("Total Active Leads", sales_analysis['total_leads'])
+    with col3:
+        st.metric("High Priority Leads", sales_analysis['high_priority_leads'])
+    
+    # Individual sales executive analysis
+    for exec_data in sales_analysis['sales_executives']:
+        st.header(f"🎯 {exec_data['name']} - Sales Executive Analysis")
+        
+        # Executive summary
+        col1, col2 = st.columns(2)
+        with col1:
+            st.subheader("📋 Executive Profile")
+            st.write(f"**Level:** {exec_data['level']}")
+            st.write(f"**Speed:** {exec_data['speed']}")
+            st.write(f"**Salary:** ${exec_data['salary']:,}")
+            st.write(f"**Mood:** {exec_data['mood']:.1f}%")
+        
+        with col2:
+            st.subheader("💼 Current Workload")
+            st.write(f"**Active Leads:** {exec_data['total_leads']}")
+            st.write(f"**Capacity Assessment:** {exec_data['capacity']}")
+            
+            # Capacity visualization
+            if exec_data['level'] == 'Beginner':
+                max_recommended = 1
+            elif exec_data['level'] == 'Intermediate':
+                max_recommended = 2
+            else:
+                max_recommended = 3
+            
+            capacity_usage = (exec_data['total_leads'] / max_recommended) * 100
+            st.progress(min(capacity_usage / 100, 1.0), text=f"Capacity Usage: {capacity_usage:.0f}%")
+        
+        # Lead portfolio analysis
+        if exec_data['leads']:
+            st.subheader("📈 Lead Portfolio Management")
+            
+            # Create lead analysis table
+            lead_data = []
+            for i, lead in enumerate(exec_data['leads']):
+                # Try to map competitor IDs to company names (simplified)
+                company_names = {
+                    'd454a2f2-bded-4b09fdfsg': 'Oregano Corp',
+                    '88885275-55bb-42d8-a8d8-5999032a5d95': 'Indie Shows',
+                    '1ce30d18-ca93-4299-9160-dab4e1bd9711': 'Greenbook Ltd'
+                }
+                
+                company_name = company_names.get(lead['competitor_id'], f"Company {i+1}")
+                
+                lead_data.append({
+                    'Company': company_name,
+                    'Impressions': f"{lead['impressions']:,}",
+                    'Priority': lead['priority'],
+                    'Value Assessment': lead['urgency'],
+                    'Last Contact': lead['timestamp'][:10] if lead['timestamp'] else 'N/A'
+                })
+            
+            df_leads = pd.DataFrame(lead_data)
+            st.dataframe(df_leads, use_container_width=True)
+            
+            # Lead prioritization strategy
+            st.subheader("🎯 Recommended Lead Strategy")
+            
+            if exec_data['level'] == 'Beginner' and len(exec_data['leads']) > 1:
+                highest_lead = exec_data['leads'][0]  # Already sorted by priority
+                company_name = company_names.get(highest_lead['competitor_id'], 'Top Lead')
+                
+                st.warning(f"**Focus Strategy Recommended**: {exec_data['name']} should focus exclusively on **{company_name}** ({highest_lead['impressions']:,} impressions)")
+                st.write("**Rationale**: Beginner-level executives perform better with single-lead focus")
+                st.write("**Action Plan**:")
+                st.write("1. ✅ Prioritize all communication with this lead")
+                st.write("2. ⏸️ Put other leads on hold or reassign")
+                st.write("3. 🎯 Develop tailored proposal for this client")
+                st.write("4. 📅 Schedule follow-up meeting within 48 hours")
+            
+            # Individual lead recommendations
+            st.subheader("📋 Lead-by-Lead Action Plan")
+            
+            for i, lead in enumerate(exec_data['leads']):
+                company_name = company_names.get(lead['competitor_id'], f"Company {i+1}")
+                
+                with st.expander(f"{lead['priority']} Priority: {company_name} ({lead['impressions']:,} impressions)", expanded=i==0):
+                    
+                    # Display quantitative lead data only
+                    col1, col2, col3 = st.columns(3)
+                    
+                    with col1:
+                        st.metric("Lead Value", f"{lead['impressions']:,} impressions")
+                    with col2:
+                        st.metric("Priority Level", lead['priority'])
+                    with col3:
+                        # Calculate contact urgency based on data
+                        if lead['priority'] == 'HIGH':
+                            st.metric("Contact Within", "24 hours", delta="URGENT")
+                        elif lead['priority'] == 'MEDIUM':
+                            st.metric("Contact Within", "3-5 days", delta="Normal")
+                        else:
+                            st.metric("Contact Within", "Weekly check", delta="Low")
+                    
+                    # Data-driven action based on impression thresholds
+                    st.markdown("**Data-Driven Actions:**")
+                    if lead['impressions'] >= 200000:
+                        st.info("📊 High-value lead detected (>200k impressions)")
+                        st.markdown("• **Action**: Schedule immediate contact")
+                        st.markdown("• **Data Point**: Premium client tier qualified")
+                    elif lead['impressions'] >= 50000:
+                        st.info("📊 Medium-value lead (50k-200k impressions)")
+                        st.markdown("• **Action**: Contact within 3 business days")
+                        st.markdown("• **Data Point**: Standard client tier")
+                    else:
+                        st.info("� Standard lead (<50k impressions)")
+                        st.markdown("• **Action**: Weekly nurture sequence")
+                        st.markdown("• **Data Point**: Entry-level client tier")
+        
+        else:
+            st.info(f"{exec_data['name']} currently has no active leads.")
+            
+            # Data-driven lead generation metrics instead of abstract advice
+            st.markdown("**Lead Generation Status:**")
+            st.markdown("• **Current Pipeline**: 0 active leads")
+            st.markdown("• **Required Action**: Initiate prospecting activities")
+            st.markdown("• **Target**: Generate 3-5 qualified leads per week")
+    
+    # Replace abstract recommendations with data-driven metrics
+    if sales_analysis.get('team_metrics'):
+        st.header("� Sales Performance Metrics")
+        
+        # Calculate actual performance data
+        total_pipeline_value = sum(
+            sum(lead['impressions'] for lead in exec_data['leads'])
+            for exec_data in sales_analysis['sales_executives']
+        )
+        active_leads_count = sum(
+            len(exec_data['leads']) 
+            for exec_data in sales_analysis['sales_executives']
+        )
         
         col1, col2, col3 = st.columns(3)
         with col1:
+            st.metric("Total Pipeline Value", f"{total_pipeline_value:,} impressions")
+        with col2:
+            st.metric("Active Leads", active_leads_count)
+        with col3:
+            avg_lead_value = total_pipeline_value / max(active_leads_count, 1)
+            st.metric("Average Lead Value", f"{avg_lead_value:,.0f} impressions")
+    
+    # Sales performance metrics
+    st.header("📈 Sales Performance Metrics")
+    
+    # Calculate team performance indicators based on actual data
+    total_impressions = sum(
+        sum(lead['impressions'] for lead in exec_data['leads']) 
+        for exec_data in sales_analysis['sales_executives']
+    )
+    
+    avg_lead_value = total_impressions / max(sales_analysis.get('total_leads', 1), 1)
+    
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.metric("Total Pipeline Value", f"{total_impressions:,} impressions")
+    with col2:
+        st.metric("Average Lead Value", f"{avg_lead_value:,.0f} impressions")
+    with col3:
+        # This would need more game data for actual conversion rates
+        st.metric("Pipeline Health", "⚡ Active")
+    
+    # Action items summary
+    st.header("✅ Action Items Summary")
+    
+    action_items = []
+    for exec_data in sales_analysis['sales_executives']:
+        name = exec_data['name']
+        
+        if not exec_data['leads']:
+            action_items.append(f"🔍 **{name}**: Begin immediate lead generation activities")
+        elif exec_data['level'] == 'Beginner' and len(exec_data['leads']) > 1:
+            action_items.append(f"🎯 **{name}**: Focus on highest-priority lead only")
+        
+        for lead in exec_data['leads']:
+            if lead['priority'] == 'HIGH':
+                action_items.append(f"🚨 **{name}**: Contact high-priority lead within 24 hours")
+                break
+    
+    if action_items:
+        for item in action_items:
+            st.write(item)
+    else:
+        st.success("🎉 No immediate action items. Team is operating optimally!")
+
+def show_data_center_monitoring(data):
+    """Display comprehensive data center monitoring and server performance"""
+    
+    st.title("🖥️ Data Center Monitoring")
+    st.markdown("*Real-time server performance, CU optimization, and SysAdmin task management*")
+    st.markdown("---")
+    
+    # Get data center analysis
+    dc_analysis = analyze_data_center_performance(data)
+    
+    # Overview metrics
+    st.header("📊 System Overview")
+    
+    col1, col2, col3, col4 = st.columns(4)
+    
+    with col1:
+        cu_usage = dc_analysis['cu_analysis']['current_cu']
+        max_cu = dc_analysis['cu_analysis']['max_cu']
+        st.metric("CU Usage", f"{cu_usage:,}", f"/ {max_cu:,} max")
+    
+    with col2:
+        utilization = dc_analysis['cu_analysis']['utilization_rate']
+        status = dc_analysis['cu_analysis']['status']
+        color = {"OPTIMAL": "🟢", "GOOD": "🔵", "WARNING": "🟡", "CRITICAL": "🔴"}
+        st.metric("Server Utilization", f"{utilization:.1f}%", f"{color.get(status, '⚪')} {status}")
+    
+    with col3:
+        efficiency = dc_analysis['cu_analysis']['efficiency_score']
+        st.metric("System Efficiency", f"{efficiency:.0f}%")
+    
+    with col4:
+        health_score = dc_analysis['hardware_status']['health_score']
+        health_status = dc_analysis['hardware_status']['health_status']
+        st.metric("Hardware Health", f"{health_score}%", health_status)
+    
+    # Performance alerts
+    if dc_analysis['performance_alerts']:
+        st.header("🚨 Performance Alerts")
+        
+        for alert in dc_analysis['performance_alerts']:
+            if alert['level'] == 'CRITICAL':
+                st.error(f"🔴 **CRITICAL**: {alert['message']}")
+                st.markdown(f"   📋 {alert['details']}")
+                st.markdown(f"   🎯 **Action Required**: {alert['recommended_action']}")
+            elif alert['level'] == 'WARNING':
+                st.warning(f"🟡 **WARNING**: {alert['message']}")
+                st.markdown(f"   📋 {alert['details']}")
+                st.markdown(f"   💡 **Recommendation**: {alert['recommended_action']}")
+    else:
+        st.success("✅ No performance alerts - all systems operating normally")
+    
+    # CU Analysis Section
+    st.header("⚡ Compute Unit (CU) Analysis")
+    
+    cu_data = dc_analysis['cu_analysis']
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.subheader("📈 CU Utilization")
+        
+        # Create a gauge chart for CU usage
+        fig = go.Figure(go.Indicator(
+            mode = "gauge+number+delta",
+            value = cu_data['utilization_rate'],
+            domain = {'x': [0, 1], 'y': [0, 1]},
+            title = {'text': "CU Utilization %"},
+            delta = {'reference': 75},
+            gauge = {
+                'axis': {'range': [None, 100]},
+                'bar': {'color': "darkblue"},
+                'steps': [
+                    {'range': [0, 50], 'color': "lightgray"},
+                    {'range': [50, 75], 'color': "yellow"},
+                    {'range': [75, 90], 'color': "orange"},
+                    {'range': [90, 100], 'color': "red"}
+                ],
+                'threshold': {
+                    'line': {'color': "red", 'width': 4},
+                    'thickness': 0.75,
+                    'value': 90
+                }
+            }
+        ))
+        
+        fig.update_layout(height=300)
+        st.plotly_chart(fig, use_container_width=True)
+    
+    with col2:
+        st.subheader("💡 CU Recommendations")
+        
+        if cu_data['recommended_actions']:
+            for rec in cu_data['recommended_actions']:
+                if rec['priority'] == 'URGENT':
+                    st.error(f"🚨 **{rec['priority']}**: {rec['action']}")
+                elif rec['priority'] == 'HIGH':
+                    st.warning(f"⚡ **{rec['priority']}**: {rec['action']}")
+                else:
+                    st.info(f"💡 **{rec['priority']}**: {rec['action']}")
+                
+                st.markdown(f"   📝 *{rec['reason']}*")
+                st.markdown(f"   🏷️ Task Type: {rec['task_type']}")
+        else:
+            st.success("✅ CU utilization is optimal - no immediate actions needed")
+    
+    # Hardware Status Section
+    st.header("🔧 Hardware Status")
+    
+    hardware_data = dc_analysis['hardware_status']
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.subheader("📦 Component Inventory")
+        
+        if hardware_data['component_inventory']:
+            inventory_df = pd.DataFrame([
+                {'Component Type': comp_type, 'Quantity': quantity}
+                for comp_type, quantity in hardware_data['component_inventory'].items()
+            ])
+            
+            fig = px.bar(inventory_df, x='Component Type', y='Quantity', 
+                        title='Hardware Component Inventory')
+            fig.update_layout(height=300)
+            st.plotly_chart(fig, use_container_width=True)
+        else:
+            st.info("No hardware components detected in inventory")
+    
+    with col2:
+        st.subheader("⚠️ Hardware Issues")
+        
+        if hardware_data['health_issues']:
+            for issue in hardware_data['health_issues']:
+                if issue['severity'] == 'HIGH':
+                    st.error(f"🔴 **{issue['type']}**: {issue['component']}")
+                else:
+                    st.warning(f"🟡 **{issue['type']}**: {issue['component']}")
+                
+                st.markdown(f"   📊 Current: {issue['current']} | Required: {issue['required']}")
+        else:
+            st.success("✅ All hardware components are adequately stocked")
+    
+    # SysAdmin Tasks Section
+    st.header("👨‍💻 SysAdmin Tasks")
+    
+    sysadmin_tasks = dc_analysis['sysadmin_tasks']
+    
+    if sysadmin_tasks:
+        # Categorize tasks by priority
+        high_priority = [task for task in sysadmin_tasks if task['priority'] == 'HIGH']
+        medium_priority = [task for task in sysadmin_tasks if task['priority'] == 'MEDIUM'] 
+        low_priority = [task for task in sysadmin_tasks if task['priority'] == 'LOW']
+        
+        if high_priority:
+            st.subheader("🚨 High Priority Tasks")
+            for task in high_priority:
+                with st.expander(f"🔥 {task['task_type']}", expanded=True):
+                    st.markdown(f"**Description:** {task['description']}")
+                    st.markdown(f"**Estimated Time:** {task['estimated_time']}")
+                    st.markdown(f"**Expected Outcome:** {task['expected_outcome']}")
+                    
+                    if task['components_needed']:
+                        st.markdown("**Components Needed:**")
+                        for component in task['components_needed']:
+                            st.markdown(f"   • {component}")
+        
+        if medium_priority:
+            st.subheader("⚡ Medium Priority Tasks")
+            for task in medium_priority:
+                with st.expander(f"🔧 {task['task_type']}", expanded=False):
+                    st.markdown(f"**Description:** {task['description']}")
+                    st.markdown(f"**Estimated Time:** {task['estimated_time']}")
+                    st.markdown(f"**Expected Outcome:** {task['expected_outcome']}")
+                    
+                    if task['components_needed']:
+                        st.markdown("**Components Needed:**")
+                        for component in task['components_needed']:
+                            st.markdown(f"   • {component}")
+        
+        if low_priority:
+            st.subheader("🔄 Low Priority Tasks")
+            for task in low_priority:
+                with st.expander(f"🛠️ {task['task_type']}", expanded=False):
+                    st.markdown(f"**Description:** {task['description']}")
+                    st.markdown(f"**Estimated Time:** {task['estimated_time']}")
+                    st.markdown(f"**Expected Outcome:** {task['expected_outcome']}")
+    else:
+        st.info("No SysAdmin tasks identified - system is running optimally")
+    
+    # Optimization Opportunities
+    st.header("🚀 Optimization Opportunities")
+    
+    opportunities = dc_analysis['optimization_opportunities']
+    
+    if opportunities:
+        for opp in opportunities:
+            with st.expander(f"💡 {opp['opportunity']} ({opp['category']})", expanded=False):
+                st.markdown(f"**Description:** {opp['description']}")
+                st.markdown(f"**Expected Benefit:** {opp['expected_benefit']}")
+                st.markdown(f"**Implementation:** {opp['implementation']}")
+    else:
+        st.success("✅ System is optimally configured - no immediate optimization opportunities identified")
+    
+    # Cost Analysis (if applicable)
+    if 'team_members' in data:
+        st.header("💰 Cost Analysis")
+        
+        from utilities.data_center_monitoring import calculate_server_cost_analysis
+        cost_analysis = calculate_server_cost_analysis(dc_analysis['server_metrics'], data)
+        
+        col1, col2, col3 = st.columns(3)
+        
+        with col1:
+            st.metric("Current Monthly Cost", f"${cost_analysis['current_monthly_cost']:,.0f}")
+        
+        with col2:
+            potential_savings = cost_analysis['potential_monthly_savings']
+            st.metric("Potential Monthly Savings", f"${potential_savings:,.0f}")
+        
+        with col3:
+            roi = cost_analysis['optimization_roi']['roi_percentage']
+            st.metric("Optimization ROI", f"{roi:.1f}%")
+        
+        if potential_savings > 0:
+            st.info(f"💡 **SysAdmin ROI**: Hiring a SysAdmin could save ${potential_savings*12:,.0f} annually")
+    
+    # Real-time status footer
+    st.markdown("---")
+    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    st.markdown(f"*Last updated: {current_time} | Data Center Monitoring System v1.0*")
+
+def show_static_evaluation(data):
+    """Display static evaluation engine results with data-driven insights"""
+    
+    st.title("🎯 Static Evaluation Engine")
+    st.markdown("*Quantitative threshold analysis and actionable game commands*")
+    st.markdown("---")
+    
+    # Run static evaluation
+    evaluation_result = run_static_evaluation(data)
+    
+    # Overview metrics
+    st.header("📊 Evaluation Summary")
+    
+    summary = evaluation_result['evaluation_summary']
+    
+    col1, col2, col3, col4 = st.columns(4)
+    
+    with col1:
+        st.metric("Metrics Calculated", summary['total_metrics_calculated'])
+    
+    with col2:
+        st.metric("Threshold Alerts", summary['total_threshold_alerts'])
+    
+    with col3:
+        st.metric("Critical Actions", summary['critical_actions_required'])
+    
+    with col4:
+        status_color = "🔴" if summary['evaluation_status'] == 'CRITICAL' else "🟢"
+        st.metric("System Status", f"{status_color} {summary['evaluation_status']}")
+    
+    # Calculated Metrics Section
+    st.header("🔢 Calculated Metrics")
+    st.markdown("*Raw data converted to quantitative business metrics*")
+    
+    metrics = evaluation_result['calculated_metrics']
+    
+    # Production Metrics
+    with st.expander("⚙️ Production Metrics", expanded=True):
+        prod_metrics = metrics['production_rates']
+        
+        col1, col2, col3 = st.columns(3)
+        
+        with col1:
+            ui_rate = prod_metrics['ui_component_rate']
+            st.metric("UI Component Rate", f"{ui_rate:.3f} /hour")
+        
+        with col2:
+            total_components = prod_metrics['total_components']
+            st.metric("Total Components", total_components)
+        
+        with col3:
+            dev_productivity = prod_metrics['developer_productivity']
+            st.metric("Developer Productivity", f"{dev_productivity:.3f}")
+    
+    # Team Utilization
+    with st.expander("👥 Team Utilization", expanded=True):
+        util_metrics = metrics['team_utilization']
+        
+        col1, col2, col3 = st.columns(3)
+        
+        with col1:
+            overall_util = util_metrics['overall_utilization']
+            st.metric("Overall Utilization", f"{overall_util:.1f}%")
+        
+        with col2:
+            total_employees = util_metrics['total_employees']
             st.metric("Total Employees", total_employees)
-        with col2:
-            st.metric("Monthly Salary Cost", f"${total_salary_cost:,}")
+        
         with col3:
-            st.metric("Avg Capacity Rating", f"{avg_capacity:.1f}")
+            assigned_employees = util_metrics['assigned_employees']
+            st.metric("Assigned Employees", assigned_employees)
         
-        # Team composition by specialization
-        specializations = {}
-        for emp in employee_analysis.values():
-            spec = emp['specialization']
-            if spec not in specializations:
-                specializations[spec] = 0
-            specializations[spec] += 1
-        
-        st.subheader("Team Composition")
-        spec_df = pd.DataFrame(list(specializations.items()), columns=['Specialization', 'Count'])
-        
-        fig_pie = px.pie(spec_df, values='Count', names='Specialization', 
-                        title="Current Team by Specialization")
-        st.plotly_chart(fig_pie, use_container_width=True)
+        # Role breakdown
+        if util_metrics['by_role']:
+            st.markdown("**Utilization by Role:**")
+            for role, role_data in util_metrics['by_role'].items():
+                utilization = role_data['utilization_percent']
+                st.write(f"• **{role}**: {utilization:.1f}% ({role_data['assigned']}/{role_data['total']})")
     
-    # Hiring recommendations
-    st.header("🎯 Strategic Hiring Recommendations")
-    hiring_recs = team_optimization['hiring_recommendations']
-    
-    if hiring_recs:
-        st.write("Based on current production requirements and capacity gaps:")
-        
-        for i, rec in enumerate(hiring_recs):
-            with st.expander(f"Hire {rec['skill'].title()} Specialist (Tier {rec['tier']})", expanded=True):
-                col1, col2 = st.columns(2)
-                
-                with col1:
-                    st.metric("Estimated Salary", f"${rec['estimated_salary']:,}")
-                    st.metric("Gap Coverage", f"{rec['gap_coverage']:.1f} units")
-                
-                with col2:
-                    st.metric("ROI Estimate", f"{rec['roi_estimate']:.1%}")
-                    roi_color = "green" if rec['roi_estimate'] > 0.2 else "orange" if rec['roi_estimate'] > 0 else "red"
-                    st.markdown(f"<span style='color: {roi_color}'>{'Strong ROI' if rec['roi_estimate'] > 0.2 else 'Moderate ROI' if rec['roi_estimate'] > 0 else 'Questionable ROI'}</span>", unsafe_allow_html=True)
-        
-        # Total investment summary
-        st.subheader("💰 Investment Summary")
-        total_cost = team_optimization['total_hiring_cost']
-        total_improvement = team_optimization['expected_capacity_improvement']
+    # Financial Runway
+    with st.expander("💰 Financial Analysis", expanded=True):
+        financial_metrics = metrics['financial_runway']
         
         col1, col2, col3 = st.columns(3)
+        
         with col1:
-            st.metric("Total Monthly Cost", f"${total_cost:,}")
+            current_cash = financial_metrics['current_cash']
+            st.metric("Current Cash", f"${current_cash:,}")
+        
         with col2:
-            st.metric("Capacity Improvement", f"{total_improvement:.1f} units")
+            runway_days = financial_metrics['runway_days']
+            if runway_days == float('inf'):
+                st.metric("Runway", "∞ days")
+            else:
+                st.metric("Runway", f"{runway_days:.1f} days")
+        
         with col3:
-            cost_per_unit = total_cost / max(total_improvement, 0.1)
-            st.metric("Cost per Capacity Unit", f"${cost_per_unit:,.0f}")
-    else:
-        st.success("🎉 Current team capacity appears sufficient for immediate needs!")
+            monthly_burn = financial_metrics['monthly_burn_rate']
+            st.metric("Monthly Burn", f"${monthly_burn:,}")
     
-    # Market analysis (if candidate data available)
-    st.header("📊 Talent Market Analysis")
-    candidates = data.get("candidates", [])
+    # Threshold Analysis Section
+    st.header("⚠️ Threshold Analysis")
+    st.markdown("*Automated detection of metrics breaching defined thresholds*")
     
-    if candidates:
-        candidate_skills = {}
-        candidate_salaries = {}
-        
-        for candidate in candidates:
-            role = candidate.get("employeeTypeName", "Unknown")
-            salary = candidate.get("salary", 0)
-            level = candidate.get("level", 1)
-            
-            if role not in candidate_skills:
-                candidate_skills[role] = []
-                candidate_salaries[role] = []
-            
-            candidate_skills[role].append(level)
-            candidate_salaries[role].append(salary)
-        
-        st.subheader("Available Candidates by Role")
-        for role, levels in candidate_skills.items():
-            avg_level = sum(levels) / len(levels)
-            avg_salary = sum(candidate_salaries[role]) / len(candidate_salaries[role])
-            
-            st.write(f"**{role}**: {len(levels)} candidates, Avg Level: {avg_level:.1f}, Avg Salary: ${avg_salary:,.0f}")
+    threshold_analysis = evaluation_result['threshold_analysis']
+    
+    total_alerts = sum(len(alerts) for alerts in threshold_analysis.values())
+    
+    if total_alerts > 0:
+        for category, alerts in threshold_analysis.items():
+            if alerts:
+                category_name = category.replace('_', ' ').title()
+                st.subheader(f"📊 {category_name}")
+                
+                for alert in alerts:
+                    severity_colors = {
+                        'CRITICAL': '🔴',
+                        'HIGH': '🟡',
+                        'MEDIUM': '🔵',
+                        'LOW': '🟢'
+                    }
+                    
+                    severity_icon = severity_colors.get(alert['severity'], '⚪')
+                    
+                    with st.expander(f"{severity_icon} {alert['metric']} - {alert['severity']}", expanded=alert['severity'] in ['CRITICAL', 'HIGH']):
+                        col1, col2 = st.columns(2)
+                        
+                        with col1:
+                            st.markdown(f"**Current Value**: {alert['current_value']}")
+                            st.markdown(f"**Threshold**: {alert['threshold']}")
+                            st.markdown(f"**Status**: {alert['status']}")
+                        
+                        with col2:
+                            st.markdown(f"**Trigger Condition**: {alert['trigger_condition']}")
+                            st.markdown(f"**Severity Level**: {alert['severity']}")
     else:
-        st.info("No candidate data available. Consider opening recruitment channels.")
+        st.success("✅ All metrics within acceptable thresholds")
+    
+    # Actionable Outputs Section
+    st.header("🎮 Actionable Game Commands")
+    st.markdown("*Specific in-game actions generated from threshold analysis*")
+    
+    actionable_outputs = evaluation_result['actionable_outputs']
+    
+    if actionable_outputs:
+        # Group by priority
+        critical_actions = [a for a in actionable_outputs if a['priority'] == 'CRITICAL']
+        high_actions = [a for a in actionable_outputs if a['priority'] == 'HIGH']
+        medium_actions = [a for a in actionable_outputs if a['priority'] == 'MEDIUM']
+        low_actions = [a for a in actionable_outputs if a['priority'] == 'LOW']
+        
+        if critical_actions:
+            st.subheader("🚨 Critical Actions")
+            for action in critical_actions:
+                with st.expander(f"🔴 {action['game_command']}", expanded=True):
+                    display_action_details(action)
+        
+        if high_actions:
+            st.subheader("🟡 High Priority Actions")
+            for action in high_actions:
+                with st.expander(f"🟡 {action['game_command']}", expanded=True):
+                    display_action_details(action)
+        
+        if medium_actions:
+            st.subheader("🔵 Medium Priority Actions")
+            for action in medium_actions:
+                with st.expander(f"🔵 {action['game_command']}", expanded=False):
+                    display_action_details(action)
+        
+        if low_actions:
+            st.subheader("🟢 Low Priority Actions")
+            for action in low_actions:
+                with st.expander(f"🟢 {action['game_command']}", expanded=False):
+                    display_action_details(action)
+    else:
+        st.success("✅ No immediate actions required - all systems optimal")
+    
+    # Data Pipeline Info
+    st.header("🔄 Data Pipeline Status")
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("**Input Data**")
+        st.markdown(f"• Timestamp: {evaluation_result['input_data_timestamp']}")
+        st.markdown(f"• Raw data fields processed: {len(data)}")
+        
+    with col2:
+        st.markdown("**Processing Results**")
+        st.markdown(f"• Metrics calculated: {summary['total_metrics_calculated']}")
+        st.markdown(f"• Alerts generated: {summary['total_threshold_alerts']}")
+        st.markdown(f"• Actions created: {len(actionable_outputs)}")
+    
+    # Next Evaluation Timing
+    next_eval = summary['next_evaluation_recommended']
+    if next_eval == 'IMMEDIATE':
+        st.error("⚡ **Next Evaluation**: IMMEDIATE - Critical issues detected")
+    elif next_eval == 'HOURLY':
+        st.info("🕐 **Next Evaluation**: Hourly monitoring recommended")
+    else:
+        st.success("✅ **Next Evaluation**: Standard schedule")
+
+def display_action_details(action):
+    """Display detailed information about a specific action"""
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown(f"**Action Type**: {action['action_type']}")
+        st.markdown(f"**Specific Action**: {action['specific_action']}")
+        st.markdown(f"**Target Metric**: {action['target_metric']}")
+        
+    with col2:
+        st.markdown(f"**Current Value**: {action['current_value']}")
+        st.markdown(f"**Target Value**: {action['target_value']}")
+        st.markdown(f"**Priority**: {action['priority']}")
+    
+    # Implementation details
+    if 'implementation' in action:
+        st.markdown("**Implementation Steps**:")
+        impl = action['implementation']
+        
+        for key, value in impl.items():
+            if key.startswith('step_'):
+                step_num = key.replace('step_', '')
+                st.markdown(f"   {step_num}. {value}")
+            elif key == 'expected_result':
+                st.markdown(f"**Expected Result**: {value}")
+    
+    # Show game command prominently
+    st.code(action['game_command'], language='text')
 
 if __name__ == "__main__":
     main()

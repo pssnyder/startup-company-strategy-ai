@@ -1,227 +1,155 @@
-# Project Phoenix: Startup Company AI Advisor
+# Project Phoenix: Startup Company Static Evaluation Engine
 
-An intelligent AI-powered strategic advisor for the business simulation game "Startup Company". This tool analyzes your game saves and provides comprehensive strategic recommendations using Google's Gemini AI.
+A data-driven static evaluation engine for the business simulation game "Startup Company". This project demonstrates industry-standard data intelligence pipeline architecture using game data as a learning laboratory for business decision automation.
 
-## ✅ Project Status (Stage 4+ Strategic Insight Automation)
-- **Real-time Strategic Alerts**: Automated critical issue detection
-- **Pattern-Based Insights**: System automatically identifies opportunities, risks, and optimization areas
-- **Actionable Recommendations**: Each insight comes with specific strategic actions
-- **Live Game Integration**: Auto-sync with game saves for real-time dashboard updates
-- **Team Assignment Intelligence**: AI-powered resource allocation and work prioritization
-- **Feature Development Tracking**: Real-time dependency analysis and component production planning
+## 🎯 Project Vision & Learning Goals
 
-## Business Intelligence Gateway 
-- Current Company: Momentum AI
-- CEO: Alex Corbin
-- 🐦‍🔥[Project Phoenix Insights](https://project-phoenix.streamlit.app/)
+This project serves as a **micro-implementation of an industry-standard data intelligence pipeline**, using the Startup Company game as a controlled environment to explore:
 
-### Business Intelligence Evolution:
-- **Stage 1:** Raw data collection  (save files, transactions)
-- **Stage 2:** Organized logical processing (structured analysis functions, data grouping)
-- **Stage 3:** Automated visibility with trends (dashboards, metrics, progress bars, charts)
-- **Stage 4:** Data-driven strategy automation (insight generation, pattern recognition, automatic recommendations)
-- **Stage 5:** Fully-automated decision making and strategic action (business state modification, automated workflows)
+- **Data-Driven Decision Making**: Converting raw business data into quantifiable, actionable insights
+- **Static Evaluation Engines**: Building systematic analysis frameworks with defined thresholds and triggers
+- **Automated Business Intelligence**: Demonstrating input → calculation → processing → output pipelines
+- **Neural Network Preparation**: Creating structured datasets and decision frameworks for future ML integration
 
-## 🎯 Features
+**End Goal**: Develop a static evaluation engine so precise that it could theoretically play the game autonomously, eventually feeding this system into a neural network for hyperstrategy optimization.
 
-- **Live Game Integration**: Real-time monitoring of game saves with automatic dashboard updates
-- **Intelligent Feature Analysis**: Real feature name detection and dependency mapping from actual game data
-- **Team Assignment Intelligence**: AI-powered recommendations for optimal resource allocation
-- **Production Planning**: Smart component production prioritization with WSJF scoring
-- **Save File Analysis**: Parse Startup Company save files to extract comprehensive game state
-- **Strategic Insights**: AI-powered analysis of business metrics and performance  
-- **Risk Assessment**: Identify critical issues like low user satisfaction or cash flow problems
-- **Dependency Visualization**: Interactive hierarchical trees showing feature requirements and blocking components
-- **Financial Analysis**: Track runway, burn rate, and financial health with trend analysis
-- **Actionable Recommendations**: Get specific, prioritized action plans with team assignments
+## 🧠 Architecture Philosophy
 
-## 🏗️ Architecture
-
-The system follows a clean 5-layer architecture:
-
-1. **Data Layer**: Static game rules and mechanics from the wiki
-2. **Input Layer**: Save file parsing and data extraction  
-3. **Calculation Layer**: Game state analysis and metrics computation
-4. **Strategy Layer**: AI-powered strategic recommendations via Gemini
-5. **Presentation Layer**: Dashboard-ready data formatting
-
-## 🚀 Quick Start
-
-### Installation
-
-```bash
-# Clone the repository
-git clone https://github.com/pssnyder/startup-company-strategy-ai
-cd startup-company-strategy-ai
-
-# Install dependencies
-pip install -r requirements.txt
+### The Data Intelligence Pipeline
+```
+Raw Game Data → Metric Calculations → Threshold Analysis → Specific Game Actions
 ```
 
-### Real-Time Game Companion (Recommended)
+**Stage 1: Data Collection** - Save file parsing and historical data storage  
+**Stage 2: Calculation Engine** - Quantitative metric computation from raw inputs  
+**Stage 3: Visual Analytics** - Dashboard representation of organized data with trends  
+**Stage 4: Static Evaluation** - Threshold-based analysis generating specific game actions  
+**Stage 5: Neural Network Integration** - ML-driven hyperstrategy optimization (future goal)
 
-Start the real-time monitoring dashboard while playing:
+### Core Principles
+- **No Abstract Recommendations**: Only data-driven, quantifiable insights
+- **Actionable Outputs**: Every analysis result maps to specific in-game actions
+- **Threshold-Based Logic**: Defined numerical triggers for all decision points
+- **Measurable Results**: All actions include expected metric improvements
 
+## 🏗️ Technical Architecture
+
+Clean 5-layer architecture designed for data flow optimization:
+
+1. **Data Layer** (`ai_advisor/data_layer.py`) - Static game rules and constants
+2. **Input Layer** (`ai_advisor/input_layer.py`) - Save file parsing & validation  
+3. **Calculation Layer** (`ai_advisor/calculation_layer.py`) - Core metrics computation
+4. **Strategy Layer** (`ai_advisor/strategy_layer.py`) - Static evaluation engine
+5. **Presentation Layer** (`ai_advisor/dashboard.py`) - Data visualization
+
+### Static Evaluation Engine
+
+The core `StaticEvaluationEngine` implements the mathematical decision framework:
+
+```python
+# Example threshold-based decision making
+PRODUCTION_THRESHOLDS = {
+    'ui_component_min_rate': 0.4,  # components per hour
+    'employee_utilization_max': 90,  # percentage
+    'satisfaction_critical': 60,  # percentage
+    'cu_utilization_critical': 90,  # percentage
+}
+
+# Converts threshold violations into specific game actions
+if ui_production_rate < PRODUCTION_THRESHOLDS['ui_component_min_rate']:
+    action = {
+        'game_command': 'ADD_UI_COMPONENT_TO_WORK_QUEUE',
+        'target_employee': 'developer_with_capacity',
+        'expected_result': 'Increase production to ≥0.4 components/hour'
+    }
+```
+
+## 📊 Live Analytics Dashboard
+
+**Production URL**: [Project Phoenix Insights](https://project-phoenix.streamlit.app/)
+
+The dashboard demonstrates real-time data pipeline processing with:
+- **Raw Data Visualization**: Game save file metrics and trends
+- **Calculated Analytics**: Production rates, utilization percentages, runway calculations
+- **Threshold Monitoring**: Color-coded alerts when metrics breach defined limits
+- **Action Generation**: Specific game commands triggered by data conditions
+
+## � Running the System
+
+### Real-Time Static Evaluation
 ```bash
-# Set your Gemini API key (optional but recommended)
-export GEMINI_API_KEY="your-api-key-here"
-
-# Start real-time monitoring
+# Start continuous evaluation engine
 python startup_monitor.py
 ```
 
-This creates a **live game companion** that:
-- 🔄 **Auto-monitors** your game's autosave files with intelligent fallback
-- 📊 **Real-time alerts** for critical issues (low satisfaction, cash flow)
-- 📈 **Trend analysis** tracks your progress over time
-- 🤖 **AI insights** every 5 minutes with strategic recommendations
-- 💾 **Historical data** logging for pattern analysis
-- 👥 **Team assignments** showing who should work on which components
-- 🌳 **Live dependency trees** with real inventory counts and blocking components
-- 🎯 **WSJF prioritization** for feature development planning
-
-### Manual Analysis
-
-For one-time analysis of save files:
-
+### Manual Analysis Mode
 ```python
-import asyncio
-from pathlib import Path
-from ai_advisor.main import StartupCompanyAdvisor
+from live_analytics.utilities.static_evaluation_engine import run_static_evaluation
 
-async def analyze_my_game():
-    # Initialize advisor
-    advisor = StartupCompanyAdvisor()
-    
-    # Load your save file
-    save_file = Path("path/to/your/save.json")
-    advisor.load_save_file(save_file)
-    
-    # Analyze and get recommendations
-    await advisor.analyze_game_state()
-    advisor.print_summary_report()
-
-# Run the analysis
-asyncio.run(analyze_my_game())
+# Load game data and run evaluation
+result = run_static_evaluation(game_data)
+print(f"Critical actions required: {result['evaluation_summary']['critical_actions_required']}")
 ```
 
-### With AI-Powered Insights
-
-```python
-# Get a Gemini API key from Google AI Studio
-advisor = StartupCompanyAdvisor(gemini_api_key="your-api-key-here")
-# ... rest same as above
-```
-
-## 📁 Save File Location
-
-Startup Company save files are typically located at:
-- **Windows**: `%APPDATA%/Startup Company/saves/`
-- **Mac**: `~/Library/Application Support/Startup Company/saves/`
-- **Linux**: `~/.local/share/Startup Company/saves/`
-
-Look for files named `sg_*.json`.
-
-## 🧪 Testing
-
-Run the example analysis with test data:
-
+### Dashboard Development
 ```bash
-python test_example.py
+streamlit run live_analytics/dashboard.py
 ```
 
-This will:
-- Create a test save file with realistic game data
-- Perform a complete analysis
-- Generate a detailed report
-- Export results to JSON
+## � Data Science Components
 
-## 📊 Output Examples
+### Metrics Calculation Engine
+- **Production Rate Analysis**: Component output per hour calculations
+- **Team Utilization Tracking**: Employee assignment and capacity analysis  
+- **Financial Runway Modeling**: Burn rate and cash flow projections
+- **Market Penetration Metrics**: User growth and satisfaction correlations
 
-### Critical Alert Example
-```
-🚨 CRITICAL ALERTS:
-   • User Satisfaction Crisis: User satisfaction is only 42.5% (Target: >75%)
+### Threshold-Based Decision Framework
+- **Binary Triggers**: Clear mathematical conditions for action initiation
+- **Severity Classification**: CRITICAL/HIGH/MEDIUM/LOW priority assignments
+- **Expected Outcomes**: Quantified improvement targets for each action
 
-🎯 TOP RECOMMENDATIONS:
-   1. Fix User Satisfaction Crisis
-      Upgrade Landing Page and other key features to improve satisfaction
-      Expected: Increase satisfaction above 75%
-      Timeframe: 24-48 hours
-```
+### Historical Data Pipeline
+- **Time Series Storage**: Continuous game state snapshots in JSONL format
+- **Trend Analysis**: Rate of change calculations for all key metrics
+- **Pattern Recognition**: Identification of recurring optimization opportunities
 
-### Production Plan Example
-```
-⚙️ PRODUCTION PRIORITIES:
-   1. Blueprint Component (1 needed)
-   2. Frontend Module (1 needed) 
-   3. UI Component (2 needed)
-```
+## 🎮 Game Context & Data Sources
 
-## 🔧 API Integration
+**Target Game**: [Startup Company](https://www.startupcompanygame.com/) - Business simulation with rich financial and operational datasets
 
-### Gemini API Setup
+**Save File Location**: 
+- Windows: `%APPDATA%/Startup Company/saves/sg_*.json`
+- Contains comprehensive business metrics: cash flow, employee data, user satisfaction, inventory levels
 
-1. Get an API key from [Google AI Studio](https://aistudio.google.com/)
-2. Pass it to the advisor:
+**Data Structure**: JSON-based save files with nested objects representing:
+- Company financials and runway
+- Employee assignments and productivity
+- User metrics and satisfaction scores  
+- Inventory levels and production rates
+- Feature development status and dependencies
 
-```python
-advisor = StartupCompanyAdvisor(gemini_api_key="your-key")
-```
+## 🧪 Development & Testing
 
-### Dashboard Integration
+This project serves as a **demonstration of data engineering and decision automation skills** rather than a community tool. The codebase showcases:
 
-Get structured data for web dashboards:
+- **ETL Pipeline Design**: Extract game data, Transform into metrics, Load into decision framework
+- **Real-Time Data Processing**: File watching and streaming analytics
+- **Threshold-Based Alerting**: Mathematical condition evaluation and action triggering
+- **Dashboard Development**: Interactive data visualization with Streamlit
+- **API Integration**: Google Gemini AI for enhanced pattern recognition
 
-```python
-dashboard_data = advisor.get_dashboard_data()
-# Returns JSON-serializable dict with:
-# - company_info
-# - financial_metrics  
-# - alerts
-# - recommendations
-# - production_plan
-# - ai_insights
-```
+## 🔮 Future Roadmap: Neural Network Integration
 
-## 📈 Key Metrics Tracked
+Once sufficient historical data is collected, the static evaluation engine will serve as training data for:
 
-- **Financial Health**: Cash flow, burn rate, runway months
-- **User Metrics**: Total users, satisfaction percentage, growth rate
-- **Production Efficiency**: Component shortfalls, employee utilization
-- **Feature Quality**: Quality/Efficiency gaps, upgrade requirements
-- **Risk Assessment**: Critical alerts and risk level
+1. **Pattern Recognition ML**: Identify optimal decision timing beyond static thresholds
+2. **Hyperstrategy Development**: Neural network-driven strategy optimization
+3. **Predictive Analytics**: Forecasting game outcomes based on current state
+4. **Automated Decision Making**: Full autonomous game play capability
 
-## 🎮 Game Context
-
-This advisor is designed for the business simulation game [Startup Company](https://www.startupcompanygame.com/), where you build and manage a tech startup. The game involves:
-
-- Hiring developers, designers, and other specialists
-- Building software features and products
-- Managing finances and user satisfaction
-- Competing with other companies
-- Growing from startup to tech giant
-
-## 🤝 Contributing
-
-This project is part of "Project Phoenix" - contributions welcome!
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
-
-## 📜 License
-
-[Add your license here]
-
-## 🙏 Acknowledgments
-
-- Startup Company game by Hovgaard Games
-- Game data sourced from the unofficial [Startup Company Wiki](https://startupcompany.fandom.com/wiki/Startup_Company_Wiki)
-- Powered by Google's Gemini AI
+The current static evaluation engine provides the structured input/output pairs necessary for supervised learning of game strategy optimization.
 
 ---
 
-**Project Phoenix Motto**: *Solve. The. Problem.* (By processing the data efficiently.)
+**Learning Focus**: This project demonstrates data pipeline architecture, threshold-based decision automation, and preparation for machine learning integration in a controlled business simulation environment.
