@@ -1,0 +1,19 @@
+2025-10-05 11:34:40,265 - strategic_advisor.file_monitor - INFO -    Source: c:\Users\patss\Saved Games\Startup Company\testing_v1
+2025-10-05 11:34:40,265 - strategic_advisor.file_monitor - INFO -    Target: strategic_advisor\save_files
+2025-10-05 11:34:40,265 - strategic_advisor.file_monitor - INFO -    Company: momentum ai
+2025-10-05 11:48:44,927 - strategic_advisor.database_sqlite - INFO - Database initialized: real_game_analysis.db
+2025-10-05 11:48:44,930 - strategic_advisor.file_monitor - INFO -    Source: c:\Users\patss\Saved Games\Startup Company\testing_v1
+2025-10-05 11:48:44,930 - strategic_advisor.file_monitor - INFO -    Target: strategic_advisor\save_files
+2025-10-05 11:48:44,930 - strategic_advisor.file_monitor - INFO -    Company: momentum ai
+2025-10-05 11:59:38,343 - strategic_advisor.database_sqlite - INFO - Database initialized: real_game_analysis.db
+2025-10-05 11:59:38,343 - strategic_advisor.database_sqlite - INFO - Database initialized: real_game_analysis.db
+2025-10-05 11:59:38,343 - strategic_advisor.file_monitor - INFO - Monitoring initialized:
+2025-10-05 11:59:38,343 - strategic_advisor.file_monitor - INFO -    Source: c:\Users\patss\Saved Games\Startup Company\testing_v1
+2025-10-05 11:59:38,343 - strategic_advisor.file_monitor - INFO -    Target: strategic_advisor\save_files
+2025-10-05 11:59:38,343 - strategic_advisor.file_monitor - INFO -    Company: momentum ai
+2025-10-05 11:59:38,343 - strategic_advisor.decision_modules.capacity_analyzer - INFO - Capacity Analyzer initialized
+2025-10-05 11:59:38,343 - strategic_advisor.main - INFO - Strategic advisor system ready
+2025-10-05 11:59:38,384 - strategic_advisor.main - INFO - Processing save file: 20251005_1139_sg_momentum_ai.json
+2025-10-05 11:59:38,554 - strategic_advisor.main - INFO - Running capacity analysis...
+2025-10-05 11:59:38,578 - strategic_advisor.main - INFO - Completed 1 decision module analyses
+2025-10-05 11:59:38,616 - strategic_advisor.main - INFO - Save file processed: 20251005_1139_sg_momentum_ai.json

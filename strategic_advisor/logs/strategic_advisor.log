@@ -1,0 +1,4 @@
+2025-10-05 13:07:18,763 - strategic_advisor.temporal_database - INFO - Temporal database schema initialized
+2025-10-05 13:07:18,764 - strategic_advisor.temporal_database - INFO - Database initialized: test_temporal_game.db
+2025-10-05 13:07:18,792 - strategic_advisor.temporal_database - INFO - Save file ingested with temporal tracking: 20251005_1139_sg_momentum_ai.json (ID: 1)
+2025-10-05 13:07:19,003 - strategic_advisor.temporal_database - ERROR - Save file ingestion failed: UNIQUE constraint failed: save_files.filename
