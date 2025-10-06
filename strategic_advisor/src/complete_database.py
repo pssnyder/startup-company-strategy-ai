@@ -98,7 +98,7 @@ class CompleteGameDatabase:
         """Initialize the complete database schema with 100% JSON coverage"""
         
         # Read the complete schema file
-        schema_path = Path(__file__).parent / "complete_schema.sql"
+        schema_path = Path(__file__).parent.parent / "config" / "complete_schema.sql"
         
         if not schema_path.exists():
             logger.error(f"Complete schema file not found: {schema_path}")
@@ -147,9 +147,6 @@ class CompleteGameDatabase:
         
         # Use the exact field names from the schema (no duplicates)
         fields = {
-            # Use 'filename' for file path, not 'fileName' which is from JSON
-            'filename': file_path.name,
-            
             # Temporal data
             'date': save_data.get('date', ''),
             'started': save_data.get('started', ''),
@@ -167,7 +164,7 @@ class CompleteGameDatabase:
             
             # Core identifiers
             'game_id': save_data.get('id', ''),
-            'fileName': save_data.get('fileName', ''),  # JSON field name
+            'fileName': save_data.get('fileName', file_path.name),  # Use JSON field, fallback to filename
             'saveGameName': save_data.get('saveGameName', ''),
             'companyName': save_data.get('companyName', ''),
             

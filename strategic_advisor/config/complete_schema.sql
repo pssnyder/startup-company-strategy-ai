@@ -4,7 +4,6 @@
 -- Main game state table (all root-level scalars)
 CREATE TABLE IF NOT EXISTS game_state (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    filename TEXT NOT NULL UNIQUE,
 
     -- Temporal tracking
     real_timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -880,7 +879,7 @@ CREATE TABLE IF NOT EXISTS employeesSortOrderList (
     game_state_id INTEGER REFERENCES game_state(id),
 
     name TEXT,  -- JSON: name
-    order BOOLEAN,  -- JSON: order
+    sort_order BOOLEAN,  -- JSON: order (renamed to avoid SQL reserved word)
 
     -- Temporal tracking
     captured_at DATETIME,

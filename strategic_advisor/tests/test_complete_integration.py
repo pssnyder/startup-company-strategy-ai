@@ -8,8 +8,8 @@ import logging
 import sys
 from pathlib import Path
 
-# Add current directory to path for imports
-sys.path.insert(0, str(Path(__file__).parent))
+# Add src directory to path for imports
+sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 from complete_database import CompleteGameDatabase
 
@@ -26,7 +26,7 @@ def test_complete_database_integration():
     db = CompleteGameDatabase()
     
     # Load save file
-    save_file_path = Path("save_files/20251005_1139_sg_momentum_ai.json")
+    save_file_path = Path("../data/save_files/20251005_1139_sg_momentum_ai.json")
     
     if not save_file_path.exists():
         logger.error(f"❌ Save file not found: {save_file_path}")
