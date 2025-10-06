@@ -1,0 +1,3961 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Schema Tree Viewer - JSON Hero Style</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: rgba(255,255,255,0.95);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .header h1 {
+            margin: 0 0 10px 0;
+            color: #1e3c72;
+            font-size: 2.2em;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .stat {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            text-align: center;
+            min-width: 100px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .stat-number {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #ffd700;
+        }
+        
+        .stat-label {
+            font-size: 0.9em;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255,255,255,0.98);
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        
+        .controls {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+            padding: 10px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        .search-box:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .control-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+        
+        .control-btn:hover {
+            background: #5a6fd8;
+        }
+        
+        .tree-container {
+            padding: 20px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .tree-node {
+            margin-bottom: 10px;
+        }
+        
+        .table-header {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+        
+        .table-header:hover {
+            transform: translateY(-2px);
+        }
+        
+        .table-header.array-table {
+            background: linear-gradient(135deg, #FF6B6B 0%, #EE5A24 100%);
+        }
+        
+        .table-header.object-table {
+            background: linear-gradient(135deg, #3742FA 0%, #2F3542 100%);
+        }
+        
+        .table-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .table-name {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        
+        .table-type {
+            background: rgba(255,255,255,0.2);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            text-transform: uppercase;
+        }
+        
+        .expand-icon {
+            font-size: 1.2em;
+            transition: transform 0.3s;
+        }
+        
+        .expand-icon.expanded {
+            transform: rotate(90deg);
+        }
+        
+        .fields-container {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            margin-left: 20px;
+            margin-top: 10px;
+            border-radius: 0 8px 8px 0;
+            overflow: hidden;
+            display: none;
+        }
+        
+        .fields-container.expanded {
+            display: block;
+        }
+        
+        .field-row {
+            padding: 12px 20px;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: background 0.2s;
+        }
+        
+        .field-row:hover {
+            background: #e9ecef;
+        }
+        
+        .field-row:last-child {
+            border-bottom: none;
+        }
+        
+        .field-name {
+            font-weight: 600;
+            color: #495057;
+            min-width: 180px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .field-type {
+            background: #667eea;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            font-weight: 500;
+            min-width: 100px;
+            text-align: center;
+        }
+        
+        .field-type.primary-key {
+            background: #28a745;
+        }
+        
+        .field-type.foreign-key {
+            background: #ffc107;
+            color: #212529;
+        }
+        
+        .field-description {
+            color: #6c757d;
+            font-size: 0.9em;
+            flex: 1;
+        }
+        
+        .field-link {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .field-link:hover {
+            text-decoration: underline;
+        }
+        
+        .required-badge {
+            background: #dc3545;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.7em;
+            font-weight: bold;
+        }
+        
+        .json-source {
+            background: #e7f3ff;
+            color: #0066cc;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.75em;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .highlight {
+            background: #fff3cd !important;
+            border-color: #ffeaa7 !important;
+        }
+        
+        .table-description {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+        
+        .field-count {
+            background: rgba(255,255,255,0.3);
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🌳 Database Schema Tree Viewer</h1>
+        <p>Interactive nested outline view - JSON Hero style comparison</p>
+        
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-number">24</div>
+                <div class="stat-label">Scalar Fields</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">22</div>
+                <div class="stat-label">Array Tables</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">12</div>
+                <div class="stat-label">Object Tables</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">59</div>
+                <div class="stat-label">Total Tables</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="controls">
+            <input type="text" class="search-box" id="searchBox" placeholder="🔍 Search tables and fields...">
+            <button class="control-btn" onclick="expandAll()">📂 Expand All</button>
+            <button class="control-btn" onclick="collapseAll()">📁 Collapse All</button>
+            <button class="control-btn" onclick="scrollToTop()">⬆️ Top</button>
+        </div>
+        
+        <div class="tree-container" id="treeContainer">
+            <!-- Tree will be generated by JavaScript -->
+        </div>
+    </div>
+
+    <script>
+        const treeData = {
+  "game_state": {
+    "type": "table",
+    "description": "Central game state table (root-level scalars)",
+    "fields": {
+      "date": {
+        "type": "DATETIME",
+        "required": true,
+        "json_source": "date",
+        "description": "JSON: date"
+      },
+      "started": {
+        "type": "DATETIME",
+        "required": true,
+        "json_source": "started",
+        "description": "JSON: started"
+      },
+      "gameover": {
+        "type": "BOOLEAN",
+        "required": true,
+        "json_source": "gameover",
+        "description": "JSON: gameover"
+      },
+      "state": {
+        "type": "INTEGER",
+        "required": true,
+        "json_source": "state",
+        "description": "JSON: state"
+      },
+      "paused": {
+        "type": "BOOLEAN",
+        "required": true,
+        "json_source": "paused",
+        "description": "JSON: paused"
+      },
+      "lastVersion": {
+        "type": "TEXT",
+        "required": true,
+        "json_source": "lastVersion",
+        "description": "JSON: lastVersion"
+      },
+      "balance": {
+        "type": "REAL",
+        "required": true,
+        "json_source": "balance",
+        "description": "JSON: balance"
+      },
+      "lastPricePerHour": {
+        "type": "INTEGER",
+        "required": true,
+        "json_source": "lastPricePerHour",
+        "description": "JSON: lastPricePerHour"
+      },
+      "selectedFloor": {
+        "type": "INTEGER",
+        "required": true,
+        "json_source": "selectedFloor",
+        "description": "JSON: selectedFloor"
+      },
+      "maxContractHours": {
+        "type": "INTEGER",
+        "required": true,
+        "json_source": "maxContractHours",
+        "description": "JSON: maxContractHours"
+      },
+      "contractsCompleted": {
+        "type": "INTEGER",
+        "required": true,
+        "json_source": "contractsCompleted",
+        "description": "JSON: contractsCompleted"
+      },
+      "xp": {
+        "type": "REAL",
+        "required": true,
+        "json_source": "xp",
+        "description": "JSON: xp"
+      },
+      "researchPoints": {
+        "type": "INTEGER",
+        "required": true,
+        "json_source": "researchPoints",
+        "description": "JSON: researchPoints"
+      },
+      "userLossEnabled": {
+        "type": "BOOLEAN",
+        "required": true,
+        "json_source": "userLossEnabled",
+        "description": "JSON: userLossEnabled"
+      },
+      "game_id": {
+        "type": "TEXT",
+        "required": true,
+        "json_source": "id",
+        "description": "JSON: id"
+      },
+      "betaVersionAtStart": {
+        "type": "INTEGER",
+        "required": true,
+        "json_source": "betaVersionAtStart",
+        "description": "JSON: betaVersionAtStart"
+      },
+      "companyName": {
+        "type": "TEXT",
+        "required": true,
+        "json_source": "companyName",
+        "description": "JSON: companyName"
+      },
+      "saveGameName": {
+        "type": "TEXT",
+        "required": true,
+        "json_source": "saveGameName",
+        "description": "JSON: saveGameName"
+      },
+      "fileName": {
+        "type": "TEXT",
+        "required": true,
+        "json_source": "fileName",
+        "description": "JSON: fileName"
+      },
+      "lastSaved": {
+        "type": "DATETIME",
+        "required": true,
+        "json_source": "lastSaved",
+        "description": "JSON: lastSaved"
+      },
+      "selectedBuildingName": {
+        "type": "TEXT",
+        "required": true,
+        "json_source": "selectedBuildingName",
+        "description": "JSON: selectedBuildingName"
+      },
+      "needsNewLoan": {
+        "type": "BOOLEAN",
+        "required": true,
+        "json_source": "needsNewLoan",
+        "description": "JSON: needsNewLoan"
+      },
+      "amountOfAvailableResearchItems": {
+        "type": "INTEGER",
+        "required": true,
+        "json_source": "amountOfAvailableResearchItems",
+        "description": "JSON: amountOfAvailableResearchItems"
+      },
+      "autoStartTimeMachine": {
+        "type": "BOOLEAN",
+        "required": true,
+        "json_source": "autoStartTimeMachine",
+        "description": "JSON: autoStartTimeMachine"
+      },
+      "id": {
+        "type": "INTEGER PRIMARY KEY",
+        "required": true,
+        "description": "Database auto-increment ID"
+      },
+      "filename": {
+        "type": "TEXT",
+        "required": true,
+        "description": "Save file name"
+      },
+      "real_timestamp": {
+        "type": "DATETIME",
+        "required": true,
+        "description": "When record was captured"
+      },
+      "file_modified_time": {
+        "type": "DATETIME",
+        "required": false,
+        "description": "File system timestamp"
+      },
+      "ingestion_order": {
+        "type": "INTEGER",
+        "required": false,
+        "description": "Order of ingestion"
+      },
+      "file_size": {
+        "type": "INTEGER",
+        "required": false,
+        "description": "File size in bytes"
+      },
+      "raw_json": {
+        "type": "TEXT",
+        "required": false,
+        "description": "Complete JSON dump"
+      },
+      "created_at": {
+        "type": "DATETIME",
+        "required": true,
+        "description": "Database record creation"
+      },
+      "updated_at": {
+        "type": "DATETIME",
+        "required": true,
+        "description": "Database record update"
+      }
+    },
+    "relationships": []
+  },
+  "transactions": {
+    "type": "array_table",
+    "description": "Array table for JSON field: transactions",
+    "json_source": "transactions",
+    "fields": {
+      "id": {
+        "type": "INTEGER PRIMARY KEY",
+        "required": true,
+        "description": "Database auto-increment ID"
+      },
+      "game_state_id": {
+        "type": "INTEGER FOREIGN KEY",
+        "required": true,
+        "description": "References game_state.id",
+        "link": "game_state"
+      },
+      "array_index": {
+        "type": "INTEGER",
+        "required": true,
+        "description": "Position in original JSON array"
+      },
+      "transactionsItemId": {
+        "type": "UUID",
+        "required": false,
+        "json_source": "id",
+        "description": "JSON item property: id"
+      },
+      "day": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "day",
+        "description": "JSON item property: day"
+      },
+      "hour": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "hour",
+        "description": "JSON item property: hour"
+      },
+      "minute": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "minute",
+        "description": "JSON item property: minute"
+      },
+      "amount": {
+        "type": "REAL",
+        "required": false,
+        "json_source": "amount",
+        "description": "JSON item property: amount"
+      },
+      "label": {
+        "type": "TEXT",
+        "required": false,
+        "json_source": "label",
+        "description": "JSON item property: label"
+      },
+      "balance": {
+        "type": "REAL",
+        "required": false,
+        "json_source": "balance",
+        "description": "JSON item property: balance"
+      },
+      "captured_at": {
+        "type": "DATETIME",
+        "required": true,
+        "description": "When this array item was captured"
+      },
+      "game_date": {
+        "type": "TEXT",
+        "required": false,
+        "description": "Game date when captured"
+      },
+      "game_day": {
+        "type": "INTEGER",
+        "required": false,
+        "description": "Game day when captured"
+      }
+    },
+    "relationships": [
+      "game_state"
+    ]
+  },
+  "loans": {
+    "type": "array_table",
+    "description": "Array table for JSON field: loans",
+    "json_source": "loans",
+    "fields": {
+      "id": {
+        "type": "INTEGER PRIMARY KEY",
+        "required": true,
+        "description": "Database auto-increment ID"
+      },
+      "game_state_id": {
+        "type": "INTEGER FOREIGN KEY",
+        "required": true,
+        "description": "References game_state.id",
+        "link": "game_state"
+      },
+      "array_index": {
+        "type": "INTEGER",
+        "required": true,
+        "description": "Position in original JSON array"
+      },
+      "provider": {
+        "type": "TEXT",
+        "required": false,
+        "json_source": "provider",
+        "description": "JSON item property: provider"
+      },
+      "daysLeft": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "daysLeft",
+        "description": "JSON item property: daysLeft"
+      },
+      "amountLeft": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "amountLeft",
+        "description": "JSON item property: amountLeft"
+      },
+      "active": {
+        "type": "BOOLEAN",
+        "required": false,
+        "json_source": "active",
+        "description": "JSON item property: active"
+      },
+      "captured_at": {
+        "type": "DATETIME",
+        "required": true,
+        "description": "When this array item was captured"
+      },
+      "game_date": {
+        "type": "TEXT",
+        "required": false,
+        "description": "Game date when captured"
+      },
+      "game_day": {
+        "type": "INTEGER",
+        "required": false,
+        "description": "Game day when captured"
+      }
+    },
+    "relationships": [
+      "game_state"
+    ]
+  },
+  "candidates": {
+    "type": "array_table",
+    "description": "Array table for JSON field: candidates",
+    "json_source": "candidates",
+    "fields": {
+      "id": {
+        "type": "INTEGER PRIMARY KEY",
+        "required": true,
+        "description": "Database auto-increment ID"
+      },
+      "game_state_id": {
+        "type": "INTEGER FOREIGN KEY",
+        "required": true,
+        "description": "References game_state.id",
+        "link": "game_state"
+      },
+      "array_index": {
+        "type": "INTEGER",
+        "required": true,
+        "description": "Position in original JSON array"
+      },
+      "candidatesItemId": {
+        "type": "UUID",
+        "required": false,
+        "json_source": "id",
+        "description": "JSON item property: id"
+      },
+      "name": {
+        "type": "TEXT",
+        "required": false,
+        "json_source": "name",
+        "description": "JSON item property: name"
+      },
+      "originalName": {
+        "type": "TEXT",
+        "required": false,
+        "json_source": "originalName",
+        "description": "JSON item property: originalName"
+      },
+      "employeeTypeName": {
+        "type": "TEXT",
+        "required": false,
+        "json_source": "employeeTypeName",
+        "description": "JSON item property: employeeTypeName"
+      },
+      "salary": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "salary",
+        "description": "JSON item property: salary"
+      },
+      "competitorProductId": {
+        "type": "TEXT",
+        "required": false,
+        "json_source": "competitorProductId",
+        "description": "JSON item property: competitorProductId"
+      },
+      "avatar": {
+        "type": "TEXT",
+        "required": false,
+        "json_source": "avatar",
+        "description": "JSON item property: avatar"
+      },
+      "progress": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "progress",
+        "description": "JSON item property: progress"
+      },
+      "level": {
+        "type": "TEXT",
+        "required": false,
+        "json_source": "level",
+        "description": "JSON item property: level"
+      },
+      "employees": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "employees",
+        "description": "JSON item property: employees"
+      },
+      "speed": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "speed",
+        "description": "JSON item property: speed"
+      },
+      "age": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "age",
+        "description": "JSON item property: age"
+      },
+      "maxSpeed": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "maxSpeed",
+        "description": "JSON item property: maxSpeed"
+      },
+      "animationSpeed": {
+        "type": "REAL",
+        "required": false,
+        "json_source": "animationSpeed",
+        "description": "JSON item property: animationSpeed"
+      },
+      "requiredWer": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "requiredWer",
+        "description": "JSON item property: requiredWer"
+      },
+      "mood": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "mood",
+        "description": "JSON item property: mood"
+      },
+      "overtimeMinutes": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "overtimeMinutes",
+        "description": "JSON item property: overtimeMinutes"
+      },
+      "components": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "components",
+        "description": "JSON item property: components"
+      },
+      "gender": {
+        "type": "TEXT",
+        "required": false,
+        "json_source": "gender",
+        "description": "JSON item property: gender"
+      },
+      "hoursLeft": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "hoursLeft",
+        "description": "JSON item property: hoursLeft"
+      },
+      "callInSickDaysLeft": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "callInSickDaysLeft",
+        "description": "JSON item property: callInSickDaysLeft"
+      },
+      "sickHoursLeft": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "sickHoursLeft",
+        "description": "JSON item property: sickHoursLeft"
+      },
+      "idleMinutes": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "idleMinutes",
+        "description": "JSON item property: idleMinutes"
+      },
+      "minutesTillNextEmotion": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "minutesTillNextEmotion",
+        "description": "JSON item property: minutesTillNextEmotion"
+      },
+      "creationTime": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "creationTime",
+        "description": "JSON item property: creationTime"
+      },
+      "schedule": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "schedule",
+        "description": "JSON item property: schedule"
+      },
+      "superstar": {
+        "type": "BOOLEAN",
+        "required": false,
+        "json_source": "superstar",
+        "description": "JSON item property: superstar"
+      },
+      "leads": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "leads",
+        "description": "JSON item property: leads"
+      },
+      "leadFilters": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "leadFilters",
+        "description": "JSON item property: leadFilters"
+      },
+      "task": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "task",
+        "description": "JSON item property: task"
+      },
+      "demands": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "demands",
+        "description": "JSON item property: demands"
+      },
+      "researchDemands": {
+        "type": "BOOLEAN",
+        "required": false,
+        "json_source": "researchDemands",
+        "description": "JSON item property: researchDemands"
+      },
+      "researchSalary": {
+        "type": "BOOLEAN",
+        "required": false,
+        "json_source": "researchSalary",
+        "description": "JSON item property: researchSalary"
+      },
+      "captured_at": {
+        "type": "DATETIME",
+        "required": true,
+        "description": "When this array item was captured"
+      },
+      "game_date": {
+        "type": "TEXT",
+        "required": false,
+        "description": "Game date when captured"
+      },
+      "game_day": {
+        "type": "INTEGER",
+        "required": false,
+        "description": "Game day when captured"
+      }
+    },
+    "relationships": [
+      "game_state"
+    ]
+  },
+  "unassignedEmployees": {
+    "type": "array_table",
+    "description": "Array table for JSON field: unassignedEmployees",
+    "json_source": "unassignedEmployees",
+    "fields": {
+      "id": {
+        "type": "INTEGER PRIMARY KEY",
+        "required": true,
+        "description": "Database auto-increment ID"
+      },
+      "game_state_id": {
+        "type": "INTEGER FOREIGN KEY",
+        "required": true,
+        "description": "References game_state.id",
+        "link": "game_state"
+      },
+      "array_index": {
+        "type": "INTEGER",
+        "required": true,
+        "description": "Position in original JSON array"
+      },
+      "value": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "description": "Array item value (any type stored as JSON)"
+      },
+      "captured_at": {
+        "type": "DATETIME",
+        "required": true,
+        "description": "When this array item was captured"
+      },
+      "game_date": {
+        "type": "TEXT",
+        "required": false,
+        "description": "Game date when captured"
+      },
+      "game_day": {
+        "type": "INTEGER",
+        "required": false,
+        "description": "Game day when captured"
+      }
+    },
+    "relationships": [
+      "game_state"
+    ]
+  },
+  "employeesOrderList": {
+    "type": "array_table",
+    "description": "Array table for JSON field: employeesOrder",
+    "json_source": "employeesOrder",
+    "fields": {
+      "id": {
+        "type": "INTEGER PRIMARY KEY",
+        "required": true,
+        "description": "Database auto-increment ID"
+      },
+      "game_state_id": {
+        "type": "INTEGER FOREIGN KEY",
+        "required": true,
+        "description": "References game_state.id",
+        "link": "game_state"
+      },
+      "array_index": {
+        "type": "INTEGER",
+        "required": true,
+        "description": "Position in original JSON array"
+      },
+      "value": {
+        "type": "TEXT",
+        "required": false,
+        "description": "Array item value (string)"
+      },
+      "captured_at": {
+        "type": "DATETIME",
+        "required": true,
+        "description": "When this array item was captured"
+      },
+      "game_date": {
+        "type": "TEXT",
+        "required": false,
+        "description": "Game date when captured"
+      },
+      "game_day": {
+        "type": "INTEGER",
+        "required": false,
+        "description": "Game day when captured"
+      }
+    },
+    "relationships": [
+      "game_state"
+    ]
+  },
+  "activatedBenefits": {
+    "type": "array_table",
+    "description": "Array table for JSON field: activatedBenefits",
+    "json_source": "activatedBenefits",
+    "fields": {
+      "id": {
+        "type": "INTEGER PRIMARY KEY",
+        "required": true,
+        "description": "Database auto-increment ID"
+      },
+      "game_state_id": {
+        "type": "INTEGER FOREIGN KEY",
+        "required": true,
+        "description": "References game_state.id",
+        "link": "game_state"
+      },
+      "array_index": {
+        "type": "INTEGER",
+        "required": true,
+        "description": "Position in original JSON array"
+      },
+      "value": {
+        "type": "TEXT",
+        "required": false,
+        "description": "Array item value (string)"
+      },
+      "captured_at": {
+        "type": "DATETIME",
+        "required": true,
+        "description": "When this array item was captured"
+      },
+      "game_date": {
+        "type": "TEXT",
+        "required": false,
+        "description": "Game date when captured"
+      },
+      "game_day": {
+        "type": "INTEGER",
+        "required": false,
+        "description": "Game day when captured"
+      }
+    },
+    "relationships": [
+      "game_state"
+    ]
+  },
+  "buildingHistory": {
+    "type": "array_table",
+    "description": "Array table for JSON field: buildingHistory",
+    "json_source": "buildingHistory",
+    "fields": {
+      "id": {
+        "type": "INTEGER PRIMARY KEY",
+        "required": true,
+        "description": "Database auto-increment ID"
+      },
+      "game_state_id": {
+        "type": "INTEGER FOREIGN KEY",
+        "required": true,
+        "description": "References game_state.id",
+        "link": "game_state"
+      },
+      "array_index": {
+        "type": "INTEGER",
+        "required": true,
+        "description": "Position in original JSON array"
+      },
+      "day": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "day",
+        "description": "JSON item property: day"
+      },
+      "buildingName": {
+        "type": "TEXT",
+        "required": false,
+        "json_source": "buildingName",
+        "description": "JSON item property: buildingName"
+      },
+      "captured_at": {
+        "type": "DATETIME",
+        "required": true,
+        "description": "When this array item was captured"
+      },
+      "game_date": {
+        "type": "TEXT",
+        "required": false,
+        "description": "Game date when captured"
+      },
+      "game_day": {
+        "type": "INTEGER",
+        "required": false,
+        "description": "Game day when captured"
+      }
+    },
+    "relationships": [
+      "game_state"
+    ]
+  },
+  "inventorySamples": {
+    "type": "array_table",
+    "description": "Array table for JSON field: inventorySamples",
+    "json_source": "inventorySamples",
+    "fields": {
+      "id": {
+        "type": "INTEGER PRIMARY KEY",
+        "required": true,
+        "description": "Database auto-increment ID"
+      },
+      "game_state_id": {
+        "type": "INTEGER FOREIGN KEY",
+        "required": true,
+        "description": "References game_state.id",
+        "link": "game_state"
+      },
+      "array_index": {
+        "type": "INTEGER",
+        "required": true,
+        "description": "Position in original JSON array"
+      },
+      "value": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "description": "Array item value (any type stored as JSON)"
+      },
+      "captured_at": {
+        "type": "DATETIME",
+        "required": true,
+        "description": "When this array item was captured"
+      },
+      "game_date": {
+        "type": "TEXT",
+        "required": false,
+        "description": "Game date when captured"
+      },
+      "game_day": {
+        "type": "INTEGER",
+        "required": false,
+        "description": "Game day when captured"
+      }
+    },
+    "relationships": [
+      "game_state"
+    ]
+  },
+  "featureInstances": {
+    "type": "array_table",
+    "description": "Array table for JSON field: featureInstances",
+    "json_source": "featureInstances",
+    "fields": {
+      "id": {
+        "type": "INTEGER PRIMARY KEY",
+        "required": true,
+        "description": "Database auto-increment ID"
+      },
+      "game_state_id": {
+        "type": "INTEGER FOREIGN KEY",
+        "required": true,
+        "description": "References game_state.id",
+        "link": "game_state"
+      },
+      "array_index": {
+        "type": "INTEGER",
+        "required": true,
+        "description": "Position in original JSON array"
+      },
+      "featureInstancesItemId": {
+        "type": "UUID",
+        "required": false,
+        "json_source": "id",
+        "description": "JSON item property: id"
+      },
+      "featureName": {
+        "type": "TEXT",
+        "required": false,
+        "json_source": "featureName",
+        "description": "JSON item property: featureName"
+      },
+      "activated": {
+        "type": "BOOLEAN",
+        "required": false,
+        "json_source": "activated",
+        "description": "JSON item property: activated"
+      },
+      "efficiency": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "efficiency",
+        "description": "JSON item property: efficiency"
+      },
+      "quality": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "quality",
+        "description": "JSON item property: quality"
+      },
+      "pricePerMonth": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "pricePerMonth",
+        "description": "JSON item property: pricePerMonth"
+      },
+      "premiumFeatures": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "premiumFeatures",
+        "description": "JSON item property: premiumFeatures"
+      },
+      "productId": {
+        "type": "UUID",
+        "required": false,
+        "json_source": "productId",
+        "description": "JSON item property: productId"
+      },
+      "requirements": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "requirements",
+        "description": "JSON item property: requirements"
+      },
+      "dissatisfaction": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "dissatisfaction",
+        "description": "JSON item property: dissatisfaction"
+      },
+      "timeSlots": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "timeSlots",
+        "description": "JSON item property: timeSlots"
+      },
+      "captured_at": {
+        "type": "DATETIME",
+        "required": true,
+        "description": "When this array item was captured"
+      },
+      "game_date": {
+        "type": "TEXT",
+        "required": false,
+        "description": "Game date when captured"
+      },
+      "game_day": {
+        "type": "INTEGER",
+        "required": false,
+        "description": "Game day when captured"
+      }
+    },
+    "relationships": [
+      "game_state"
+    ]
+  },
+  "contracts": {
+    "type": "array_table",
+    "description": "Array table for JSON field: contracts",
+    "json_source": "contracts",
+    "fields": {
+      "id": {
+        "type": "INTEGER PRIMARY KEY",
+        "required": true,
+        "description": "Database auto-increment ID"
+      },
+      "game_state_id": {
+        "type": "INTEGER FOREIGN KEY",
+        "required": true,
+        "description": "References game_state.id",
+        "link": "game_state"
+      },
+      "array_index": {
+        "type": "INTEGER",
+        "required": true,
+        "description": "Position in original JSON array"
+      },
+      "value": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "description": "Array item value (any type stored as JSON)"
+      },
+      "captured_at": {
+        "type": "DATETIME",
+        "required": true,
+        "description": "When this array item was captured"
+      },
+      "game_date": {
+        "type": "TEXT",
+        "required": false,
+        "description": "Game date when captured"
+      },
+      "game_day": {
+        "type": "INTEGER",
+        "required": false,
+        "description": "Game day when captured"
+      }
+    },
+    "relationships": [
+      "game_state"
+    ]
+  },
+  "products": {
+    "type": "array_table",
+    "description": "Array table for JSON field: products",
+    "json_source": "products",
+    "fields": {
+      "id": {
+        "type": "INTEGER PRIMARY KEY",
+        "required": true,
+        "description": "Database auto-increment ID"
+      },
+      "game_state_id": {
+        "type": "INTEGER FOREIGN KEY",
+        "required": true,
+        "description": "References game_state.id",
+        "link": "game_state"
+      },
+      "array_index": {
+        "type": "INTEGER",
+        "required": true,
+        "description": "Position in original JSON array"
+      },
+      "productsItemId": {
+        "type": "UUID",
+        "required": false,
+        "json_source": "id",
+        "description": "JSON item property: id"
+      },
+      "name": {
+        "type": "TEXT",
+        "required": false,
+        "json_source": "name",
+        "description": "JSON item property: name"
+      },
+      "ageInDays": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "ageInDays",
+        "description": "JSON item property: ageInDays"
+      },
+      "stats": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "stats",
+        "description": "JSON item property: stats"
+      },
+      "servers": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "servers",
+        "description": "JSON item property: servers"
+      },
+      "campaigns": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "campaigns",
+        "description": "JSON item property: campaigns"
+      },
+      "hostingAllocation": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "hostingAllocation",
+        "description": "JSON item property: hostingAllocation"
+      },
+      "frameworkName": {
+        "type": "TEXT",
+        "required": false,
+        "json_source": "frameworkName",
+        "description": "JSON item property: frameworkName"
+      },
+      "investments": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "investments",
+        "description": "JSON item property: investments"
+      },
+      "mergers": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "mergers",
+        "description": "JSON item property: mergers"
+      },
+      "supportTeams": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "supportTeams",
+        "description": "JSON item property: supportTeams"
+      },
+      "tickets": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "tickets",
+        "description": "JSON item property: tickets"
+      },
+      "ticketResolveTimes": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "ticketResolveTimes",
+        "description": "JSON item property: ticketResolveTimes"
+      },
+      "resolvedTickets": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "resolvedTickets",
+        "description": "JSON item property: resolvedTickets"
+      },
+      "totalTickets": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "totalTickets",
+        "description": "JSON item property: totalTickets"
+      },
+      "ads": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "ads",
+        "description": "JSON item property: ads"
+      },
+      "nextDdosAttack": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "nextDdosAttack",
+        "description": "JSON item property: nextDdosAttack"
+      },
+      "logoPath": {
+        "type": "TEXT",
+        "required": false,
+        "json_source": "logoPath",
+        "description": "JSON item property: logoPath"
+      },
+      "productTypeName": {
+        "type": "TEXT",
+        "required": false,
+        "json_source": "productTypeName",
+        "description": "JSON item property: productTypeName"
+      },
+      "investor": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "investor",
+        "description": "JSON item property: investor"
+      },
+      "position": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "position",
+        "description": "JSON item property: position"
+      },
+      "ownedPercentage": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "ownedPercentage",
+        "description": "JSON item property: ownedPercentage"
+      },
+      "disableUserLoss": {
+        "type": "BOOLEAN",
+        "required": false,
+        "json_source": "disableUserLoss",
+        "description": "JSON item property: disableUserLoss"
+      },
+      "lastDdosAttack": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "lastDdosAttack",
+        "description": "JSON item property: lastDdosAttack"
+      },
+      "captured_at": {
+        "type": "DATETIME",
+        "required": true,
+        "description": "When this array item was captured"
+      },
+      "game_date": {
+        "type": "TEXT",
+        "required": false,
+        "description": "Game date when captured"
+      },
+      "game_day": {
+        "type": "INTEGER",
+        "required": false,
+        "description": "Game day when captured"
+      }
+    },
+    "relationships": [
+      "game_state"
+    ]
+  },
+  "marketingInsight": {
+    "type": "array_table",
+    "description": "Array table for JSON field: marketingInsight",
+    "json_source": "marketingInsight",
+    "fields": {
+      "id": {
+        "type": "INTEGER PRIMARY KEY",
+        "required": true,
+        "description": "Database auto-increment ID"
+      },
+      "game_state_id": {
+        "type": "INTEGER FOREIGN KEY",
+        "required": true,
+        "description": "References game_state.id",
+        "link": "game_state"
+      },
+      "array_index": {
+        "type": "INTEGER",
+        "required": true,
+        "description": "Position in original JSON array"
+      },
+      "value": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "description": "Array item value (any type stored as JSON)"
+      },
+      "captured_at": {
+        "type": "DATETIME",
+        "required": true,
+        "description": "When this array item was captured"
+      },
+      "game_date": {
+        "type": "TEXT",
+        "required": false,
+        "description": "Game date when captured"
+      },
+      "game_day": {
+        "type": "INTEGER",
+        "required": false,
+        "description": "Game day when captured"
+      }
+    },
+    "relationships": [
+      "game_state"
+    ]
+  },
+  "notifications": {
+    "type": "array_table",
+    "description": "Array table for JSON field: notifications",
+    "json_source": "notifications",
+    "fields": {
+      "id": {
+        "type": "INTEGER PRIMARY KEY",
+        "required": true,
+        "description": "Database auto-increment ID"
+      },
+      "game_state_id": {
+        "type": "INTEGER FOREIGN KEY",
+        "required": true,
+        "description": "References game_state.id",
+        "link": "game_state"
+      },
+      "array_index": {
+        "type": "INTEGER",
+        "required": true,
+        "description": "Position in original JSON array"
+      },
+      "value": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "description": "Array item value (any type stored as JSON)"
+      },
+      "captured_at": {
+        "type": "DATETIME",
+        "required": true,
+        "description": "When this array item was captured"
+      },
+      "game_date": {
+        "type": "TEXT",
+        "required": false,
+        "description": "Game date when captured"
+      },
+      "game_day": {
+        "type": "INTEGER",
+        "required": false,
+        "description": "Game day when captured"
+      }
+    },
+    "relationships": [
+      "game_state"
+    ]
+  },
+  "actions": {
+    "type": "array_table",
+    "description": "Array table for JSON field: actions",
+    "json_source": "actions",
+    "fields": {
+      "id": {
+        "type": "INTEGER PRIMARY KEY",
+        "required": true,
+        "description": "Database auto-increment ID"
+      },
+      "game_state_id": {
+        "type": "INTEGER FOREIGN KEY",
+        "required": true,
+        "description": "References game_state.id",
+        "link": "game_state"
+      },
+      "array_index": {
+        "type": "INTEGER",
+        "required": true,
+        "description": "Position in original JSON array"
+      },
+      "value": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "description": "Array item value (any type stored as JSON)"
+      },
+      "captured_at": {
+        "type": "DATETIME",
+        "required": true,
+        "description": "When this array item was captured"
+      },
+      "game_date": {
+        "type": "TEXT",
+        "required": false,
+        "description": "Game date when captured"
+      },
+      "game_day": {
+        "type": "INTEGER",
+        "required": false,
+        "description": "Game day when captured"
+      }
+    },
+    "relationships": [
+      "game_state"
+    ]
+  },
+  "outsourcingTasks": {
+    "type": "array_table",
+    "description": "Array table for JSON field: outsourcingTasks",
+    "json_source": "outsourcingTasks",
+    "fields": {
+      "id": {
+        "type": "INTEGER PRIMARY KEY",
+        "required": true,
+        "description": "Database auto-increment ID"
+      },
+      "game_state_id": {
+        "type": "INTEGER FOREIGN KEY",
+        "required": true,
+        "description": "References game_state.id",
+        "link": "game_state"
+      },
+      "array_index": {
+        "type": "INTEGER",
+        "required": true,
+        "description": "Position in original JSON array"
+      },
+      "value": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "description": "Array item value (any type stored as JSON)"
+      },
+      "captured_at": {
+        "type": "DATETIME",
+        "required": true,
+        "description": "When this array item was captured"
+      },
+      "game_date": {
+        "type": "TEXT",
+        "required": false,
+        "description": "Game date when captured"
+      },
+      "game_day": {
+        "type": "INTEGER",
+        "required": false,
+        "description": "Game day when captured"
+      }
+    },
+    "relationships": [
+      "game_state"
+    ]
+  },
+  "productionPlans": {
+    "type": "array_table",
+    "description": "Array table for JSON field: productionPlans",
+    "json_source": "productionPlans",
+    "fields": {
+      "id": {
+        "type": "INTEGER PRIMARY KEY",
+        "required": true,
+        "description": "Database auto-increment ID"
+      },
+      "game_state_id": {
+        "type": "INTEGER FOREIGN KEY",
+        "required": true,
+        "description": "References game_state.id",
+        "link": "game_state"
+      },
+      "array_index": {
+        "type": "INTEGER",
+        "required": true,
+        "description": "Position in original JSON array"
+      },
+      "productionPlansItemId": {
+        "type": "UUID",
+        "required": false,
+        "json_source": "id",
+        "description": "JSON item property: id"
+      },
+      "name": {
+        "type": "TEXT",
+        "required": false,
+        "json_source": "name",
+        "description": "JSON item property: name"
+      },
+      "production": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "production",
+        "description": "JSON item property: production"
+      },
+      "skipModulesWithMissingRequirements": {
+        "type": "BOOLEAN",
+        "required": false,
+        "json_source": "skipModulesWithMissingRequirements",
+        "description": "JSON item property: skipModulesWithMissingRequirements"
+      },
+      "exceedTargets": {
+        "type": "BOOLEAN",
+        "required": false,
+        "json_source": "exceedTargets",
+        "description": "JSON item property: exceedTargets"
+      },
+      "captured_at": {
+        "type": "DATETIME",
+        "required": true,
+        "description": "When this array item was captured"
+      },
+      "game_date": {
+        "type": "TEXT",
+        "required": false,
+        "description": "Game date when captured"
+      },
+      "game_day": {
+        "type": "INTEGER",
+        "required": false,
+        "description": "Game day when captured"
+      }
+    },
+    "relationships": [
+      "game_state"
+    ]
+  },
+  "jeets": {
+    "type": "array_table",
+    "description": "Array table for JSON field: jeets",
+    "json_source": "jeets",
+    "fields": {
+      "id": {
+        "type": "INTEGER PRIMARY KEY",
+        "required": true,
+        "description": "Database auto-increment ID"
+      },
+      "game_state_id": {
+        "type": "INTEGER FOREIGN KEY",
+        "required": true,
+        "description": "References game_state.id",
+        "link": "game_state"
+      },
+      "array_index": {
+        "type": "INTEGER",
+        "required": true,
+        "description": "Position in original JSON array"
+      },
+      "jeetsItemId": {
+        "type": "UUID",
+        "required": false,
+        "json_source": "id",
+        "description": "JSON item property: id"
+      },
+      "gender": {
+        "type": "TEXT",
+        "required": false,
+        "json_source": "gender",
+        "description": "JSON item property: gender"
+      },
+      "name": {
+        "type": "TEXT",
+        "required": false,
+        "json_source": "name",
+        "description": "JSON item property: name"
+      },
+      "handle": {
+        "type": "TEXT",
+        "required": false,
+        "json_source": "handle",
+        "description": "JSON item property: handle"
+      },
+      "avatar": {
+        "type": "TEXT",
+        "required": false,
+        "json_source": "avatar",
+        "description": "JSON item property: avatar"
+      },
+      "text": {
+        "type": "TEXT",
+        "required": false,
+        "json_source": "text",
+        "description": "JSON item property: text"
+      },
+      "day": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "day",
+        "description": "JSON item property: day"
+      },
+      "read": {
+        "type": "BOOLEAN",
+        "required": false,
+        "json_source": "read",
+        "description": "JSON item property: read"
+      },
+      "captured_at": {
+        "type": "DATETIME",
+        "required": true,
+        "description": "When this array item was captured"
+      },
+      "game_date": {
+        "type": "TEXT",
+        "required": false,
+        "description": "Game date when captured"
+      },
+      "game_day": {
+        "type": "INTEGER",
+        "required": false,
+        "description": "Game day when captured"
+      }
+    },
+    "relationships": [
+      "game_state"
+    ]
+  },
+  "firedEmployees": {
+    "type": "array_table",
+    "description": "Array table for JSON field: firedEmployees",
+    "json_source": "firedEmployees",
+    "fields": {
+      "id": {
+        "type": "INTEGER PRIMARY KEY",
+        "required": true,
+        "description": "Database auto-increment ID"
+      },
+      "game_state_id": {
+        "type": "INTEGER FOREIGN KEY",
+        "required": true,
+        "description": "References game_state.id",
+        "link": "game_state"
+      },
+      "array_index": {
+        "type": "INTEGER",
+        "required": true,
+        "description": "Position in original JSON array"
+      },
+      "firedEmployeesItemId": {
+        "type": "UUID",
+        "required": false,
+        "json_source": "id",
+        "description": "JSON item property: id"
+      },
+      "name": {
+        "type": "TEXT",
+        "required": false,
+        "json_source": "name",
+        "description": "JSON item property: name"
+      },
+      "originalName": {
+        "type": "TEXT",
+        "required": false,
+        "json_source": "originalName",
+        "description": "JSON item property: originalName"
+      },
+      "employeeTypeName": {
+        "type": "TEXT",
+        "required": false,
+        "json_source": "employeeTypeName",
+        "description": "JSON item property: employeeTypeName"
+      },
+      "salary": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "salary",
+        "description": "JSON item property: salary"
+      },
+      "competitorProductId": {
+        "type": "UUID",
+        "required": false,
+        "json_source": "competitorProductId",
+        "description": "JSON item property: competitorProductId"
+      },
+      "avatar": {
+        "type": "TEXT",
+        "required": false,
+        "json_source": "avatar",
+        "description": "JSON item property: avatar"
+      },
+      "progress": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "progress",
+        "description": "JSON item property: progress"
+      },
+      "level": {
+        "type": "TEXT",
+        "required": false,
+        "json_source": "level",
+        "description": "JSON item property: level"
+      },
+      "employees": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "employees",
+        "description": "JSON item property: employees"
+      },
+      "speed": {
+        "type": "REAL",
+        "required": false,
+        "json_source": "speed",
+        "description": "JSON item property: speed"
+      },
+      "age": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "age",
+        "description": "JSON item property: age"
+      },
+      "maxSpeed": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "maxSpeed",
+        "description": "JSON item property: maxSpeed"
+      },
+      "animationSpeed": {
+        "type": "REAL",
+        "required": false,
+        "json_source": "animationSpeed",
+        "description": "JSON item property: animationSpeed"
+      },
+      "requiredWer": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "requiredWer",
+        "description": "JSON item property: requiredWer"
+      },
+      "mood": {
+        "type": "REAL",
+        "required": false,
+        "json_source": "mood",
+        "description": "JSON item property: mood"
+      },
+      "overtimeMinutes": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "overtimeMinutes",
+        "description": "JSON item property: overtimeMinutes"
+      },
+      "components": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "components",
+        "description": "JSON item property: components"
+      },
+      "gender": {
+        "type": "TEXT",
+        "required": false,
+        "json_source": "gender",
+        "description": "JSON item property: gender"
+      },
+      "hoursLeft": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "hoursLeft",
+        "description": "JSON item property: hoursLeft"
+      },
+      "callInSickDaysLeft": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "callInSickDaysLeft",
+        "description": "JSON item property: callInSickDaysLeft"
+      },
+      "sickHoursLeft": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "sickHoursLeft",
+        "description": "JSON item property: sickHoursLeft"
+      },
+      "idleMinutes": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "idleMinutes",
+        "description": "JSON item property: idleMinutes"
+      },
+      "minutesTillNextEmotion": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "minutesTillNextEmotion",
+        "description": "JSON item property: minutesTillNextEmotion"
+      },
+      "creationTime": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "creationTime",
+        "description": "JSON item property: creationTime"
+      },
+      "schedule": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "schedule",
+        "description": "JSON item property: schedule"
+      },
+      "superstar": {
+        "type": "BOOLEAN",
+        "required": false,
+        "json_source": "superstar",
+        "description": "JSON item property: superstar"
+      },
+      "queue": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "queue",
+        "description": "JSON item property: queue"
+      },
+      "demands": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "demands",
+        "description": "JSON item property: demands"
+      },
+      "researchDemands": {
+        "type": "BOOLEAN",
+        "required": false,
+        "json_source": "researchDemands",
+        "description": "JSON item property: researchDemands"
+      },
+      "researchSalary": {
+        "type": "BOOLEAN",
+        "required": false,
+        "json_source": "researchSalary",
+        "description": "JSON item property: researchSalary"
+      },
+      "negotiation": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "negotiation",
+        "description": "JSON item property: negotiation"
+      },
+      "hired": {
+        "type": "DATETIME",
+        "required": false,
+        "json_source": "hired",
+        "description": "JSON item property: hired"
+      },
+      "activeQueueIndex": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "activeQueueIndex",
+        "description": "JSON item property: activeQueueIndex"
+      },
+      "task": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "task",
+        "description": "JSON item property: task"
+      },
+      "lastTab": {
+        "type": "TEXT",
+        "required": false,
+        "json_source": "lastTab",
+        "description": "JSON item property: lastTab"
+      },
+      "lastEmotionName": {
+        "type": "TEXT",
+        "required": false,
+        "json_source": "lastEmotionName",
+        "description": "JSON item property: lastEmotionName"
+      },
+      "lastBonusDay": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "lastBonusDay",
+        "description": "JSON item property: lastBonusDay"
+      },
+      "isTraining": {
+        "type": "BOOLEAN",
+        "required": false,
+        "json_source": "isTraining",
+        "description": "JSON item property: isTraining"
+      },
+      "lastDay": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "lastDay",
+        "description": "JSON item property: lastDay"
+      },
+      "captured_at": {
+        "type": "DATETIME",
+        "required": true,
+        "description": "When this array item was captured"
+      },
+      "game_date": {
+        "type": "TEXT",
+        "required": false,
+        "description": "Game date when captured"
+      },
+      "game_day": {
+        "type": "INTEGER",
+        "required": false,
+        "description": "Game day when captured"
+      }
+    },
+    "relationships": [
+      "game_state"
+    ]
+  },
+  "resignedEmployees": {
+    "type": "array_table",
+    "description": "Array table for JSON field: resignedEmployees",
+    "json_source": "resignedEmployees",
+    "fields": {
+      "id": {
+        "type": "INTEGER PRIMARY KEY",
+        "required": true,
+        "description": "Database auto-increment ID"
+      },
+      "game_state_id": {
+        "type": "INTEGER FOREIGN KEY",
+        "required": true,
+        "description": "References game_state.id",
+        "link": "game_state"
+      },
+      "array_index": {
+        "type": "INTEGER",
+        "required": true,
+        "description": "Position in original JSON array"
+      },
+      "resignedEmployeesItemId": {
+        "type": "UUID",
+        "required": false,
+        "json_source": "id",
+        "description": "JSON item property: id"
+      },
+      "name": {
+        "type": "TEXT",
+        "required": false,
+        "json_source": "name",
+        "description": "JSON item property: name"
+      },
+      "originalName": {
+        "type": "TEXT",
+        "required": false,
+        "json_source": "originalName",
+        "description": "JSON item property: originalName"
+      },
+      "employeeTypeName": {
+        "type": "TEXT",
+        "required": false,
+        "json_source": "employeeTypeName",
+        "description": "JSON item property: employeeTypeName"
+      },
+      "salary": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "salary",
+        "description": "JSON item property: salary"
+      },
+      "competitorProductId": {
+        "type": "UUID",
+        "required": false,
+        "json_source": "competitorProductId",
+        "description": "JSON item property: competitorProductId"
+      },
+      "avatar": {
+        "type": "TEXT",
+        "required": false,
+        "json_source": "avatar",
+        "description": "JSON item property: avatar"
+      },
+      "progress": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "progress",
+        "description": "JSON item property: progress"
+      },
+      "level": {
+        "type": "TEXT",
+        "required": false,
+        "json_source": "level",
+        "description": "JSON item property: level"
+      },
+      "employees": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "employees",
+        "description": "JSON item property: employees"
+      },
+      "speed": {
+        "type": "REAL",
+        "required": false,
+        "json_source": "speed",
+        "description": "JSON item property: speed"
+      },
+      "age": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "age",
+        "description": "JSON item property: age"
+      },
+      "maxSpeed": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "maxSpeed",
+        "description": "JSON item property: maxSpeed"
+      },
+      "animationSpeed": {
+        "type": "REAL",
+        "required": false,
+        "json_source": "animationSpeed",
+        "description": "JSON item property: animationSpeed"
+      },
+      "requiredWer": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "requiredWer",
+        "description": "JSON item property: requiredWer"
+      },
+      "mood": {
+        "type": "REAL",
+        "required": false,
+        "json_source": "mood",
+        "description": "JSON item property: mood"
+      },
+      "overtimeMinutes": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "overtimeMinutes",
+        "description": "JSON item property: overtimeMinutes"
+      },
+      "components": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "components",
+        "description": "JSON item property: components"
+      },
+      "gender": {
+        "type": "TEXT",
+        "required": false,
+        "json_source": "gender",
+        "description": "JSON item property: gender"
+      },
+      "hoursLeft": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "hoursLeft",
+        "description": "JSON item property: hoursLeft"
+      },
+      "callInSickDaysLeft": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "callInSickDaysLeft",
+        "description": "JSON item property: callInSickDaysLeft"
+      },
+      "sickHoursLeft": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "sickHoursLeft",
+        "description": "JSON item property: sickHoursLeft"
+      },
+      "idleMinutes": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "idleMinutes",
+        "description": "JSON item property: idleMinutes"
+      },
+      "minutesTillNextEmotion": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "minutesTillNextEmotion",
+        "description": "JSON item property: minutesTillNextEmotion"
+      },
+      "creationTime": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "creationTime",
+        "description": "JSON item property: creationTime"
+      },
+      "schedule": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "schedule",
+        "description": "JSON item property: schedule"
+      },
+      "superstar": {
+        "type": "BOOLEAN",
+        "required": false,
+        "json_source": "superstar",
+        "description": "JSON item property: superstar"
+      },
+      "demands": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "demands",
+        "description": "JSON item property: demands"
+      },
+      "researchDemands": {
+        "type": "BOOLEAN",
+        "required": false,
+        "json_source": "researchDemands",
+        "description": "JSON item property: researchDemands"
+      },
+      "researchSalary": {
+        "type": "BOOLEAN",
+        "required": false,
+        "json_source": "researchSalary",
+        "description": "JSON item property: researchSalary"
+      },
+      "negotiation": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "negotiation",
+        "description": "JSON item property: negotiation"
+      },
+      "hired": {
+        "type": "DATETIME",
+        "required": false,
+        "json_source": "hired",
+        "description": "JSON item property: hired"
+      },
+      "lastTab": {
+        "type": "TEXT",
+        "required": false,
+        "json_source": "lastTab",
+        "description": "JSON item property: lastTab"
+      },
+      "task": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "task",
+        "description": "JSON item property: task"
+      },
+      "lastSendHomeLength": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "lastSendHomeLength",
+        "description": "JSON item property: lastSendHomeLength"
+      },
+      "sendHomeDaysLeft": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "sendHomeDaysLeft",
+        "description": "JSON item property: sendHomeDaysLeft"
+      },
+      "isTraining": {
+        "type": "BOOLEAN",
+        "required": false,
+        "json_source": "isTraining",
+        "description": "JSON item property: isTraining"
+      },
+      "lastBonusDay": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "lastBonusDay",
+        "description": "JSON item property: lastBonusDay"
+      },
+      "lastEmotionName": {
+        "type": "TEXT",
+        "required": false,
+        "json_source": "lastEmotionName",
+        "description": "JSON item property: lastEmotionName"
+      },
+      "lastCompetitorJobOffer": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "lastCompetitorJobOffer",
+        "description": "JSON item property: lastCompetitorJobOffer"
+      },
+      "lastDay": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "lastDay",
+        "description": "JSON item property: lastDay"
+      },
+      "captured_at": {
+        "type": "DATETIME",
+        "required": true,
+        "description": "When this array item was captured"
+      },
+      "game_date": {
+        "type": "TEXT",
+        "required": false,
+        "description": "Game date when captured"
+      },
+      "game_day": {
+        "type": "INTEGER",
+        "required": false,
+        "description": "Game day when captured"
+      }
+    },
+    "relationships": [
+      "game_state"
+    ]
+  },
+  "researchedItems": {
+    "type": "array_table",
+    "description": "Array table for JSON field: researchedItems",
+    "json_source": "researchedItems",
+    "fields": {
+      "id": {
+        "type": "INTEGER PRIMARY KEY",
+        "required": true,
+        "description": "Database auto-increment ID"
+      },
+      "game_state_id": {
+        "type": "INTEGER FOREIGN KEY",
+        "required": true,
+        "description": "References game_state.id",
+        "link": "game_state"
+      },
+      "array_index": {
+        "type": "INTEGER",
+        "required": true,
+        "description": "Position in original JSON array"
+      },
+      "value": {
+        "type": "TEXT",
+        "required": false,
+        "description": "Array item value (string)"
+      },
+      "captured_at": {
+        "type": "DATETIME",
+        "required": true,
+        "description": "When this array item was captured"
+      },
+      "game_date": {
+        "type": "TEXT",
+        "required": false,
+        "description": "Game date when captured"
+      },
+      "game_day": {
+        "type": "INTEGER",
+        "required": false,
+        "description": "Game day when captured"
+      }
+    },
+    "relationships": [
+      "game_state"
+    ]
+  },
+  "competitorProducts": {
+    "type": "array_table",
+    "description": "Array table for JSON field: competitorProducts",
+    "json_source": "competitorProducts",
+    "fields": {
+      "id": {
+        "type": "INTEGER PRIMARY KEY",
+        "required": true,
+        "description": "Database auto-increment ID"
+      },
+      "game_state_id": {
+        "type": "INTEGER FOREIGN KEY",
+        "required": true,
+        "description": "References game_state.id",
+        "link": "game_state"
+      },
+      "array_index": {
+        "type": "INTEGER",
+        "required": true,
+        "description": "Position in original JSON array"
+      },
+      "competitorProductsItemId": {
+        "type": "TEXT",
+        "required": false,
+        "json_source": "id",
+        "description": "JSON item property: id"
+      },
+      "name": {
+        "type": "TEXT",
+        "required": false,
+        "json_source": "name",
+        "description": "JSON item property: name"
+      },
+      "logoColorDegree": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "logoColorDegree",
+        "description": "JSON item property: logoColorDegree"
+      },
+      "logoPath": {
+        "type": "TEXT",
+        "required": false,
+        "json_source": "logoPath",
+        "description": "JSON item property: logoPath"
+      },
+      "users": {
+        "type": "REAL",
+        "required": false,
+        "json_source": "users",
+        "description": "JSON item property: users"
+      },
+      "productTypeName": {
+        "type": "TEXT",
+        "required": false,
+        "json_source": "productTypeName",
+        "description": "JSON item property: productTypeName"
+      },
+      "controlled": {
+        "type": "BOOLEAN",
+        "required": false,
+        "json_source": "controlled",
+        "description": "JSON item property: controlled"
+      },
+      "history": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "history",
+        "description": "JSON item property: history"
+      },
+      "stockVolume": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "stockVolume",
+        "description": "JSON item property: stockVolume"
+      },
+      "ownedStocks": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "ownedStocks",
+        "description": "JSON item property: ownedStocks"
+      },
+      "dealResults": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "dealResults",
+        "description": "JSON item property: dealResults"
+      },
+      "stockTransactions": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "stockTransactions",
+        "description": "JSON item property: stockTransactions"
+      },
+      "priceExpectations": {
+        "type": "REAL",
+        "required": false,
+        "json_source": "priceExpectations",
+        "description": "JSON item property: priceExpectations"
+      },
+      "growth": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "growth",
+        "description": "JSON item property: growth"
+      },
+      "viralDaysLeft": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "viralDaysLeft",
+        "description": "JSON item property: viralDaysLeft"
+      },
+      "version": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "version",
+        "description": "JSON item property: version"
+      },
+      "captured_at": {
+        "type": "DATETIME",
+        "required": true,
+        "description": "When this array item was captured"
+      },
+      "game_date": {
+        "type": "TEXT",
+        "required": false,
+        "description": "Game date when captured"
+      },
+      "game_day": {
+        "type": "INTEGER",
+        "required": false,
+        "description": "Game day when captured"
+      }
+    },
+    "relationships": [
+      "game_state"
+    ]
+  },
+  "loadedMods": {
+    "type": "array_table",
+    "description": "Array table for JSON field: loadedMods",
+    "json_source": "loadedMods",
+    "fields": {
+      "id": {
+        "type": "INTEGER PRIMARY KEY",
+        "required": true,
+        "description": "Database auto-increment ID"
+      },
+      "game_state_id": {
+        "type": "INTEGER FOREIGN KEY",
+        "required": true,
+        "description": "References game_state.id",
+        "link": "game_state"
+      },
+      "array_index": {
+        "type": "INTEGER",
+        "required": true,
+        "description": "Position in original JSON array"
+      },
+      "value": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "description": "Array item value (any type stored as JSON)"
+      },
+      "captured_at": {
+        "type": "DATETIME",
+        "required": true,
+        "description": "When this array item was captured"
+      },
+      "game_date": {
+        "type": "TEXT",
+        "required": false,
+        "description": "Game date when captured"
+      },
+      "game_day": {
+        "type": "INTEGER",
+        "required": false,
+        "description": "Game day when captured"
+      }
+    },
+    "relationships": [
+      "game_state"
+    ]
+  },
+  "progress": {
+    "type": "object_table",
+    "description": "Object table for JSON field: progress",
+    "json_source": "progress",
+    "fields": {
+      "id": {
+        "type": "INTEGER PRIMARY KEY",
+        "required": true,
+        "description": "Database auto-increment ID"
+      },
+      "game_state_id": {
+        "type": "INTEGER FOREIGN KEY",
+        "required": true,
+        "description": "References game_state.id",
+        "link": "game_state"
+      },
+      "products": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "products",
+        "description": "JSON object property: products"
+      },
+      "captured_at": {
+        "type": "DATETIME",
+        "required": true,
+        "description": "When this object was captured"
+      },
+      "game_date": {
+        "type": "TEXT",
+        "required": false,
+        "description": "Game date when captured"
+      },
+      "game_day": {
+        "type": "INTEGER",
+        "required": false,
+        "description": "Game day when captured"
+      }
+    },
+    "relationships": [
+      "game_state"
+    ]
+  },
+  "office": {
+    "type": "object_table",
+    "description": "Object table for JSON field: office",
+    "json_source": "office",
+    "fields": {
+      "id": {
+        "type": "INTEGER PRIMARY KEY",
+        "required": true,
+        "description": "Database auto-increment ID"
+      },
+      "game_state_id": {
+        "type": "INTEGER FOREIGN KEY",
+        "required": true,
+        "description": "References game_state.id",
+        "link": "game_state"
+      },
+      "buildingName": {
+        "type": "TEXT",
+        "required": false,
+        "json_source": "buildingName",
+        "description": "JSON object property: buildingName"
+      },
+      "workstations": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "workstations",
+        "description": "JSON object property: workstations"
+      },
+      "grid": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "grid",
+        "description": "JSON object property: grid"
+      },
+      "lastSelectedFloor": {
+        "type": "TEXT",
+        "required": false,
+        "json_source": "lastSelectedFloor",
+        "description": "JSON object property: lastSelectedFloor"
+      },
+      "captured_at": {
+        "type": "DATETIME",
+        "required": true,
+        "description": "When this object was captured"
+      },
+      "game_date": {
+        "type": "TEXT",
+        "required": false,
+        "description": "Game date when captured"
+      },
+      "game_day": {
+        "type": "INTEGER",
+        "required": false,
+        "description": "Game day when captured"
+      }
+    },
+    "relationships": [
+      "game_state"
+    ]
+  },
+  "completedEvents": {
+    "type": "object_table",
+    "description": "Object table for JSON field: completedEvents",
+    "json_source": "completedEvents",
+    "fields": {
+      "id": {
+        "type": "INTEGER PRIMARY KEY",
+        "required": true,
+        "description": "Database auto-increment ID"
+      },
+      "game_state_id": {
+        "type": "INTEGER FOREIGN KEY",
+        "required": true,
+        "description": "References game_state.id",
+        "link": "game_state"
+      },
+      "JeetInvestmentHint": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "JeetInvestmentHint",
+        "description": "JSON object property: JeetInvestmentHint"
+      },
+      "EmployeeCallInSick": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "EmployeeCallInSick",
+        "description": "JSON object property: EmployeeCallInSick"
+      },
+      "JeetTooMuchLevelDifference": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "JeetTooMuchLevelDifference",
+        "description": "JSON object property: JeetTooMuchLevelDifference"
+      },
+      "ViralBoost": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "ViralBoost",
+        "description": "JSON object property: ViralBoost"
+      },
+      "EmployeeCompetitorOffer": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "EmployeeCompetitorOffer",
+        "description": "JSON object property: EmployeeCompetitorOffer"
+      },
+      "DdosAttack": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "DdosAttack",
+        "description": "JSON object property: DdosAttack"
+      },
+      "JeetHighResponseTime": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "JeetHighResponseTime",
+        "description": "JSON object property: JeetHighResponseTime"
+      },
+      "captured_at": {
+        "type": "DATETIME",
+        "required": true,
+        "description": "When this object was captured"
+      },
+      "game_date": {
+        "type": "TEXT",
+        "required": false,
+        "description": "Game date when captured"
+      },
+      "game_day": {
+        "type": "INTEGER",
+        "required": false,
+        "description": "Game day when captured"
+      }
+    },
+    "relationships": [
+      "game_state"
+    ]
+  },
+  "inventory": {
+    "type": "object_table",
+    "description": "Object table for JSON field: inventory",
+    "json_source": "inventory",
+    "fields": {
+      "id": {
+        "type": "INTEGER PRIMARY KEY",
+        "required": true,
+        "description": "Database auto-increment ID"
+      },
+      "game_state_id": {
+        "type": "INTEGER FOREIGN KEY",
+        "required": true,
+        "description": "References game_state.id",
+        "link": "game_state"
+      },
+      "stats": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "stats",
+        "description": "JSON object property: stats"
+      },
+      "UiComponent": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "UiComponent",
+        "description": "JSON object property: UiComponent"
+      },
+      "BackendComponent": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "BackendComponent",
+        "description": "JSON object property: BackendComponent"
+      },
+      "BlueprintComponent": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "BlueprintComponent",
+        "description": "JSON object property: BlueprintComponent"
+      },
+      "GraphicsComponent": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "GraphicsComponent",
+        "description": "JSON object property: GraphicsComponent"
+      },
+      "VideoComponent": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "VideoComponent",
+        "description": "JSON object property: VideoComponent"
+      },
+      "UiElement": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "UiElement",
+        "description": "JSON object property: UiElement"
+      },
+      "WireframeComponent": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "WireframeComponent",
+        "description": "JSON object property: WireframeComponent"
+      },
+      "InterfaceModule": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "InterfaceModule",
+        "description": "JSON object property: InterfaceModule"
+      },
+      "FrontendModule": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "FrontendModule",
+        "description": "JSON object property: FrontendModule"
+      },
+      "NetworkComponent": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "NetworkComponent",
+        "description": "JSON object property: NetworkComponent"
+      },
+      "BackendModule": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "BackendModule",
+        "description": "JSON object property: BackendModule"
+      },
+      "VideoPlaybackModule": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "VideoPlaybackModule",
+        "description": "JSON object property: VideoPlaybackModule"
+      },
+      "Copywriting": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "Copywriting",
+        "description": "JSON object property: Copywriting"
+      },
+      "TextFormat": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "TextFormat",
+        "description": "JSON object property: TextFormat"
+      },
+      "Firewall": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "Firewall",
+        "description": "JSON object property: Firewall"
+      },
+      "OperatingSystem": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "OperatingSystem",
+        "description": "JSON object property: OperatingSystem"
+      },
+      "VirtualHardware": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "VirtualHardware",
+        "description": "JSON object property: VirtualHardware"
+      },
+      "ImageFormat": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "ImageFormat",
+        "description": "JSON object property: ImageFormat"
+      },
+      "captured_at": {
+        "type": "DATETIME",
+        "required": true,
+        "description": "When this object was captured"
+      },
+      "game_date": {
+        "type": "TEXT",
+        "required": false,
+        "description": "Game date when captured"
+      },
+      "game_day": {
+        "type": "INTEGER",
+        "required": false,
+        "description": "Game day when captured"
+      }
+    },
+    "relationships": [
+      "game_state"
+    ]
+  },
+  "purchaseInventory": {
+    "type": "object_table",
+    "description": "Object table for JSON field: purchaseInventory",
+    "json_source": "purchaseInventory",
+    "fields": {
+      "id": {
+        "type": "INTEGER PRIMARY KEY",
+        "required": true,
+        "description": "Database auto-increment ID"
+      },
+      "game_state_id": {
+        "type": "INTEGER FOREIGN KEY",
+        "required": true,
+        "description": "References game_state.id",
+        "link": "game_state"
+      },
+      "glass_wall1": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "glass_wall1",
+        "description": "JSON object property: glass_wall1"
+      },
+      "glass_wall_corner1": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "glass_wall_corner1",
+        "description": "JSON object property: glass_wall_corner1"
+      },
+      "glass_door2": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "glass_door2",
+        "description": "JSON object property: glass_door2"
+      },
+      "captured_at": {
+        "type": "DATETIME",
+        "required": true,
+        "description": "When this object was captured"
+      },
+      "game_date": {
+        "type": "TEXT",
+        "required": false,
+        "description": "Game date when captured"
+      },
+      "game_day": {
+        "type": "INTEGER",
+        "required": false,
+        "description": "Game day when captured"
+      }
+    },
+    "relationships": [
+      "game_state"
+    ]
+  },
+  "investmentProjects": {
+    "type": "object_table",
+    "description": "Object table for JSON field: investmentProjects",
+    "json_source": "investmentProjects",
+    "fields": {
+      "id": {
+        "type": "INTEGER PRIMARY KEY",
+        "required": true,
+        "description": "Database auto-increment ID"
+      },
+      "game_state_id": {
+        "type": "INTEGER FOREIGN KEY",
+        "required": true,
+        "description": "References game_state.id",
+        "link": "game_state"
+      },
+      "SolarPower": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "SolarPower",
+        "description": "JSON object property: SolarPower"
+      },
+      "captured_at": {
+        "type": "DATETIME",
+        "required": true,
+        "description": "When this object was captured"
+      },
+      "game_date": {
+        "type": "TEXT",
+        "required": false,
+        "description": "Game date when captured"
+      },
+      "game_day": {
+        "type": "INTEGER",
+        "required": false,
+        "description": "Game day when captured"
+      }
+    },
+    "relationships": [
+      "game_state"
+    ]
+  },
+  "compatibilityModifiers": {
+    "type": "object_table",
+    "description": "Object table for JSON field: compatibilityModifiers",
+    "json_source": "compatibilityModifiers",
+    "fields": {
+      "id": {
+        "type": "INTEGER PRIMARY KEY",
+        "required": true,
+        "description": "Database auto-increment ID"
+      },
+      "game_state_id": {
+        "type": "INTEGER FOREIGN KEY",
+        "required": true,
+        "description": "References game_state.id",
+        "link": "game_state"
+      },
+      "captured_at": {
+        "type": "DATETIME",
+        "required": true,
+        "description": "When this object was captured"
+      },
+      "game_date": {
+        "type": "TEXT",
+        "required": false,
+        "description": "Game date when captured"
+      },
+      "game_day": {
+        "type": "INTEGER",
+        "required": false,
+        "description": "Game day when captured"
+      }
+    },
+    "relationships": [
+      "game_state"
+    ]
+  },
+  "marketValues": {
+    "type": "object_table",
+    "description": "Object table for JSON field: marketValues",
+    "json_source": "marketValues",
+    "fields": {
+      "id": {
+        "type": "INTEGER PRIMARY KEY",
+        "required": true,
+        "description": "Database auto-increment ID"
+      },
+      "game_state_id": {
+        "type": "INTEGER FOREIGN KEY",
+        "required": true,
+        "description": "References game_state.id",
+        "link": "game_state"
+      },
+      "BlueprintComponent": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "BlueprintComponent",
+        "description": "JSON object property: BlueprintComponent"
+      },
+      "WireframeComponent": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "WireframeComponent",
+        "description": "JSON object property: WireframeComponent"
+      },
+      "GraphicsComponent": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "GraphicsComponent",
+        "description": "JSON object property: GraphicsComponent"
+      },
+      "UiComponent": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "UiComponent",
+        "description": "JSON object property: UiComponent"
+      },
+      "BackendComponent": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "BackendComponent",
+        "description": "JSON object property: BackendComponent"
+      },
+      "NetworkComponent": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "NetworkComponent",
+        "description": "JSON object property: NetworkComponent"
+      },
+      "DatabaseComponent": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "DatabaseComponent",
+        "description": "JSON object property: DatabaseComponent"
+      },
+      "SemanticComponent": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "SemanticComponent",
+        "description": "JSON object property: SemanticComponent"
+      },
+      "EncryptionComponent": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "EncryptionComponent",
+        "description": "JSON object property: EncryptionComponent"
+      },
+      "FilesystemComponent": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "FilesystemComponent",
+        "description": "JSON object property: FilesystemComponent"
+      },
+      "VideoComponent": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "VideoComponent",
+        "description": "JSON object property: VideoComponent"
+      },
+      "SmtpComponent": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "SmtpComponent",
+        "description": "JSON object property: SmtpComponent"
+      },
+      "I18nComponent": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "I18nComponent",
+        "description": "JSON object property: I18nComponent"
+      },
+      "SearchAlgorithmComponent": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "SearchAlgorithmComponent",
+        "description": "JSON object property: SearchAlgorithmComponent"
+      },
+      "CompressionComponent": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "CompressionComponent",
+        "description": "JSON object property: CompressionComponent"
+      },
+      "VirtualHardware": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "VirtualHardware",
+        "description": "JSON object property: VirtualHardware"
+      },
+      "OperatingSystem": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "OperatingSystem",
+        "description": "JSON object property: OperatingSystem"
+      },
+      "Firewall": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "Firewall",
+        "description": "JSON object property: Firewall"
+      },
+      "Copywriting": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "Copywriting",
+        "description": "JSON object property: Copywriting"
+      },
+      "TextFormat": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "TextFormat",
+        "description": "JSON object property: TextFormat"
+      },
+      "ImageFormat": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "ImageFormat",
+        "description": "JSON object property: ImageFormat"
+      },
+      "VideoFormat": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "VideoFormat",
+        "description": "JSON object property: VideoFormat"
+      },
+      "AudioFormat": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "AudioFormat",
+        "description": "JSON object property: AudioFormat"
+      },
+      "ContractAgreement": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "ContractAgreement",
+        "description": "JSON object property: ContractAgreement"
+      },
+      "Survey": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "Survey",
+        "description": "JSON object property: Survey"
+      },
+      "UserFeedback": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "UserFeedback",
+        "description": "JSON object property: UserFeedback"
+      },
+      "PhoneInterview": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "PhoneInterview",
+        "description": "JSON object property: PhoneInterview"
+      },
+      "AnalyticsResearch": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "AnalyticsResearch",
+        "description": "JSON object property: AnalyticsResearch"
+      },
+      "BehaviorObservation": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "BehaviorObservation",
+        "description": "JSON object property: BehaviorObservation"
+      },
+      "AbTesting": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "AbTesting",
+        "description": "JSON object property: AbTesting"
+      },
+      "DocumentationComponent": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "DocumentationComponent",
+        "description": "JSON object property: DocumentationComponent"
+      },
+      "ProcessManagement": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "ProcessManagement",
+        "description": "JSON object property: ProcessManagement"
+      },
+      "ContinuousIntegration": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "ContinuousIntegration",
+        "description": "JSON object property: ContinuousIntegration"
+      },
+      "CronJob": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "CronJob",
+        "description": "JSON object property: CronJob"
+      },
+      "ResearchPoint": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "ResearchPoint",
+        "description": "JSON object property: ResearchPoint"
+      },
+      "InterfaceModule": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "InterfaceModule",
+        "description": "JSON object property: InterfaceModule"
+      },
+      "FrontendModule": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "FrontendModule",
+        "description": "JSON object property: FrontendModule"
+      },
+      "BackendModule": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "BackendModule",
+        "description": "JSON object property: BackendModule"
+      },
+      "InputModule": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "InputModule",
+        "description": "JSON object property: InputModule"
+      },
+      "StorageModule": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "StorageModule",
+        "description": "JSON object property: StorageModule"
+      },
+      "ContentManagementModule": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "ContentManagementModule",
+        "description": "JSON object property: ContentManagementModule"
+      },
+      "SeoModule": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "SeoModule",
+        "description": "JSON object property: SeoModule"
+      },
+      "AuthenticationModule": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "AuthenticationModule",
+        "description": "JSON object property: AuthenticationModule"
+      },
+      "PaymentGatewayModule": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "PaymentGatewayModule",
+        "description": "JSON object property: PaymentGatewayModule"
+      },
+      "VideoPlaybackModule": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "VideoPlaybackModule",
+        "description": "JSON object property: VideoPlaybackModule"
+      },
+      "EmailModule": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "EmailModule",
+        "description": "JSON object property: EmailModule"
+      },
+      "LocalizationModule": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "LocalizationModule",
+        "description": "JSON object property: LocalizationModule"
+      },
+      "SearchModule": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "SearchModule",
+        "description": "JSON object property: SearchModule"
+      },
+      "BandwidthCompressionModule": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "BandwidthCompressionModule",
+        "description": "JSON object property: BandwidthCompressionModule"
+      },
+      "DatabaseLayer": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "DatabaseLayer",
+        "description": "JSON object property: DatabaseLayer"
+      },
+      "NotificationModule": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "NotificationModule",
+        "description": "JSON object property: NotificationModule"
+      },
+      "ApiClientModule": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "ApiClientModule",
+        "description": "JSON object property: ApiClientModule"
+      },
+      "CodeOptimizationModule": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "CodeOptimizationModule",
+        "description": "JSON object property: CodeOptimizationModule"
+      },
+      "UiElement": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "UiElement",
+        "description": "JSON object property: UiElement"
+      },
+      "UiSet": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "UiSet",
+        "description": "JSON object property: UiSet"
+      },
+      "ResponsiveUi": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "ResponsiveUi",
+        "description": "JSON object property: ResponsiveUi"
+      },
+      "DesignGuidelines": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "DesignGuidelines",
+        "description": "JSON object property: DesignGuidelines"
+      },
+      "VirtualContainer": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "VirtualContainer",
+        "description": "JSON object property: VirtualContainer"
+      },
+      "Cluster": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "Cluster",
+        "description": "JSON object property: Cluster"
+      },
+      "SwarmManagement": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "SwarmManagement",
+        "description": "JSON object property: SwarmManagement"
+      },
+      "captured_at": {
+        "type": "DATETIME",
+        "required": true,
+        "description": "When this object was captured"
+      },
+      "game_date": {
+        "type": "TEXT",
+        "required": false,
+        "description": "Game date when captured"
+      },
+      "game_day": {
+        "type": "INTEGER",
+        "required": false,
+        "description": "Game day when captured"
+      }
+    },
+    "relationships": [
+      "game_state"
+    ]
+  },
+  "variables": {
+    "type": "object_table",
+    "description": "Object table for JSON field: variables",
+    "json_source": "variables",
+    "fields": {
+      "id": {
+        "type": "INTEGER PRIMARY KEY",
+        "required": true,
+        "description": "Database auto-increment ID"
+      },
+      "game_state_id": {
+        "type": "INTEGER FOREIGN KEY",
+        "required": true,
+        "description": "References game_state.id",
+        "link": "game_state"
+      },
+      "ceoStartingAge": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "ceoStartingAge",
+        "description": "JSON object property: ceoStartingAge"
+      },
+      "disableCeoAging": {
+        "type": "BOOLEAN",
+        "required": false,
+        "json_source": "disableCeoAging",
+        "description": "JSON object property: disableCeoAging"
+      },
+      "disableEmployeeAging": {
+        "type": "BOOLEAN",
+        "required": false,
+        "json_source": "disableEmployeeAging",
+        "description": "JSON object property: disableEmployeeAging"
+      },
+      "startingMoney": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "startingMoney",
+        "description": "JSON object property: startingMoney"
+      },
+      "everythingUnlocked": {
+        "type": "BOOLEAN",
+        "required": false,
+        "json_source": "everythingUnlocked",
+        "description": "JSON object property: everythingUnlocked"
+      },
+      "disableWorkstationLimit": {
+        "type": "BOOLEAN",
+        "required": false,
+        "json_source": "disableWorkstationLimit",
+        "description": "JSON object property: disableWorkstationLimit"
+      },
+      "disableInvestor": {
+        "type": "BOOLEAN",
+        "required": false,
+        "json_source": "disableInvestor",
+        "description": "JSON object property: disableInvestor"
+      },
+      "retirementAge": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "retirementAge",
+        "description": "JSON object property: retirementAge"
+      },
+      "daysPerYear": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "daysPerYear",
+        "description": "JSON object property: daysPerYear"
+      },
+      "captured_at": {
+        "type": "DATETIME",
+        "required": true,
+        "description": "When this object was captured"
+      },
+      "game_date": {
+        "type": "TEXT",
+        "required": false,
+        "description": "Game date when captured"
+      },
+      "game_day": {
+        "type": "INTEGER",
+        "required": false,
+        "description": "Game day when captured"
+      }
+    },
+    "relationships": [
+      "game_state"
+    ]
+  },
+  "ceo": {
+    "type": "object_table",
+    "description": "Object table for JSON field: ceo",
+    "json_source": "ceo",
+    "fields": {
+      "id": {
+        "type": "INTEGER PRIMARY KEY",
+        "required": true,
+        "description": "Database auto-increment ID"
+      },
+      "game_state_id": {
+        "type": "INTEGER FOREIGN KEY",
+        "required": true,
+        "description": "References game_state.id",
+        "link": "game_state"
+      },
+      "retirementFund": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "retirementFund",
+        "description": "JSON object property: retirementFund"
+      },
+      "backstory": {
+        "type": "TEXT",
+        "required": false,
+        "json_source": "backstory",
+        "description": "JSON object property: backstory"
+      },
+      "name": {
+        "type": "TEXT",
+        "required": false,
+        "json_source": "name",
+        "description": "JSON object property: name"
+      },
+      "avatar": {
+        "type": "TEXT",
+        "required": false,
+        "json_source": "avatar",
+        "description": "JSON object property: avatar"
+      },
+      "employeeId": {
+        "type": "UUID",
+        "required": false,
+        "json_source": "employeeId",
+        "description": "JSON object property: employeeId"
+      },
+      "captured_at": {
+        "type": "DATETIME",
+        "required": true,
+        "description": "When this object was captured"
+      },
+      "game_date": {
+        "type": "TEXT",
+        "required": false,
+        "description": "Game date when captured"
+      },
+      "game_day": {
+        "type": "INTEGER",
+        "required": false,
+        "description": "Game day when captured"
+      }
+    },
+    "relationships": [
+      "game_state"
+    ]
+  },
+  "employeesSortOrderList": {
+    "type": "object_table",
+    "description": "Object table for JSON field: employeesSortOrder",
+    "json_source": "employeesSortOrder",
+    "fields": {
+      "id": {
+        "type": "INTEGER PRIMARY KEY",
+        "required": true,
+        "description": "Database auto-increment ID"
+      },
+      "game_state_id": {
+        "type": "INTEGER FOREIGN KEY",
+        "required": true,
+        "description": "References game_state.id",
+        "link": "game_state"
+      },
+      "name": {
+        "type": "TEXT",
+        "required": false,
+        "json_source": "name",
+        "description": "JSON object property: name"
+      },
+      "order": {
+        "type": "BOOLEAN",
+        "required": false,
+        "json_source": "order",
+        "description": "JSON object property: order"
+      },
+      "captured_at": {
+        "type": "DATETIME",
+        "required": true,
+        "description": "When this object was captured"
+      },
+      "game_date": {
+        "type": "TEXT",
+        "required": false,
+        "description": "Game date when captured"
+      },
+      "game_day": {
+        "type": "INTEGER",
+        "required": false,
+        "description": "Game day when captured"
+      }
+    },
+    "relationships": [
+      "game_state"
+    ]
+  },
+  "hosting": {
+    "type": "object_table",
+    "description": "Object table for JSON field: hosting",
+    "json_source": "hosting",
+    "fields": {
+      "id": {
+        "type": "INTEGER PRIMARY KEY",
+        "required": true,
+        "description": "Database auto-increment ID"
+      },
+      "game_state_id": {
+        "type": "INTEGER FOREIGN KEY",
+        "required": true,
+        "description": "References game_state.id",
+        "link": "game_state"
+      },
+      "buildingName": {
+        "type": "TEXT",
+        "required": false,
+        "json_source": "buildingName",
+        "description": "JSON object property: buildingName"
+      },
+      "grid": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "grid",
+        "description": "JSON object property: grid"
+      },
+      "racks": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "racks",
+        "description": "JSON object property: racks"
+      },
+      "controllers": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "controllers",
+        "description": "JSON object property: controllers"
+      },
+      "inventory": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "inventory",
+        "description": "JSON object property: inventory"
+      },
+      "roomTemperature": {
+        "type": "INTEGER",
+        "required": false,
+        "json_source": "roomTemperature",
+        "description": "JSON object property: roomTemperature"
+      },
+      "performance": {
+        "type": "TEXT (JSON)",
+        "required": false,
+        "json_source": "performance",
+        "description": "JSON object property: performance"
+      },
+      "captured_at": {
+        "type": "DATETIME",
+        "required": true,
+        "description": "When this object was captured"
+      },
+      "game_date": {
+        "type": "TEXT",
+        "required": false,
+        "description": "Game date when captured"
+      },
+      "game_day": {
+        "type": "INTEGER",
+        "required": false,
+        "description": "Game day when captured"
+      }
+    },
+    "relationships": [
+      "game_state"
+    ]
+  }
+};
+        
+        function createTreeView() {
+            const container = document.getElementById('treeContainer');
+            container.innerHTML = '';
+            
+            // Sort tables: game_state first, then arrays, then objects
+            const sortedTables = Object.keys(treeData).sort((a, b) => {
+                if (a === 'game_state') return -1;
+                if (b === 'game_state') return 1;
+                
+                const aType = treeData[a].type;
+                const bType = treeData[b].type;
+                
+                if (aType === 'array_table' && bType === 'object_table') return -1;
+                if (aType === 'object_table' && bType === 'array_table') return 1;
+                
+                return a.localeCompare(b);
+            });
+            
+            sortedTables.forEach(tableName => {
+                const tableData = treeData[tableName];
+                const tableNode = createTableNode(tableName, tableData);
+                container.appendChild(tableNode);
+            });
+        }
+        
+        function createTableNode(tableName, tableData) {
+            const node = document.createElement('div');
+            node.className = 'tree-node';
+            node.setAttribute('data-table', tableName);
+            
+            const fieldCount = Object.keys(tableData.fields).length;
+            const typeClass = tableData.type === 'array_table' ? 'array-table' : 
+                             tableData.type === 'object_table' ? 'object-table' : 'table';
+            
+            node.innerHTML = `
+                <div class="table-header ${typeClass}" onclick="toggleTable('${tableName}')">
+                    <div class="table-info">
+                        <div class="table-name">${tableName}</div>
+                        <div class="table-type">${tableData.type.replace('_', ' ')}</div>
+                        <div class="field-count">${fieldCount} fields</div>
+                        ${tableData.json_source ? `<div class="json-source">JSON: ${tableData.json_source}</div>` : ''}
+                    </div>
+                    <div class="expand-icon" id="icon-${tableName}">▶</div>
+                </div>
+                <div class="fields-container" id="fields-${tableName}">
+                    ${Object.entries(tableData.fields).map(([fieldName, fieldData]) => 
+                        createFieldRow(tableName, fieldName, fieldData)
+                    ).join('')}
+                </div>
+            `;
+            
+            return node;
+        }
+        
+        function createFieldRow(tableName, fieldName, fieldData) {
+            const isRequired = fieldData.required ? '<span class="required-badge">REQ</span>' : '';
+            const jsonSource = fieldData.json_source ? `<span class="json-source">JSON: ${fieldData.json_source}</span>` : '';
+            const link = fieldData.link ? `<a class="field-link" onclick="scrollToTable('${fieldData.link}')" title="Click to go to ${fieldData.link} table">🔗 ${fieldData.link}</a>` : '';
+            
+            let typeClass = 'field-type';
+            if (fieldData.type.includes('PRIMARY KEY')) typeClass += ' primary-key';
+            if (fieldData.type.includes('FOREIGN KEY')) typeClass += ' foreign-key';
+            
+            return `
+                <div class="field-row" data-field="${tableName}.${fieldName}">
+                    <div class="field-name">${fieldName}</div>
+                    <div class="${typeClass}">${fieldData.type}</div>
+                    <div class="field-description">
+                        ${fieldData.description}
+                        ${isRequired}
+                        ${jsonSource}
+                        ${link}
+                    </div>
+                </div>
+            `;
+        }
+        
+        function toggleTable(tableName) {
+            const fieldsContainer = document.getElementById(`fields-${tableName}`);
+            const icon = document.getElementById(`icon-${tableName}`);
+            
+            if (fieldsContainer.classList.contains('expanded')) {
+                fieldsContainer.classList.remove('expanded');
+                icon.classList.remove('expanded');
+            } else {
+                fieldsContainer.classList.add('expanded');
+                icon.classList.add('expanded');
+            }
+        }
+        
+        function expandAll() {
+            document.querySelectorAll('.fields-container').forEach(container => {
+                container.classList.add('expanded');
+            });
+            document.querySelectorAll('.expand-icon').forEach(icon => {
+                icon.classList.add('expanded');
+            });
+        }
+        
+        function collapseAll() {
+            document.querySelectorAll('.fields-container').forEach(container => {
+                container.classList.remove('expanded');
+            });
+            document.querySelectorAll('.expand-icon').forEach(icon => {
+                icon.classList.remove('expanded');
+            });
+        }
+        
+        function scrollToTable(tableName) {
+            const tableElement = document.querySelector(`[data-table="${tableName}"]`);
+            if (tableElement) {
+                tableElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                tableElement.querySelector('.table-header').style.transform = 'scale(1.02)';
+                setTimeout(() => {
+                    tableElement.querySelector('.table-header').style.transform = '';
+                }, 300);
+                
+                // Expand the table if it's not already expanded
+                const fieldsContainer = document.getElementById(`fields-${tableName}`);
+                const icon = document.getElementById(`icon-${tableName}`);
+                if (!fieldsContainer.classList.contains('expanded')) {
+                    fieldsContainer.classList.add('expanded');
+                    icon.classList.add('expanded');
+                }
+            }
+        }
+        
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        // Search functionality
+        document.getElementById('searchBox').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const allNodes = document.querySelectorAll('.tree-node');
+            
+            if (!searchTerm) {
+                allNodes.forEach(node => {
+                    node.classList.remove('hidden');
+                    node.querySelectorAll('.field-row').forEach(row => row.classList.remove('highlight'));
+                });
+                return;
+            }
+            
+            allNodes.forEach(node => {
+                const tableName = node.getAttribute('data-table').toLowerCase();
+                const fieldRows = node.querySelectorAll('.field-row');
+                let hasMatch = false;
+                
+                // Check table name
+                if (tableName.includes(searchTerm)) {
+                    hasMatch = true;
+                }
+                
+                // Check field names and descriptions
+                fieldRows.forEach(row => {
+                    const text = row.textContent.toLowerCase();
+                    if (text.includes(searchTerm)) {
+                        hasMatch = true;
+                        row.classList.add('highlight');
+                    } else {
+                        row.classList.remove('highlight');
+                    }
+                });
+                
+                if (hasMatch) {
+                    node.classList.remove('hidden');
+                    // Auto-expand if there's a match
+                    const fieldsContainer = node.querySelector('.fields-container');
+                    const icon = node.querySelector('.expand-icon');
+                    if (fieldsContainer && icon) {
+                        fieldsContainer.classList.add('expanded');
+                        icon.classList.add('expanded');
+                    }
+                } else {
+                    node.classList.add('hidden');
+                }
+            });
+        });
+        
+        // Initialize the tree view
+        createTreeView();
+        
+        // Auto-expand game_state table
+        setTimeout(() => {
+            toggleTable('game_state');
+        }, 500);
+    </script>
+</body>
+</html>

@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Startup Company Database ERD</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            overflow-x: auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .stat {
+            background: rgba(255,255,255,0.2);
+            padding: 15px 25px;
+            border-radius: 8px;
+            text-align: center;
+            min-width: 120px;
+        }
+        
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #ffd700;
+        }
+        
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+        
+        .diagram-container {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px auto;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            overflow: auto;
+            position: relative;
+            max-width: 95vw;
+            height: 80vh;
+        }
+        
+        .controls {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 1000;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .control-btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+        
+        .control-btn:hover {
+            background: #45a049;
+        }
+        
+        .mermaid {
+            transform-origin: 0 0;
+            transition: transform 0.3s ease;
+        }
+        
+        .zoom-info {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+        }
+        
+        .legend {
+            margin-top: 20px;
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .legend-item {
+            display: inline-block;
+            margin: 0 15px;
+            font-size: 0.9em;
+        }
+        
+        .legend-color {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border-radius: 3px;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🏗️ Complete Startup Company Database Schema</h1>
+        <p>Interactive Entity Relationship Diagram with 100% JSON Schema Coverage</p>
+        
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-number">24</div>
+                <div class="stat-label">Scalar Fields</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">22</div>
+                <div class="stat-label">Array Tables</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">12</div>
+                <div class="stat-label">Object Tables</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">59</div>
+                <div class="stat-label">Total Tables</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="diagram-container" id="diagramContainer">
+        <div class="controls">
+            <button class="control-btn" onclick="zoomIn()">🔍 Zoom In</button>
+            <button class="control-btn" onclick="zoomOut()">🔍 Zoom Out</button>
+            <button class="control-btn" onclick="resetZoom()">🎯 Reset</button>
+            <button class="control-btn" onclick="fitToWidth()">📏 Fit Width</button>
+        </div>
+        
+        <div class="zoom-info" id="zoomInfo">Zoom: 100%</div>
+        
+        <div class="mermaid" id="mermaidDiagram">
+erDiagram
+
+    %% CENTRAL GAME STATE TABLE
+    game_state {
+        INTEGER id PK
+        TEXT filename
+        DATETIME real_timestamp
+        DATETIME file_modified_time
+        INTEGER ingestion_order
+        DATETIME date
+        DATETIME started
+        BOOL gameover
+        INT state
+        BOOL paused
+        TEXT lastVersion
+        REAL balance
+        INT lastPricePerHour
+        INT selectedFloor
+        INT maxContractHours
+        INT contractsCompleted
+        REAL xp
+        INT researchPoints
+        BOOL userLossEnabled
+        TEXT game_id
+        INT betaVersionAtStart
+        TEXT companyName
+        TEXT saveGameName
+        TEXT fileName
+        DATETIME lastSaved
+        TEXT selectedBuildingName
+        BOOL needsNewLoan
+        INT amountOfAvailableResearchItems
+        BOOL autoStartTimeMachine
+        INTEGER file_size
+        TEXT raw_json
+        DATETIME created_at
+        DATETIME updated_at
+    }
+
+    %% ARRAY TABLES
+    transactions {
+        INTEGER id PK
+        INTEGER game_state_id FK
+        INTEGER array_index
+        TEXT transactionsItemId
+        INT day
+        INT hour
+        INT minute
+        REAL amount
+        TEXT more_fields
+        DATETIME captured_at
+        TEXT game_date
+        INTEGER game_day
+    }
+
+    loans {
+        INTEGER id PK
+        INTEGER game_state_id FK
+        INTEGER array_index
+        TEXT provider
+        INT daysLeft
+        INT amountLeft
+        BOOL active
+        DATETIME captured_at
+        TEXT game_date
+        INTEGER game_day
+    }
+
+    candidates {
+        INTEGER id PK
+        INTEGER game_state_id FK
+        INTEGER array_index
+        TEXT candidatesItemId
+        TEXT name
+        TEXT originalName
+        TEXT employeeTypeName
+        INT salary
+        TEXT more_fields
+        DATETIME captured_at
+        TEXT game_date
+        INTEGER game_day
+    }
+
+    unassignedEmployees {
+        INTEGER id PK
+        INTEGER game_state_id FK
+        INTEGER array_index
+        TEXT value
+        DATETIME captured_at
+        TEXT game_date
+        INTEGER game_day
+    }
+
+    employeesOrderList {
+        INTEGER id PK
+        INTEGER game_state_id FK
+        INTEGER array_index
+        TEXT value
+        DATETIME captured_at
+        TEXT game_date
+        INTEGER game_day
+    }
+
+    activatedBenefits {
+        INTEGER id PK
+        INTEGER game_state_id FK
+        INTEGER array_index
+        TEXT value
+        DATETIME captured_at
+        TEXT game_date
+        INTEGER game_day
+    }
+
+    buildingHistory {
+        INTEGER id PK
+        INTEGER game_state_id FK
+        INTEGER array_index
+        INT day
+        TEXT buildingName
+        DATETIME captured_at
+        TEXT game_date
+        INTEGER game_day
+    }
+
+    inventorySamples {
+        INTEGER id PK
+        INTEGER game_state_id FK
+        INTEGER array_index
+        TEXT value
+        DATETIME captured_at
+        TEXT game_date
+        INTEGER game_day
+    }
+
+    featureInstances {
+        INTEGER id PK
+        INTEGER game_state_id FK
+        INTEGER array_index
+        TEXT featureInstancesItemId
+        TEXT featureName
+        BOOL activated
+        TEXT efficiency
+        TEXT quality
+        TEXT more_fields
+        DATETIME captured_at
+        TEXT game_date
+        INTEGER game_day
+    }
+
+    contracts {
+        INTEGER id PK
+        INTEGER game_state_id FK
+        INTEGER array_index
+        TEXT value
+        DATETIME captured_at
+        TEXT game_date
+        INTEGER game_day
+    }
+
+    products {
+        INTEGER id PK
+        INTEGER game_state_id FK
+        INTEGER array_index
+        TEXT productsItemId
+        TEXT name
+        INT ageInDays
+        TEXT stats
+        TEXT servers
+        TEXT more_fields
+        DATETIME captured_at
+        TEXT game_date
+        INTEGER game_day
+    }
+
+    marketingInsight {
+        INTEGER id PK
+        INTEGER game_state_id FK
+        INTEGER array_index
+        TEXT value
+        DATETIME captured_at
+        TEXT game_date
+        INTEGER game_day
+    }
+
+    notifications {
+        INTEGER id PK
+        INTEGER game_state_id FK
+        INTEGER array_index
+        TEXT value
+        DATETIME captured_at
+        TEXT game_date
+        INTEGER game_day
+    }
+
+    actions {
+        INTEGER id PK
+        INTEGER game_state_id FK
+        INTEGER array_index
+        TEXT value
+        DATETIME captured_at
+        TEXT game_date
+        INTEGER game_day
+    }
+
+    outsourcingTasks {
+        INTEGER id PK
+        INTEGER game_state_id FK
+        INTEGER array_index
+        TEXT value
+        DATETIME captured_at
+        TEXT game_date
+        INTEGER game_day
+    }
+
+    productionPlans {
+        INTEGER id PK
+        INTEGER game_state_id FK
+        INTEGER array_index
+        TEXT productionPlansItemId
+        TEXT name
+        TEXT production
+        BOOL skipModulesWithMissingRequirements
+        BOOL exceedTargets
+        DATETIME captured_at
+        TEXT game_date
+        INTEGER game_day
+    }
+
+    jeets {
+        INTEGER id PK
+        INTEGER game_state_id FK
+        INTEGER array_index
+        TEXT jeetsItemId
+        TEXT gender
+        TEXT name
+        TEXT handle
+        TEXT avatar
+        TEXT more_fields
+        DATETIME captured_at
+        TEXT game_date
+        INTEGER game_day
+    }
+
+    firedEmployees {
+        INTEGER id PK
+        INTEGER game_state_id FK
+        INTEGER array_index
+        TEXT firedEmployeesItemId
+        TEXT name
+        TEXT originalName
+        TEXT employeeTypeName
+        INT salary
+        TEXT more_fields
+        DATETIME captured_at
+        TEXT game_date
+        INTEGER game_day
+    }
+
+    resignedEmployees {
+        INTEGER id PK
+        INTEGER game_state_id FK
+        INTEGER array_index
+        TEXT resignedEmployeesItemId
+        TEXT name
+        TEXT originalName
+        TEXT employeeTypeName
+        INT salary
+        TEXT more_fields
+        DATETIME captured_at
+        TEXT game_date
+        INTEGER game_day
+    }
+
+    researchedItems {
+        INTEGER id PK
+        INTEGER game_state_id FK
+        INTEGER array_index
+        TEXT value
+        DATETIME captured_at
+        TEXT game_date
+        INTEGER game_day
+    }
+
+    competitorProducts {
+        INTEGER id PK
+        INTEGER game_state_id FK
+        INTEGER array_index
+        TEXT competitorProductsItemId
+        TEXT name
+        INT logoColorDegree
+        TEXT logoPath
+        REAL users
+        TEXT more_fields
+        DATETIME captured_at
+        TEXT game_date
+        INTEGER game_day
+    }
+
+    loadedMods {
+        INTEGER id PK
+        INTEGER game_state_id FK
+        INTEGER array_index
+        TEXT value
+        DATETIME captured_at
+        TEXT game_date
+        INTEGER game_day
+    }
+
+    %% OBJECT TABLES
+    progress {
+        INTEGER id PK
+        INTEGER game_state_id FK
+        TEXT products
+        DATETIME captured_at
+        TEXT game_date
+        INTEGER game_day
+    }
+
+    office {
+        INTEGER id PK
+        INTEGER game_state_id FK
+        TEXT buildingName
+        TEXT workstations
+        TEXT grid
+        TEXT lastSelectedFloor
+        DATETIME captured_at
+        TEXT game_date
+        INTEGER game_day
+    }
+
+    completedEvents {
+        INTEGER id PK
+        INTEGER game_state_id FK
+        INT JeetInvestmentHint
+        INT EmployeeCallInSick
+        INT JeetTooMuchLevelDifference
+        INT ViralBoost
+        INT EmployeeCompetitorOffer
+        INT DdosAttack
+        INT JeetHighResponseTime
+        DATETIME captured_at
+        TEXT game_date
+        INTEGER game_day
+    }
+
+    inventory {
+        INTEGER id PK
+        INTEGER game_state_id FK
+        TEXT stats
+        INT UiComponent
+        INT BackendComponent
+        INT BlueprintComponent
+        INT GraphicsComponent
+        INT VideoComponent
+        INT UiElement
+        INT WireframeComponent
+        TEXT more_properties
+        DATETIME captured_at
+        TEXT game_date
+        INTEGER game_day
+    }
+
+    purchaseInventory {
+        INTEGER id PK
+        INTEGER game_state_id FK
+        INT glass_wall1
+        INT glass_wall_corner1
+        INT glass_door2
+        DATETIME captured_at
+        TEXT game_date
+        INTEGER game_day
+    }
+
+    investmentProjects {
+        INTEGER id PK
+        INTEGER game_state_id FK
+        TEXT SolarPower
+        DATETIME captured_at
+        TEXT game_date
+        INTEGER game_day
+    }
+
+    compatibilityModifiers {
+        INTEGER id PK
+        INTEGER game_state_id FK
+        DATETIME captured_at
+        TEXT game_date
+        INTEGER game_day
+    }
+
+    marketValues {
+        INTEGER id PK
+        INTEGER game_state_id FK
+        TEXT BlueprintComponent
+        TEXT WireframeComponent
+        TEXT GraphicsComponent
+        TEXT UiComponent
+        TEXT BackendComponent
+        TEXT NetworkComponent
+        TEXT DatabaseComponent
+        TEXT SemanticComponent
+        TEXT more_properties
+        DATETIME captured_at
+        TEXT game_date
+        INTEGER game_day
+    }
+
+    variables {
+        INTEGER id PK
+        INTEGER game_state_id FK
+        INT ceoStartingAge
+        BOOL disableCeoAging
+        BOOL disableEmployeeAging
+        INT startingMoney
+        BOOL everythingUnlocked
+        BOOL disableWorkstationLimit
+        BOOL disableInvestor
+        INT retirementAge
+        TEXT more_properties
+        DATETIME captured_at
+        TEXT game_date
+        INTEGER game_day
+    }
+
+    ceo {
+        INTEGER id PK
+        INTEGER game_state_id FK
+        TEXT retirementFund
+        TEXT backstory
+        TEXT name
+        TEXT avatar
+        TEXT employeeId
+        DATETIME captured_at
+        TEXT game_date
+        INTEGER game_day
+    }
+
+    employeesSortOrderList {
+        INTEGER id PK
+        INTEGER game_state_id FK
+        TEXT name
+        BOOL order
+        DATETIME captured_at
+        TEXT game_date
+        INTEGER game_day
+    }
+
+    hosting {
+        INTEGER id PK
+        INTEGER game_state_id FK
+        TEXT buildingName
+        TEXT grid
+        TEXT racks
+        TEXT controllers
+        TEXT inventory
+        INT roomTemperature
+        TEXT performance
+        DATETIME captured_at
+        TEXT game_date
+        INTEGER game_day
+    }
+
+    %% RELATIONSHIPS
+    game_state ||--o{ transactions : contains
+    game_state ||--o{ loans : contains
+    game_state ||--o{ candidates : contains
+    game_state ||--o{ unassignedEmployees : contains
+    game_state ||--o{ employeesOrderList : contains
+    game_state ||--o{ activatedBenefits : contains
+    game_state ||--o{ buildingHistory : contains
+    game_state ||--o{ inventorySamples : contains
+    game_state ||--o{ featureInstances : contains
+    game_state ||--o{ contracts : contains
+    game_state ||--o{ products : contains
+    game_state ||--o{ marketingInsight : contains
+    game_state ||--o{ notifications : contains
+    game_state ||--o{ actions : contains
+    game_state ||--o{ outsourcingTasks : contains
+    game_state ||--o{ productionPlans : contains
+    game_state ||--o{ jeets : contains
+    game_state ||--o{ firedEmployees : contains
+    game_state ||--o{ resignedEmployees : contains
+    game_state ||--o{ researchedItems : contains
+    game_state ||--o{ competitorProducts : contains
+    game_state ||--o{ loadedMods : contains
+    game_state ||--|| progress : has
+    game_state ||--|| office : has
+    game_state ||--|| completedEvents : has
+    game_state ||--|| inventory : has
+    game_state ||--|| purchaseInventory : has
+    game_state ||--|| investmentProjects : has
+    game_state ||--|| compatibilityModifiers : has
+    game_state ||--|| marketValues : has
+    game_state ||--|| variables : has
+    game_state ||--|| ceo : has
+    game_state ||--|| employeesSortOrderList : has
+    game_state ||--|| hosting : has
+        </div>
+    </div>
+    
+    <div class="legend">
+        <h3>🎨 Diagram Legend</h3>
+        <div class="legend-item">
+            <span class="legend-color" style="background: #ff6b6b;"></span>
+            Primary Key (PK)
+        </div>
+        <div class="legend-item">
+            <span class="legend-color" style="background: #4ecdc4;"></span>
+            Foreign Key (FK)
+        </div>
+        <div class="legend-item">
+            <span class="legend-color" style="background: #45b7d1;"></span>
+            One-to-Many (||--o{)
+        </div>
+        <div class="legend-item">
+            <span class="legend-color" style="background: #96ceb4;"></span>
+            One-to-One (||--||)
+        </div>
+    </div>
+
+    <script>
+        let currentZoom = 1;
+        const zoomStep = 0.2;
+        const minZoom = 0.1;
+        const maxZoom = 3;
+        
+        // Initialize Mermaid
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'base',
+            themeVariables: {
+                primaryColor: '#ff6b6b',
+                primaryTextColor: '#333',
+                primaryBorderColor: '#ff6b6b',
+                lineColor: '#666',
+                sectionBkColor: '#f8f9fa',
+                altSectionBkColor: '#e9ecef',
+                gridColor: '#ddd',
+                c0: '#4ecdc4',
+                c1: '#44a08d',
+                c2: '#45b7d1',
+                c3: '#96ceb4',
+                c4: '#ffd93d'
+            },
+            er: {
+                entityPadding: 15,
+                labelBackground: '#f8f9fa',
+                primaryColor: '#ff6b6b',
+                primaryBorderColor: '#ff6b6b',
+                primaryTextColor: '#333',
+                relationColor: '#666',
+                attributeBackgroundColorOdd: '#ffffff',
+                attributeBackgroundColorEven: '#f8f9fa'
+            }
+        });
+        
+        function updateZoom() {
+            const diagram = document.getElementById('mermaidDiagram');
+            diagram.style.transform = `scale(${currentZoom})`;
+            document.getElementById('zoomInfo').textContent = `Zoom: ${Math.round(currentZoom * 100)}%`;
+        }
+        
+        function zoomIn() {
+            if (currentZoom < maxZoom) {
+                currentZoom += zoomStep;
+                updateZoom();
+            }
+        }
+        
+        function zoomOut() {
+            if (currentZoom > minZoom) {
+                currentZoom -= zoomStep;
+                updateZoom();
+            }
+        }
+        
+        function resetZoom() {
+            currentZoom = 1;
+            updateZoom();
+        }
+        
+        function fitToWidth() {
+            const container = document.getElementById('diagramContainer');
+            const diagram = document.getElementById('mermaidDiagram');
+            const containerWidth = container.clientWidth - 40; // Account for padding
+            const diagramWidth = diagram.scrollWidth;
+            currentZoom = Math.min(containerWidth / diagramWidth, 1);
+            updateZoom();
+        }
+        
+        // Enable dragging
+        let isDragging = false;
+        let startX, startY, scrollLeft, scrollTop;
+        
+        const container = document.getElementById('diagramContainer');
+        
+        container.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            startX = e.pageX - container.offsetLeft;
+            startY = e.pageY - container.offsetTop;
+            scrollLeft = container.scrollLeft;
+            scrollTop = container.scrollTop;
+            container.style.cursor = 'grabbing';
+        });
+        
+        container.addEventListener('mouseleave', () => {
+            isDragging = false;
+            container.style.cursor = 'grab';
+        });
+        
+        container.addEventListener('mouseup', () => {
+            isDragging = false;
+            container.style.cursor = 'grab';
+        });
+        
+        container.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            e.preventDefault();
+            const x = e.pageX - container.offsetLeft;
+            const y = e.pageY - container.offsetTop;
+            const walkX = (x - startX) * 2;
+            const walkY = (y - startY) * 2;
+            container.scrollLeft = scrollLeft - walkX;
+            container.scrollTop = scrollTop - walkY;
+        });
+        
+        // Mouse wheel zoom
+        container.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            if (e.deltaY < 0) {
+                zoomIn();
+            } else {
+                zoomOut();
+            }
+        });
+        
+        // Initial setup
+        container.style.cursor = 'grab';
+        
+        // Auto-fit on load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                fitToWidth();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

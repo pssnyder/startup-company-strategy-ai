@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Momentum AI Database ER Diagram</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            font-weight: 300;
+        }
+        .header p {
+            margin: 10px 0 0 0;
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .tab {
+            padding: 15px 25px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 16px;
+            color: #495057;
+            transition: all 0.3s ease;
+        }
+        .tab:hover {
+            background: #e9ecef;
+        }
+        .tab.active {
+            background: white;
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+        }
+        .content {
+            padding: 30px;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            border-left: 4px solid #667eea;
+        }
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+        .table-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .table-card {
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .table-header {
+            background: #667eea;
+            color: white;
+            padding: 15px;
+            font-weight: bold;
+        }
+        .table-body {
+            padding: 15px;
+        }
+        .table-info {
+            margin: 5px 0;
+            color: #495057;
+        }
+        .diagram-container {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            overflow: auto;
+        }
+        .relationships-list {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+        }
+        .relationship-type {
+            margin: 20px 0;
+        }
+        .relationship-type h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        .relationship-item {
+            background: white;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            border-left: 3px solid #667eea;
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+        #mermaid-diagram {
+            text-align: center;
+            overflow: auto;
+            position: relative;
+        }
+        .zoom-controls {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .zoom-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            margin: 0 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .zoom-btn:hover {
+            background: #5a6fd8;
+        }
+        .diagram-wrapper {
+            transform-origin: center center;
+            transition: transform 0.3s ease;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Momentum AI Database</h1>
+            <p>Entity Relationship Diagram & Schema Analysis</p>
+        </div>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('overview')">📊 Overview</button>
+            <button class="tab" onclick="showTab('schema')">🏗️ Schema</button>
+            <button class="tab" onclick="showTab('diagram')">🔗 ER Diagram</button>
+            <button class="tab" onclick="showTab('relationships')">🔄 Relationships</button>
+        </div>
+        
+        <div class="content">
+            <!-- Overview Tab -->
+            <div id="overview" class="tab-content active">
+                <h2>Database Overview</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number">7</div>
+                        <div class="stat-label">Total Tables</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">1,065</div>
+                        <div class="stat-label">Total Records</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">5</div>
+                        <div class="stat-label">Foreign Key Relations</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">193</div>
+                        <div class="stat-label">Game Days Tracked</div>
+                    </div>
+                </div>
+                
+                <h3>Core Tables</h3>
+                <div class="table-list">
+                    <div class="table-card">
+                        <div class="table-header">💾 SAVE_FILES</div>
+                        <div class="table-body">
+                            <div class="table-info">📊 Records: 7</div>
+                            <div class="table-info">🔗 Columns: 34</div>
+                            <div class="table-info">📝 Core game state snapshots</div>
+                        </div>
+                    </div>
+                    <div class="table-card">
+                        <div class="table-header">💳 TRANSACTIONS</div>
+                        <div class="table-body">
+                            <div class="table-info">📊 Records: 606</div>
+                            <div class="table-info">🔗 Columns: 12</div>
+                            <div class="table-info">💰 Financial history tracking</div>
+                        </div>
+                    </div>
+                    <div class="table-card">
+                        <div class="table-header">📈 MARKET_VALUES</div>
+                        <div class="table-body">
+                            <div class="table-info">📊 Records: 420</div>
+                            <div class="table-info">🔗 Columns: 8</div>
+                            <div class="table-info">🏷️ Component pricing data</div>
+                        </div>
+                    </div>
+                    <div class="table-card">
+                        <div class="table-header">🐦 JEETS</div>
+                        <div class="table-body">
+                            <div class="table-info">📊 Records: 32</div>
+                            <div class="table-info">🔗 Columns: 13</div>
+                            <div class="table-info">📱 Social media tracking</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Schema Tab -->
+            <div id="schema" class="tab-content">
+                <h2>Database Schema Details</h2>
+                <p>Complete table structures with columns, types, and constraints:</p>
+                
+                <div class="table-card">
+                    <div class="table-header">💾 SAVE_FILES (Central Repository)</div>
+                    <div class="table-body">
+                        <strong>Key Columns:</strong><br>
+                        • id (PRIMARY KEY) - Unique identifier<br>
+                        • filename - Save file name<br>
+                        • game_day - In-game day progression<br>
+                        • balance - Company financial status<br>
+                        • xp - Experience points<br>
+                        • research_points - Research capacity<br>
+                        • real_timestamp - When data was captured<br><br>
+                        
+                        <strong>Indexes:</strong><br>
+                        • Game day indexing for temporal queries<br>
+                        • Real timestamp for capture time analysis<br>
+                        • Unique filename constraint
+                    </div>
+                </div>
+                
+                <div class="table-card">
+                    <div class="table-header">💳 TRANSACTIONS (Financial Data)</div>
+                    <div class="table-body">
+                        <strong>Key Columns:</strong><br>
+                        • save_file_id (FOREIGN KEY) → save_files.id<br>
+                        • transaction_id - Unique transaction identifier<br>
+                        • day, hour, minute - Transaction timing<br>
+                        • amount - Transaction value<br>
+                        • balance - Account balance after transaction<br><br>
+                        
+                        <strong>Natural Deduplication:</strong><br>
+                        • Unique constraint on (save_file_id, transaction_id)
+                    </div>
+                </div>
+                
+                <div class="table-card">
+                    <div class="table-header">👥 EMPLOYEES (Workforce Data)</div>
+                    <div class="table-body">
+                        <strong>Key Columns:</strong><br>
+                        • save_file_id (FOREIGN KEY) → save_files.id<br>
+                        • employee_id - Game's employee identifier<br>
+                        • name, salary, mood, level - Employee attributes<br>
+                        • employee_status - Current employment state<br><br>
+                        
+                        <strong>Status Tracking:</strong><br>
+                        • Tracks employee lifecycle (hired, active, fired)<br>
+                        • Temporal progression through save files
+                    </div>
+                </div>
+            </div>
+            
+            <!-- ER Diagram Tab -->
+            <div id="diagram" class="tab-content">
+                <h2>Entity Relationship Diagram</h2>
+                <p>Visual representation of table relationships and dependencies:</p>
+                
+                <div class="zoom-controls">
+                    <button class="zoom-btn" onclick="zoomDiagram(0.8)">🔍- Zoom Out</button>
+                    <button class="zoom-btn" onclick="zoomDiagram(1.0)">📐 Reset</button>
+                    <button class="zoom-btn" onclick="zoomDiagram(1.2)">🔍+ Zoom In</button>
+                    <span id="zoom-level" style="margin-left: 20px; color: #667eea;">Zoom: 100%</span>
+                </div>
+                
+                <div class="diagram-container" id="mermaid-diagram">
+                    <div class="diagram-wrapper">
+                        <div class="mermaid">
+erDiagram
+    SAVE_FILES {
+        INTEGER id PK "🔑 Primary Key"
+        TEXT filename "📁 Save file name"
+        INTEGER game_day "📅 Game progression"
+        REAL balance "💰 Company balance"
+        REAL xp "⭐ Experience points"
+        INTEGER research_points "🔬 Research capacity"
+        DATETIME real_timestamp "⏰ Capture time"
+        TEXT company_name "🏢 Company name"
+        TEXT raw_json "📄 Complete data"
+    }
+    
+    TRANSACTIONS {
+        INTEGER id PK "🔑 Primary Key"
+        INTEGER save_file_id FK "🔗 Links to save_files"
+        TEXT transaction_id "🆔 Unique transaction"
+        INTEGER day "📅 Transaction day"
+        INTEGER hour "🕐 Transaction hour"
+        REAL amount "💰 Transaction value"
+        REAL balance "📊 Balance after"
+        TEXT label "📝 Description"
+    }
+    
+    EMPLOYEES {
+        INTEGER id PK "🔑 Primary Key"
+        INTEGER save_file_id FK "🔗 Links to save_files"
+        TEXT employee_id "🆔 Employee identifier"
+        TEXT name "👤 Employee name"
+        INTEGER salary "💵 Salary amount"
+        TEXT employee_status "📊 Employment status"
+        REAL mood "😊 Employee mood"
+        TEXT employee_type_name "💼 Job type"
+    }
+    
+    JEETS {
+        INTEGER id PK "🔑 Primary Key"
+        INTEGER save_file_id FK "🔗 Links to save_files"
+        TEXT jeet_id "🆔 Jeet identifier"
+        TEXT jeet_name "👤 User name"
+        INTEGER day "📅 Post day"
+        TEXT text "💬 Jeet content"
+        TEXT handle "📱 User handle"
+    }
+    
+    MARKET_VALUES {
+        INTEGER id PK "🔑 Primary Key"
+        INTEGER save_file_id FK "🔗 Links to save_files"
+        TEXT component_name "🏷️ Component name"
+        INTEGER base_price "💰 Base price"
+        REAL price_change "📈 Price change"
+        INTEGER game_day "📅 Market day"
+    }
+    
+    EMPLOYEE_REFERENCES {
+        INTEGER id PK "🔑 Primary Key"
+        INTEGER save_file_id FK "🔗 Links to save_files"
+        TEXT employee_id "🆔 Employee reference"
+        INTEGER employee_order "📊 Order index"
+        INTEGER game_day "📅 Reference day"
+    }
+    
+    %% Relationships
+    SAVE_FILES ||--o{ TRANSACTIONS : "contains financial data"
+    SAVE_FILES ||--o{ EMPLOYEES : "manages workforce"
+    SAVE_FILES ||--o{ JEETS : "tracks social media"
+    SAVE_FILES ||--o{ MARKET_VALUES : "captures market data"
+    SAVE_FILES ||--o{ EMPLOYEE_REFERENCES : "references employees"
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 20px; padding: 15px; background: #e3f2fd; border-radius: 8px;">
+                    <strong>🔗 Relationship Patterns:</strong><br>
+                    • <strong>One-to-Many:</strong> Each save file contains multiple transactions, employees, jeets, and market values<br>
+                    • <strong>Temporal Linking:</strong> All data linked by game_day for time-series analysis<br>
+                    • <strong>Natural Deduplication:</strong> Game UUIDs prevent duplicate data across saves
+                </div>
+            </div>
+            
+            <!-- Relationships Tab -->
+            <div id="relationships" class="tab-content">
+                <h2>Database Relationships</h2>
+                
+                <div class="relationships-list">
+                    <div class="relationship-type">
+                        <h3>🔑 Foreign Key Relationships</h3>
+                        <div class="relationship-item">transactions.save_file_id → save_files.id</div>
+                        <div class="relationship-item">employees.save_file_id → save_files.id</div>
+                        <div class="relationship-item">jeets.save_file_id → save_files.id</div>
+                        <div class="relationship-item">market_values.save_file_id → save_files.id</div>
+                        <div class="relationship-item">employee_references.save_file_id → save_files.id</div>
+                    </div>
+                    
+                    <div class="relationship-type">
+                        <h3>⏰ Temporal Relationships</h3>
+                        <div class="relationship-item">All tables linked by game_day for time-series analysis</div>
+                        <div class="relationship-item">Real timestamp tracks data capture chronology</div>
+                        <div class="relationship-item">Game date provides in-game temporal context</div>
+                    </div>
+                    
+                    <div class="relationship-type">
+                        <h3>🔍 Business Logic Relationships</h3>
+                        <div class="relationship-item">Transactions → Balance changes in save_files</div>
+                        <div class="relationship-item">Employee status → Company operational capacity</div>
+                        <div class="relationship-item">Market values → Component purchasing decisions</div>
+                        <div class="relationship-item">Jeets → Social engagement tracking</div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                    <h3>🎯 Strategic Analysis Capabilities</h3>
+                    <ul style="list-style-type: none; padding: 0;">
+                        <li>📈 <strong>Growth Trajectory:</strong> Track balance, XP, and research progression over time</li>
+                        <li>💰 <strong>Cash Flow Analysis:</strong> Detailed transaction history and patterns</li>
+                        <li>👥 <strong>Workforce Evolution:</strong> Employee hiring, firing, and productivity trends</li>
+                        <li>📊 <strong>Market Intelligence:</strong> Component price tracking for strategic purchasing</li>
+                        <li>🐦 <strong>Social Sentiment:</strong> Community engagement and feedback analysis</li>
+                        <li>⏰ <strong>Temporal Correlation:</strong> Cross-reference all metrics by time for insights</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Initialize Mermaid with proper configuration
+        mermaid.initialize({ 
+            startOnLoad: true, 
+            theme: 'default',
+            er: {
+                fontSize: 14,
+                useMaxWidth: false
+            },
+            flowchart: {
+                useMaxWidth: false
+            }
+        });
+        
+        let currentZoom = 1.0;
+        
+        function zoomDiagram(factor) {
+            if (factor === 1.0) {
+                currentZoom = 1.0;
+            } else {
+                currentZoom *= factor;
+            }
+            
+            // Constrain zoom levels
+            currentZoom = Math.max(0.3, Math.min(3.0, currentZoom));
+            
+            const wrapper = document.querySelector('.diagram-wrapper');
+            if (wrapper) {
+                wrapper.style.transform = `scale(${currentZoom})`;
+            }
+            
+            // Update zoom level display
+            const zoomDisplay = document.getElementById('zoom-level');
+            if (zoomDisplay) {
+                zoomDisplay.textContent = `Zoom: ${Math.round(currentZoom * 100)}%`;
+            }
+        }
+        
+        function showTab(tabName) {
+            // Hide all tab contents
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(content => content.classList.remove('active'));
+            
+            // Remove active class from all tabs
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+        }
+        
+        // Initialize zoom on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set initial zoom to make diagram more readable
+            setTimeout(() => {
+                zoomDiagram(1.5); // Start at 150% zoom for better readability
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

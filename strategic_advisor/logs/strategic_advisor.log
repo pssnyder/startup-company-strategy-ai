@@ -2,3 +2,19 @@
 2025-10-05 13:07:18,764 - strategic_advisor.temporal_database - INFO - Database initialized: test_temporal_game.db
 2025-10-05 13:07:18,792 - strategic_advisor.temporal_database - INFO - Save file ingested with temporal tracking: 20251005_1139_sg_momentum_ai.json (ID: 1)
 2025-10-05 13:07:19,003 - strategic_advisor.temporal_database - ERROR - Save file ingestion failed: UNIQUE constraint failed: save_files.filename
+2025-10-05 14:58:49,449 - strategic_advisor.temporal_database - INFO - Temporal database schema initialized
+2025-10-05 14:58:49,449 - strategic_advisor.temporal_database - INFO - Database initialized: momentum_ai_historical.db
+2025-10-05 14:58:49,493 - strategic_advisor.temporal_database - INFO - Save file ingested with temporal tracking: sg_momentum ai_autosave.json (ID: 1)
+2025-10-05 14:58:49,697 - strategic_advisor.temporal_database - INFO - Save file ingested with temporal tracking: sg_momentum ai.json (ID: 2)
+2025-10-05 14:58:49,904 - strategic_advisor.temporal_database - INFO - Save file ingested with temporal tracking: 20251005_1139_sg_momentum_ai.json (ID: 3)
+2025-10-05 14:59:23,428 - strategic_advisor.temporal_database - INFO - Temporal database schema initialized
+2025-10-05 14:59:23,428 - strategic_advisor.temporal_database - INFO - Database initialized: momentum_ai_historical.db
+2025-10-05 14:59:23,443 - strategic_advisor.temporal_database - INFO - Save file ingested with temporal tracking: 20250929_1919_sg_momentum ai.json (ID: 4)
+2025-10-05 14:59:23,595 - strategic_advisor.temporal_database - INFO - Save file ingested with temporal tracking: 20250929_1933_sg_momentum ai.json (ID: 5)
+2025-10-05 14:59:23,796 - strategic_advisor.temporal_database - INFO - Save file ingested with temporal tracking: 20250929_2150_sg_momentum ai.json (ID: 6)
+2025-10-05 14:59:24,043 - strategic_advisor.temporal_database - INFO - Save file ingested with temporal tracking: 20251005_1013_sg_momentum ai.json (ID: 7)
+2025-10-05 15:00:32,521 - strategic_advisor.temporal_database - INFO - Temporal database schema initialized
+2025-10-05 15:00:32,522 - strategic_advisor.temporal_database - INFO - Database initialized: momentum_ai_historical.db
+2025-10-05 15:00:32,544 - strategic_advisor.temporal_database - ERROR - Read query failed: no such column: description
+2025-10-05 15:01:27,187 - strategic_advisor.temporal_database - INFO - Temporal database schema initialized
+2025-10-05 15:01:27,187 - strategic_advisor.temporal_database - INFO - Database initialized: momentum_ai_historical.db

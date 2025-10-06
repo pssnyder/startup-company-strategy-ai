@@ -1,0 +1,344 @@
+🗄️ MOMENTUM AI TEMPORAL DATABASE - ENTITY RELATIONSHIP DIAGRAM
+================================================================================
+
+📊 TABLES OVERVIEW
+--------------------------------------------------
+📋 SAVE_FILES
+   📊 Rows: 7
+   🔗 Columns: 34
+   🔑 Foreign Keys: 0
+   📇 Indexes: 5
+
+📋 SQLITE_SEQUENCE
+   📊 Rows: 4
+   🔗 Columns: 2
+   🔑 Foreign Keys: 0
+   📇 Indexes: 0
+
+📋 EMPLOYEE_REFERENCES
+   📊 Rows: 0
+   🔗 Columns: 7
+   🔑 Foreign Keys: 1
+   📇 Indexes: 1
+
+📋 EMPLOYEES
+   📊 Rows: 0
+   🔗 Columns: 50
+   🔑 Foreign Keys: 1
+   📇 Indexes: 5
+
+📋 TRANSACTIONS
+   📊 Rows: 606
+   🔗 Columns: 12
+   🔑 Foreign Keys: 1
+   📇 Indexes: 5
+
+📋 JEETS
+   📊 Rows: 32
+   🔗 Columns: 13
+   🔑 Foreign Keys: 1
+   📇 Indexes: 4
+
+📋 MARKET_VALUES
+   📊 Rows: 420
+   🔗 Columns: 8
+   🔑 Foreign Keys: 1
+   📇 Indexes: 2
+
+🏗️ DETAILED SCHEMA
+--------------------------------------------------
+
+📋 TABLE: SAVE_FILES
+├─ Row Count: 7
+├─ Columns:
+│  ├─ id: INTEGER (🔑 PK)
+│  ├─ filename: TEXT (❗ NOT NULL)
+│  ├─ game_date: TEXT
+│  ├─ game_started: TEXT
+│  ├─ game_day: INTEGER
+│  ├─ last_saved: TEXT
+│  ├─ real_timestamp: DATETIME (📝 DEFAULT: CURRENT_TIMESTAMP)
+│  ├─ file_modified_time: DATETIME
+│  ├─ ingestion_order: INTEGER
+│  ├─ game_id: TEXT
+│  ├─ company_name: TEXT
+│  ├─ save_game_name: TEXT
+│  ├─ file_name: TEXT
+│  ├─ last_version: TEXT
+│  ├─ gameover: BOOLEAN
+│  ├─ state: INTEGER
+│  ├─ paused: BOOLEAN
+│  ├─ user_loss_enabled: BOOLEAN
+│  ├─ beta_version_at_start: INTEGER
+│  ├─ balance: REAL
+│  ├─ last_price_per_hour: INTEGER
+│  ├─ xp: REAL
+│  ├─ research_points: INTEGER
+│  ├─ amount_of_available_research_items: INTEGER
+│  ├─ selected_floor: INTEGER
+│  ├─ selected_building_name: TEXT
+│  ├─ max_contract_hours: INTEGER
+│  ├─ contracts_completed: INTEGER
+│  ├─ needs_new_loan: BOOLEAN
+│  ├─ auto_start_time_machine: BOOLEAN
+│  ├─ file_size: INTEGER
+│  ├─ raw_json: TEXT
+│  ├─ created_at: DATETIME (📝 DEFAULT: CURRENT_TIMESTAMP)
+│  └─ updated_at: DATETIME (📝 DEFAULT: CURRENT_TIMESTAMP)
+└─ Indexes:
+   ├─ idx_save_files_ingestion_order: ingestion_order
+   ├─ idx_save_files_real_timestamp: real_timestamp
+   ├─ idx_save_files_game_day: game_day
+   ├─ idx_save_files_game_date: game_date
+   └─ sqlite_autoindex_save_files_1: filename (UNIQUE)
+
+📋 TABLE: SQLITE_SEQUENCE
+├─ Row Count: 4
+├─ Columns:
+│  ├─ name: 
+│  └─ seq: 
+
+📋 TABLE: EMPLOYEE_REFERENCES
+├─ Row Count: 0
+├─ Columns:
+│  ├─ id: INTEGER (🔑 PK)
+│  ├─ save_file_id: INTEGER
+│  ├─ employee_id: TEXT
+│  ├─ employee_order: INTEGER
+│  ├─ captured_at: DATETIME
+│  ├─ game_date: TEXT
+│  └─ game_day: INTEGER
+├─ Foreign Keys:
+│  └─ save_file_id → save_files.id
+└─ Indexes:
+   └─ sqlite_autoindex_employee_references_1: save_file_id, employee_id (UNIQUE)
+
+📋 TABLE: EMPLOYEES
+├─ Row Count: 0
+├─ Columns:
+│  ├─ id: INTEGER (🔑 PK)
+│  ├─ save_file_id: INTEGER
+│  ├─ employee_id: TEXT
+│  ├─ name: TEXT
+│  ├─ original_name: TEXT
+│  ├─ employee_type_name: TEXT
+│  ├─ salary: INTEGER
+│  ├─ competitor_product_id: TEXT
+│  ├─ avatar: TEXT
+│  ├─ progress: INTEGER
+│  ├─ level: TEXT
+│  ├─ speed: REAL
+│  ├─ age: INTEGER
+│  ├─ max_speed: INTEGER
+│  ├─ animation_speed: REAL
+│  ├─ required_worker: INTEGER
+│  ├─ mood: REAL
+│  ├─ overtime_minutes: INTEGER
+│  ├─ components: TEXT
+│  ├─ gender: TEXT
+│  ├─ hours_left: INTEGER
+│  ├─ call_in_sick_days_left: INTEGER
+│  ├─ sick_hours_left: INTEGER
+│  ├─ idle_minutes: INTEGER
+│  ├─ minutes_till_next_emotion: INTEGER
+│  ├─ creation_time: INTEGER
+│  ├─ schedule: TEXT
+│  ├─ superstar: BOOLEAN
+│  ├─ leads: TEXT
+│  ├─ lead_filters: TEXT
+│  ├─ task: TEXT
+│  ├─ demands: TEXT
+│  ├─ research_demands: BOOLEAN
+│  ├─ research_salary: BOOLEAN
+│  ├─ negotiation: TEXT
+│  ├─ hired: DATETIME
+│  ├─ active_queue_index: INTEGER
+│  ├─ last_tab: TEXT
+│  ├─ last_emotion_name: TEXT
+│  ├─ last_bonus_day: INTEGER
+│  ├─ is_training: BOOLEAN
+│  ├─ last_day: INTEGER
+│  ├─ last_send_home_length: INTEGER
+│  ├─ send_home_days_left: INTEGER
+│  ├─ last_competitor_job_offer: INTEGER
+│  ├─ employee_status: TEXT
+│  ├─ source_array: TEXT
+│  ├─ captured_at: DATETIME
+│  ├─ game_date: TEXT
+│  └─ game_day: INTEGER
+├─ Foreign Keys:
+│  └─ save_file_id → save_files.id
+└─ Indexes:
+   ├─ idx_employees_natural_key: employee_id, employee_status
+   ├─ idx_employees_save_file: save_file_id
+   ├─ idx_employees_game_day: game_day
+   ├─ idx_employees_captured_at: captured_at
+   └─ sqlite_autoindex_employees_1: save_file_id, employee_id, employee_status (UNIQUE)
+
+📋 TABLE: TRANSACTIONS
+├─ Row Count: 606
+├─ Columns:
+│  ├─ id: INTEGER (🔑 PK)
+│  ├─ save_file_id: INTEGER
+│  ├─ transaction_id: TEXT
+│  ├─ day: INTEGER
+│  ├─ hour: INTEGER
+│  ├─ minute: INTEGER
+│  ├─ amount: REAL
+│  ├─ label: TEXT
+│  ├─ balance: REAL
+│  ├─ captured_at: DATETIME
+│  ├─ game_date: TEXT
+│  └─ transaction_game_time: TEXT
+├─ Foreign Keys:
+│  └─ save_file_id → save_files.id
+└─ Indexes:
+   ├─ idx_transactions_natural_key: transaction_id
+   ├─ idx_transactions_save_file: save_file_id
+   ├─ idx_transactions_game_day: day
+   ├─ idx_transactions_captured_at: captured_at
+   └─ sqlite_autoindex_transactions_1: save_file_id, transaction_id (UNIQUE)
+
+📋 TABLE: JEETS
+├─ Row Count: 32
+├─ Columns:
+│  ├─ id: INTEGER (🔑 PK)
+│  ├─ save_file_id: INTEGER
+│  ├─ jeet_id: TEXT
+│  ├─ gender: TEXT
+│  ├─ jeet_name: TEXT
+│  ├─ handle: TEXT
+│  ├─ avatar: TEXT
+│  ├─ text: TEXT
+│  ├─ day: INTEGER
+│  ├─ read: BOOLEAN
+│  ├─ captured_at: DATETIME
+│  ├─ game_date: TEXT
+│  └─ first_seen_game_day: INTEGER
+├─ Foreign Keys:
+│  └─ save_file_id → save_files.id
+└─ Indexes:
+   ├─ idx_jeets_natural_key: jeet_id, day
+   ├─ idx_jeets_game_day: day
+   ├─ idx_jeets_captured_at: captured_at
+   └─ sqlite_autoindex_jeets_1: jeet_id, day (UNIQUE)
+
+📋 TABLE: MARKET_VALUES
+├─ Row Count: 420
+├─ Columns:
+│  ├─ id: INTEGER (🔑 PK)
+│  ├─ save_file_id: INTEGER
+│  ├─ component_name: TEXT
+│  ├─ base_price: INTEGER
+│  ├─ price_change: REAL
+│  ├─ captured_at: DATETIME
+│  ├─ game_date: TEXT
+│  └─ game_day: INTEGER
+├─ Foreign Keys:
+│  └─ save_file_id → save_files.id
+└─ Indexes:
+   ├─ idx_market_values_captured_at: captured_at
+   └─ sqlite_autoindex_market_values_1: save_file_id, component_name (UNIQUE)
+
+🔗 RELATIONSHIPS
+--------------------------------------------------
+🔑 Foreign Key Relationships:
+   employee_references.save_file_id ──→ save_files.id
+   employees.save_file_id ──→ save_files.id
+   transactions.save_file_id ──→ save_files.id
+   jeets.save_file_id ──→ save_files.id
+   market_values.save_file_id ──→ save_files.id
+
+🔍 Implied Relationships (Common Patterns):
+   employee_references.save_file_id ⟷ employees.save_file_id (via save_file_id)
+   employee_references.save_file_id ⟷ transactions.save_file_id (via save_file_id)
+   employee_references.save_file_id ⟷ jeets.save_file_id (via save_file_id)
+   employee_references.save_file_id ⟷ market_values.save_file_id (via save_file_id)
+   employees.save_file_id ⟷ transactions.save_file_id (via save_file_id)
+   employees.save_file_id ⟷ jeets.save_file_id (via save_file_id)
+   employees.save_file_id ⟷ market_values.save_file_id (via save_file_id)
+   transactions.save_file_id ⟷ jeets.save_file_id (via save_file_id)
+   transactions.save_file_id ⟷ market_values.save_file_id (via save_file_id)
+   jeets.save_file_id ⟷ market_values.save_file_id (via save_file_id)
+   save_files.game_day ⟷ employee_references.game_day (via game_day)
+   save_files.game_day ⟷ employees.game_day (via game_day)
+   save_files.game_day ⟷ jeets.first_seen_game_day (via game_day)
+   save_files.game_day ⟷ market_values.game_day (via game_day)
+   employee_references.game_day ⟷ employees.game_day (via game_day)
+   employee_references.game_day ⟷ jeets.first_seen_game_day (via game_day)
+   employee_references.game_day ⟷ market_values.game_day (via game_day)
+   employees.game_day ⟷ jeets.first_seen_game_day (via game_day)
+   employees.game_day ⟷ market_values.game_day (via game_day)
+   jeets.first_seen_game_day ⟷ market_values.game_day (via game_day)
+   save_files.game_day ⟷ employee_references.game_day (via day)
+   save_files.game_day ⟷ employees.call_in_sick_days_left (via day)
+   save_files.game_day ⟷ employees.last_bonus_day (via day)
+   save_files.game_day ⟷ employees.last_day (via day)
+   save_files.game_day ⟷ employees.send_home_days_left (via day)
+   save_files.game_day ⟷ employees.game_day (via day)
+   save_files.game_day ⟷ transactions.day (via day)
+   save_files.game_day ⟷ jeets.day (via day)
+   save_files.game_day ⟷ jeets.first_seen_game_day (via day)
+   save_files.game_day ⟷ market_values.game_day (via day)
+   employee_references.game_day ⟷ employees.call_in_sick_days_left (via day)
+   employee_references.game_day ⟷ employees.last_bonus_day (via day)
+   employee_references.game_day ⟷ employees.last_day (via day)
+   employee_references.game_day ⟷ employees.send_home_days_left (via day)
+   employee_references.game_day ⟷ employees.game_day (via day)
+   employee_references.game_day ⟷ transactions.day (via day)
+   employee_references.game_day ⟷ jeets.day (via day)
+   employee_references.game_day ⟷ jeets.first_seen_game_day (via day)
+   employee_references.game_day ⟷ market_values.game_day (via day)
+   employees.call_in_sick_days_left ⟷ employees.last_bonus_day (via day)
+   employees.call_in_sick_days_left ⟷ employees.last_day (via day)
+   employees.call_in_sick_days_left ⟷ employees.send_home_days_left (via day)
+   employees.call_in_sick_days_left ⟷ employees.game_day (via day)
+   employees.call_in_sick_days_left ⟷ transactions.day (via day)
+   employees.call_in_sick_days_left ⟷ jeets.day (via day)
+   employees.call_in_sick_days_left ⟷ jeets.first_seen_game_day (via day)
+   employees.call_in_sick_days_left ⟷ market_values.game_day (via day)
+   employees.last_bonus_day ⟷ employees.last_day (via day)
+   employees.last_bonus_day ⟷ employees.send_home_days_left (via day)
+   employees.last_bonus_day ⟷ employees.game_day (via day)
+   employees.last_bonus_day ⟷ transactions.day (via day)
+   employees.last_bonus_day ⟷ jeets.day (via day)
+   employees.last_bonus_day ⟷ jeets.first_seen_game_day (via day)
+   employees.last_bonus_day ⟷ market_values.game_day (via day)
+   employees.last_day ⟷ employees.send_home_days_left (via day)
+   employees.last_day ⟷ employees.game_day (via day)
+   employees.last_day ⟷ transactions.day (via day)
+   employees.last_day ⟷ jeets.day (via day)
+   employees.last_day ⟷ jeets.first_seen_game_day (via day)
+   employees.last_day ⟷ market_values.game_day (via day)
+   employees.send_home_days_left ⟷ employees.game_day (via day)
+   employees.send_home_days_left ⟷ transactions.day (via day)
+   employees.send_home_days_left ⟷ jeets.day (via day)
+   employees.send_home_days_left ⟷ jeets.first_seen_game_day (via day)
+   employees.send_home_days_left ⟷ market_values.game_day (via day)
+   employees.game_day ⟷ transactions.day (via day)
+   employees.game_day ⟷ jeets.day (via day)
+   employees.game_day ⟷ jeets.first_seen_game_day (via day)
+   employees.game_day ⟷ market_values.game_day (via day)
+   transactions.day ⟷ jeets.day (via day)
+   transactions.day ⟷ jeets.first_seen_game_day (via day)
+   transactions.day ⟷ market_values.game_day (via day)
+   jeets.day ⟷ jeets.first_seen_game_day (via day)
+   jeets.day ⟷ market_values.game_day (via day)
+   jeets.first_seen_game_day ⟷ market_values.game_day (via day)
+
+⏰ Temporal Relationships:
+   save_files ⟷ employee_references (time-based)
+   save_files ⟷ employees (time-based)
+   save_files ⟷ transactions (time-based)
+   save_files ⟷ jeets (time-based)
+   save_files ⟷ market_values (time-based)
+   employee_references ⟷ employees (time-based)
+   employee_references ⟷ transactions (time-based)
+   employee_references ⟷ jeets (time-based)
+   employee_references ⟷ market_values (time-based)
+   employees ⟷ transactions (time-based)
+   employees ⟷ jeets (time-based)
+   employees ⟷ market_values (time-based)
+   transactions ⟷ jeets (time-based)
+   transactions ⟷ market_values (time-based)
+   jeets ⟷ market_values (time-based)
