@@ -12,9 +12,16 @@ import streamlit as st
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
-# Game save file path
-GAME_SAVE_PATH = Path(r"C:\Users\patss\Saved Games\Startup Company\testing_v1\sg_momentum ai.json")
-LOCAL_SAVE_PATH = Path("save_data/sg_momentum ai.json")
+# Game save file path - Use environment variable for flexibility in deployment
+import os
+GAME_SAVE_PATH = Path(os.environ.get(
+    'STARTUP_COMPANY_SAVE_PATH', 
+    r"C:\Users\patss\Saved Games\Startup Company\testing_v1\sg_momentum ai.json"
+))
+
+# Local save path - resolve relative to this file's directory
+_SCRIPT_DIR = Path(__file__).parent
+LOCAL_SAVE_PATH = _SCRIPT_DIR.parent / "save_data" / "sg_momentum ai.json"
 
 class GameSaveHandler(FileSystemEventHandler):
     """Handler for game save file changes"""
@@ -188,38 +195,159 @@ def ensure_backup_file_exists():
             except Exception as e:
                 print(f"Could not sync from live game file: {e}")
         
-        # Create a minimal placeholder file for cloud deployment
-        placeholder_data = {
-            "balance": 0,
-            "researchPoints": 0,
-            "date": "2000-01-01",
-            "inventory": {},
-            "featureInstances": [],
-            "progress": {
-                "products": {}
+        # Create a realistic demo data file for cloud deployment
+        demo_data = {
+            "date": "2025-12-18T16:17:00.681Z",
+            "started": "2025-09-29T12:00:00.681Z",
+            "gameover": False,
+            "state": 1,
+            "paused": False,
+            "lastVersion": "1.24",
+            "balance": 227591.39,
+            "researchPoints": 15432,
+            "transactions": [
+                {
+                    "id": "demo-transaction-1",
+                    "day": 69,
+                    "hour": 0,
+                    "minute": 0,
+                    "amount": -434,
+                    "label": "Loan: Eazy Money",
+                    "balance": 79198.39
+                },
+                {
+                    "id": "demo-transaction-2", 
+                    "day": 69,
+                    "hour": 0,
+                    "minute": 0,
+                    "amount": 5000,
+                    "label": "Software Sales Revenue",
+                    "balance": 84198.39
+                }
+            ],
+            "inventory": {
+                "UiComponent": 15,
+                "BackendComponent": 8,
+                "DatabaseComponent": 12,
+                "GraphicsComponent": 5,
+                "NetworkComponent": 10
             },
-            "employees": [],
+            "featureInstances": [
+                {
+                    "id": "demo-feature-1",
+                    "featureName": "User Interface System",
+                    "activated": True,
+                    "requirements": {
+                        "UiComponent": 5,
+                        "GraphicsComponent": 3
+                    },
+                    "quality": {
+                        "current": 1200,
+                        "max": 2000
+                    },
+                    "efficiency": {
+                        "current": 800,
+                        "max": 1500
+                    },
+                    "pricePerMonth": 50
+                }
+            ],
+            "progress": {
+                "products": {
+                    "main_product": {
+                        "users": {
+                            "total": 15420,
+                            "satisfaction": 75,
+                            "conversionRate": 12.5,
+                            "potentialUsers": 50000
+                        },
+                        "stats": {
+                            "quality": 1200,
+                            "efficiency": 800,
+                            "valuation": 450000,
+                            "performance": {
+                                "state": "Good"
+                            }
+                        }
+                    }
+                }
+            },
+            "office": {
+                "workstations": [
+                    {
+                        "employee": {
+                            "name": "Alice Johnson",
+                            "employeeTypeName": "Developer",
+                            "level": "Intermediate",
+                            "speed": 120,
+                            "mood": 85,
+                            "queue": [
+                                {
+                                    "component": {
+                                        "name": "PaymentModule",
+                                        "type": "Module"
+                                    },
+                                    "state": "Running",
+                                    "totalMinutes": 480,
+                                    "completedMinutes": 240
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "employee": {
+                            "name": "Bob Smith", 
+                            "employeeTypeName": "Designer",
+                            "level": "Expert",
+                            "speed": 150,
+                            "mood": 90,
+                            "queue": []
+                        }
+                    }
+                ]
+            },
+            "employees": [
+                {
+                    "name": "Alice Johnson",
+                    "employeeTypeName": "Developer", 
+                    "level": "Intermediate",
+                    "speed": 120,
+                    "mood": 85
+                },
+                {
+                    "name": "Bob Smith",
+                    "employeeTypeName": "Designer",
+                    "level": "Expert", 
+                    "speed": 150,
+                    "mood": 90
+                }
+            ],
             "meta": {
                 "created_by": "Project Phoenix Dashboard",
-                "note": "Placeholder data - please upload actual save file"
+                "note": "Demo data for portfolio showcase - live game integration available",
+                "data_type": "demo"
             }
         }
         
         try:
             with open(LOCAL_SAVE_PATH, 'w') as f:
-                json.dump(placeholder_data, f, indent=2)
+                json.dump(demo_data, f, indent=2)
             return True
         except Exception as e:
-            print(f"Could not create placeholder backup file: {e}")
+            print(f"Could not create demo backup file: {e}")
             return False
     
     return True
 
 def load_game_data():
-    """Load current game data directly from game save directory - no auto-refresh"""
+    """Load current game data with robust fallback system for cloud deployment"""
+    
+    # Ensure backup file exists for cloud deployment
+    ensure_backup_file_exists()
     
     data = None
     data_source = "unknown"
+    error_details = []
     
     # Priority 1: Read directly from game save file (if exists)
     if GAME_SAVE_PATH.exists():
@@ -229,29 +357,79 @@ def load_game_data():
             data_source = "live_game_file"
             
         except Exception as e:
-            st.warning(f"Failed to read from game save file: {e}")
+            error_details.append(f"Game save file error: {e}")
             data = None
+    else:
+        error_details.append(f"Game save file not found: {GAME_SAVE_PATH}")
     
-    # Priority 2: Fallback to local backup copy if game file not available
-    if data is None and LOCAL_SAVE_PATH.exists():
-        try:
-            with open(LOCAL_SAVE_PATH, 'r', encoding='utf-8') as f:
-                data = json.load(f)
-            data_source = "local_backup"
-            
-        except Exception as e:
-            st.warning(f"Failed to read from local backup: {e}")
+    # Priority 2: Fallback to local backup copy
+    if data is None:
+        # Check if backup file exists and log path for debugging
+        backup_exists = LOCAL_SAVE_PATH.exists()
+        error_details.append(f"Checking backup at: {LOCAL_SAVE_PATH.absolute()}")
+        error_details.append(f"Backup exists: {backup_exists}")
+        
+        if backup_exists:
+            try:
+                with open(LOCAL_SAVE_PATH, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                data_source = "local_backup"
+                
+            except Exception as e:
+                error_details.append(f"Backup file error: {e}")
+        else:
+            error_details.append(f"Backup file not found: {LOCAL_SAVE_PATH}")
+    
+    # Priority 3: Try alternative backup locations for cloud deployment
+    if data is None:
+        alternative_paths = [
+            Path("save_data/sg_momentum ai.json"),  # Original relative path
+            Path("live_analytics/save_data/sg_momentum ai.json"),  # From project root
+            Path("../save_data/sg_momentum ai.json"),  # Up one level
+        ]
+        
+        for alt_path in alternative_paths:
+            if alt_path.exists():
+                try:
+                    with open(alt_path, 'r', encoding='utf-8') as f:
+                        data = json.load(f)
+                    data_source = f"alternative_backup_{alt_path}"
+                    error_details.append(f"Found backup at: {alt_path.absolute()}")
+                    break
+                except Exception as e:
+                    error_details.append(f"Alternative backup error ({alt_path}): {e}")
+            else:
+                error_details.append(f"Alternative path not found: {alt_path.absolute()}")
     
     # Set data source info for status display
     if data and hasattr(st, 'session_state'):
         st.session_state.data_source = data_source
+        if error_details:
+            st.session_state.data_source_debug = error_details
     
-    # Handle no data available
+    # Handle no data available - show debugging info
     if data is None:
-        if GAME_SAVE_PATH.exists():
-            st.error(f"Game save file exists but could not be read: {GAME_SAVE_PATH}")
-        else:
-            st.error(f"Game save file not found: {GAME_SAVE_PATH}")
+        # Show debugging information in the UI
+        st.error("❌ No game data available from any source")
+        
+        with st.expander("🔧 Debug Information", expanded=True):
+            st.write("**Data Source Attempts:**")
+            for detail in error_details:
+                st.write(f"• {detail}")
+            
+            st.write("**Current Working Directory:**")
+            st.write(f"• {Path.cwd().absolute()}")
+            
+            st.write("**File Search Locations:**")
+            all_paths = [GAME_SAVE_PATH, LOCAL_SAVE_PATH] + [
+                Path("save_data/sg_momentum ai.json"),
+                Path("live_analytics/save_data/sg_momentum ai.json"),
+                Path("../save_data/sg_momentum ai.json"),
+            ]
+            for path in all_paths:
+                exists = path.exists()
+                st.write(f"• {path.absolute()} - {'✅ EXISTS' if exists else '❌ NOT FOUND'}")
+        
         return None
     
     return data

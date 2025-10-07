@@ -54,6 +54,25 @@ def load_live_data():
         return load_game_data()
     except Exception as e:
         st.error(f"Error loading game data: {e}")
+        # Show debugging information for deployment issues
+        with st.expander("🔧 Deployment Debug Info", expanded=True):
+            st.write("**Error Details:**")
+            st.write(f"• {str(e)}")
+            st.write("**Environment:**")
+            st.write(f"• Current working directory: {Path.cwd()}")
+            st.write(f"• Script directory: {Path(__file__).parent}")
+            
+            # Check for backup file manually
+            backup_paths = [
+                Path("save_data/sg_momentum ai.json"),
+                Path("live_analytics/save_data/sg_momentum ai.json"),
+                Path(__file__).parent / "save_data" / "sg_momentum ai.json"
+            ]
+            st.write("**Backup File Search:**")
+            for path in backup_paths:
+                exists = path.exists()
+                st.write(f"• {path.absolute()} - {'✅ FOUND' if exists else '❌ NOT FOUND'}")
+        
         return None
 
 @st.cache_data(ttl=30)  # Cache for 30 seconds to allow for real-time updates
